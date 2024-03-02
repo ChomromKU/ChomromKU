@@ -5,7 +5,8 @@ import {
 } from 'react-router-dom'
 import Navbar from './page/components/Navbar';
 import Main from './page/main'
-import Clubs from './page/club'
+import Clubs from './page/club/clubs'
+import ClubProfile from './page/club/clubProfile';
 
 export default function App() {
   return (
@@ -13,7 +14,8 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route path='/' element={<Main />} />
-        <Route path='/clubs' element={<Clubs searchParams={{ q: "" }} />} />
+        <Route path='/clubs' element={<Clubs />} />
+        <Route path='/clubs/:id' element={<ClubProfile />} />
       </Routes>
     </Router>
   );

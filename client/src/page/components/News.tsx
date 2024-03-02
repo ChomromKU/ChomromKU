@@ -18,8 +18,6 @@ import commentIcon from '../../images/chat.svg'
 import sendIcon from '../../images/send.svg'
 // import Modal from "@/components/CustomModal";
 // import { useRouter } from "next/navigation";
-import { FaRegComment } from "react-icons/fa6";
-import { FiSend } from "react-icons/fi";
 interface NewsProps {
 	post: {id: number, club: string, owner: string, likes: number, content: string, type: string };
 	role?: String;
