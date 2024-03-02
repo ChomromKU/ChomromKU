@@ -7,6 +7,7 @@ import Navbar from './page/components/Navbar';
 import Main from './page/main'
 import Clubs from './page/club/clubs'
 import ClubProfile from './page/club/clubProfile';
+import Login from './page/login/loginPage';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
         <Route path='/' element={<Main />} />
         <Route path='/clubs' element={<Clubs />} />
         <Route path='/clubs/:id' element={<ClubProfile />} />
+        <Route path='/login' element={<Login />} />
       </Routes>
     </Router>
   );
