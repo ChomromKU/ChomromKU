@@ -70,7 +70,9 @@ model Post {
   imageUrl  String   @db.Text
   approved  Boolean  @default(false)
   createdAt DateTime @default(now()) @map(name: "created_at")
-  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  updatedAt DateTime @updatedAt @default(now()) @map(name: "updated_at")
+
+  // updatedAt DateTime @updatedAt @map(name: "updated_at")
 
   likes    Like[]
   comments Comment[]
@@ -105,7 +107,8 @@ model Event {
   status    EventStatus @default(OPEN)
   approved  Boolean     @default(false)
   createdAt DateTime    @default(now()) @map(name: "created_at")
-  updatedAt DateTime    @updatedAt @map(name: "updated_at")
+  updatedAt DateTime @updatedAt @default(now()) @map(name: "updated_at")
+  // updatedAt DateTime    @updatedAt @map(name: "updated_at")
 
   followers User[]
   likes     Like[]

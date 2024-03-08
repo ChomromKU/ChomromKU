@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
 // import EventBox from "@/components/EventBox";
+import EventBox from '../components/EventBox';
 // import ClubPosts from "./_components/ClubPosts";
 
 import { getCategoryInThai } from "../../lib/event";
@@ -15,6 +16,7 @@ import facebookIcon from '../../images/facebook.svg'
 import instagramIcon from '../../images/instagram.svg'
 
 
+
 type Club = {
 	id: number;
 	label: string;
@@ -22,6 +24,14 @@ type Club = {
     category: string;
     location: string;
     phoneNumber: string;
+};
+
+type Event = {
+	id: number;
+	title: string;
+	startDate: string;
+	endDate: string;
+	location: string;
 };
 
 export default function ClubProfile() {
@@ -33,12 +43,27 @@ export default function ClubProfile() {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
-                console.log(data);
+                // console.log(data);
 			} catch (error) {
 				console.error('Error fetching clubs:', error);
 			}
 		};
 		fetchClubs();
+	}, []);
+	
+	const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+
+	useEffect(() => {
+		const fetchEvents = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/events`);
+				setUpcomingEvents(data);
+				console.log(data);
+			} catch (error) {
+				console.error('Error fetching events:', error);
+			}
+		};
+		fetchEvents();
 	}, []);
     
 	return (
@@ -98,19 +123,19 @@ export default function ClubProfile() {
 
 			{/* ------------------------------ upcoming event ------------------------------*/}
 
-			{/* <div>
+			<div>
 				<div className="flex justify-between px-[24px] pt-[24px]">
 					<h1 className="font-bold text-[#006664]">Upcoming Event</h1>
 					<Link
-						href={`/clubs/${club.id}/events`}
+						to={`/clubs/${club?.id}/events`}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
 					>
 						ดูตารางกิจกรรมทั้งหมด
 					</Link>
 				</div>
 				<div className="flex gap-[10px] pl-[24px] pb-[24px] pt-[15px] pr-[24px] overflow-auto scrollbar-hide">
-					{upcomingEvents.map((event) => (
-						<Link href={`/events/${event.id}`} key={event.id}>
+					{upcomingEvents.map(event => (
+						<Link to={`/events/${event?.id}`} key={event.id}>
 							<EventBox
 								eventName={event.title}
 								link={"/"}
@@ -125,7 +150,7 @@ export default function ClubProfile() {
 						</Link>
 					))}
 				</div>
-			</div> */}
+			</div>
 
 			{/* ------------------------------ club members ------------------------------*/}
 

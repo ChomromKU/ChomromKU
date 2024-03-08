@@ -43,6 +43,40 @@ app.get('/clubs/:id', async (req, res) => {
     }
 });
 
+app.get('/events', async (req, res) => {
+    try {
+        const events = await prisma.event.findMany();
+        res.json(events);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching events' });
+    }
+});
+
+
+app.get('/events/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const event = await prisma.event.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                club: true,
+            },
+        });
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+        res.json(event);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching event' });
+    }
+});
+
+
+
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
