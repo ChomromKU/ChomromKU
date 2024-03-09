@@ -73,6 +73,30 @@ app.get('/events/:id', async (req, res) => {
     }
 });
 
+app.get('/users', async (req, res) => {
+    try {
+        const users = await prisma.user.findMany();
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching users' });
+    }
+});
+
+
+app.get('/clubs/:id/members', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const members = await prisma.member.findMany({
+            where: { clubId: parseInt(id) },
+            include: { user: true },
+        });
+        res.json(members);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching club members' });
+    }
+});
 
 
 

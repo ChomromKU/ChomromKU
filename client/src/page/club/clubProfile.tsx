@@ -34,9 +34,20 @@ type Event = {
 	location: string;
 };
 
+type Member = {
+	id: number;
+	role: string;
+	user: {
+		firstNameTh: string;
+		firstNameEn: string;
+	};
+};
+
 export default function ClubProfile() {
     const { id } = useParams();
     const [club, setClub] = useState<Club>();
+	const [member, setMember] = useState<Member>();
+	const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
     useEffect(() => {
 		const fetchClubs = async () => {
@@ -49,22 +60,40 @@ export default function ClubProfile() {
 			}
 		};
 		fetchClubs();
-	}, []);
+	}, [id]);
 	
-	const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+	
 
 	useEffect(() => {
 		const fetchEvents = async () => {
 			try {
-				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/events`);
-				setUpcomingEvents(data);
-				console.log(data);
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
+				if (data.events) {
+					setUpcomingEvents(data.events);
+				} else {
+					console.error('Events data not found in response:', data);
+				}
 			} catch (error) {
 				console.error('Error fetching events:', error);
 			}
 		};
 		fetchEvents();
-	}, []);
+	}, [id]);
+	
+	
+
+	// useEffect(() => {
+	// 	const fetchMembers = async () => {
+	// 		try {
+	// 			const { data } = await axios.get(`http://localhost:3001/clubs/${id}/members`);
+	// 			setMembers(data);
+	// 		} catch (error) {
+	// 			console.error('Error fetching club members:', error);
+	// 		}
+	// 	};
+	// 	fetchMembers();
+	// }, [id]);
+
     
 	return (
         <div>
@@ -154,27 +183,27 @@ export default function ClubProfile() {
 
 			{/* ------------------------------ club members ------------------------------*/}
 
-			{/* <div className="bg-[#FFFFDD]">
+			<div className="bg-[#FFFFDD]">
 				<div className="flex justify-between px-[24px] pt-[24px]">
-					<h1 className="font-bold">จำนวนสมาชิก {club.members.length} คน</h1>
+					{/* <h1 className="font-bold">จำนวนสมาชิก {club.members.length} คน</h1>
 					<Link
-						href={`/clubs/${club.id}/members`}
+						to={`/clubs/${club.id}/members`}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
 					>
 						ดูสมาชิกทั้งหมด
-					</Link>
+					</Link> */}
 				</div>
 				<div className="flex gap-[15px] px-[24px] pb-[24px] pt-[15px] overflow-auto">
-					{club.members.map((member) => (
+					{/* {club.members.map((member) => (
 						<div className="w-min h-min flex flex-col whitespace-nowrap gap-[10px]" key={member.id}>
 							<div className="bg-[#006664] w-[32px] h-[32px] rounded-[20px] text-center flex items-center justify-center">
 								<p className="text-white">{member.user.firstNameEn[0]}</p>
 							</div>
 							<p>{member.user.firstNameTh}</p>
 						</div>
-					))}
+					))} */}
 				</div>
-			</div> */}
+			</div>
 
 			{/* ------------------------------ club news ------------------------------*/}
 
