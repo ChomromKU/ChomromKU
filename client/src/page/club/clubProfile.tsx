@@ -24,6 +24,7 @@ type Club = {
     category: string;
     location: string;
     phoneNumber: string;
+	members?: Member[];
 };
 
 type Event = {
@@ -46,7 +47,7 @@ type Member = {
 export default function ClubProfile() {
     const { id } = useParams();
     const [club, setClub] = useState<Club>();
-	const [member, setMember] = useState<Member>();
+	const [members, setMembers] = useState<Member[]>([]);
 	const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
 
     useEffect(() => {
@@ -82,17 +83,17 @@ export default function ClubProfile() {
 	
 	
 
-	// useEffect(() => {
-	// 	const fetchMembers = async () => {
-	// 		try {
-	// 			const { data } = await axios.get(`http://localhost:3001/clubs/${id}/members`);
-	// 			setMembers(data);
-	// 		} catch (error) {
-	// 			console.error('Error fetching club members:', error);
-	// 		}
-	// 	};
-	// 	fetchMembers();
-	// }, [id]);
+	useEffect(() => {
+		const fetchMembers = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/members`);
+				setMembers(data);
+			} catch (error) {
+				console.error('Error fetching club members:', error);
+			}
+		};
+		fetchMembers();
+	}, [id]);	
 
     
 	return (
@@ -185,40 +186,40 @@ export default function ClubProfile() {
 
 			<div className="bg-[#FFFFDD]">
 				<div className="flex justify-between px-[24px] pt-[24px]">
-					{/* <h1 className="font-bold">จำนวนสมาชิก {club.members.length} คน</h1>
+				<h1 className="font-bold">จำนวนสมาชิก {club?.members?.length ?? 0} คน</h1>
 					<Link
-						to={`/clubs/${club.id}/members`}
+						to={`/clubs/${club?.id}/members`}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
 					>
 						ดูสมาชิกทั้งหมด
-					</Link> */}
+					</Link>
 				</div>
 				<div className="flex gap-[15px] px-[24px] pb-[24px] pt-[15px] overflow-auto">
-					{/* {club.members.map((member) => (
+					{club?.members?.map((member) => (
 						<div className="w-min h-min flex flex-col whitespace-nowrap gap-[10px]" key={member.id}>
 							<div className="bg-[#006664] w-[32px] h-[32px] rounded-[20px] text-center flex items-center justify-center">
 								<p className="text-white">{member.user.firstNameEn[0]}</p>
 							</div>
 							<p>{member.user.firstNameTh}</p>
 						</div>
-					))} */}
+					))}
 				</div>
 			</div>
 
 			{/* ------------------------------ club news ------------------------------*/}
 
-			{/* <div className="p-[24px] flex flex-col gap-[20px]">
-				<div className="flex">
+			<div className="p-[24px] flex flex-col gap-[20px]">
+				{/* <div className="flex">
 					<p className="font-bold text-[24px] w-full ">โพสต์</p>
 					{session && member && (
 						<Link href={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
 							โพสต์ที่รออนุมัติ
 						</Link>
 					)}
-				</div>
+				</div> */}
 
-				<ClubPosts posts={club.posts} clubId={club.id} />
-			</div> */}
+				{/* <ClubPosts posts={club.posts} clubId={club.id} /> */}
+			</div>
 		</div>
 	);
 }
