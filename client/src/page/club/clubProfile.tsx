@@ -209,14 +209,14 @@ export default function ClubProfile() {
 			{/* ------------------------------ club news ------------------------------*/}
 
 			<div className="p-[24px] flex flex-col gap-[20px]">
-				{/* <div className="flex">
+				<div className="flex">
 					<p className="font-bold text-[24px] w-full ">โพสต์</p>
-					{session && member && (
+					{/* {session && member && (
 						<Link href={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
 							โพสต์ที่รออนุมัติ
 						</Link>
-					)}
-				</div> */}
+					)} */}
+				</div>
 
 				{/* <ClubPosts posts={club.posts} clubId={club.id} /> */}
 			</div>
