@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -7,7 +7,8 @@ const loginSchema = z.object({
   password: z.string().min(8).max(255),
 });
 
-export default function Login() {
+export default function LoginPage() {
+  const { login } = useAuth();
   const [formData, setFormData] = useState<LoginForm>({
     username: "",
     password: "",
@@ -20,7 +21,13 @@ export default function Login() {
     if (!validation.success) {
       setIsFormError(true);
     } else {
-      console.log("Sign-in successful");
+      const { username, password } = formData;
+      if(username === "username" && password === "password") {
+        login({ id: "test_id", name:"test user", email: "user@test.com"});
+        console.log("Sign-in successful");
+      } else {
+        setIsFormError(true);
+      }
     }
   };
 
