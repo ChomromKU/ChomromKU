@@ -1,0 +1,18 @@
+export interface User {
+  id: number;
+  stdId: string;
+  titleTh: string;
+  titleEn: string;
+  firstNameTh: string;
+  lastNameTh: string;
+  firstNameEn: string;
+  lastNameEn: string;
+  campusNameTh: string;
+  campusNameEn: string;
+}
+
+
+export interface Session {
+  user: User;
+
+}

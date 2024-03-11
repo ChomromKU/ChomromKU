@@ -23,8 +23,8 @@ export default function LoginPage() {
     } else {
       const { username, password } = formData;
       if(username === "username" && password === "password") {
-        login({ id: "test_id", name:"test user", email: "user@test.com"});
-        console.log("Sign-in successful");
+        login({ id: 1, stdId: "test_id", titleTh: "-", titleEn: "-", firstNameTh:"test_name", lastNameTh:"-", firstNameEn:"test name", lastNameEn:"-", campusNameTh:"-", campusNameEn:"-"});
+        console.log(formData);
       } else {
         setIsFormError(true);
       }
