@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 
-// Define the login schema using Zod
 const loginSchema = z.object({
   username: z.string(),
   password: z.string().min(8).max(255),
@@ -38,7 +37,7 @@ export default function Login() {
       <div>
         <a href={"/"}>
           <img
-              className="absolute top-0 right-0 mr-6 mt-6"
+              className="absolute top-0 right-0 mr-6 mt-[80px]"
               src={"/icons/close.svg"}
               alt={"close"}
               height={16}
