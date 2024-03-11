@@ -63,7 +63,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
       {events.length > 0 && (
         <>
           {status === 'กิจกรรมที่กำลังจัดตอนนี้' && presentEvents.length > 0 && (
-            <div className="flex flex-col gap-[20px] border-[2px] border-[#28C3D7] rounded-[20px]">
+            <div className="flex flex-col gap-[20px] rounded-[20px]">
               {presentEvents.map(event => (
                 <Link to={`/events/${event.id}`} key={event.id}>
                   <EventBox
@@ -72,6 +72,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
                     startDate={new Date(event.startDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     endDate={new Date(event.endDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     location={event.location}
+                    type='present'
                   />
                 </Link>
               ))}
@@ -79,7 +80,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
           )}
 
           {status === 'กิจกรรมที่กำลังจะเกิดขึ้น' && upcomingEvents.length > 0 && (
-            <div className="flex flex-col gap-[20px] border-[2px] border-[#28C3D7] rounded-[20px]">
+            <div className="flex flex-col gap-[20px]">
               {upcomingEvents.map(event => (
                 <Link to={`/events/${event.id}`} key={event.id}>
                   <EventBox
@@ -88,6 +89,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
                     startDate={new Date(event.startDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     endDate={new Date(event.endDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     location={event.location}
+                    type='upcoming'
                   />
                 </Link>
               ))}
@@ -95,7 +97,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
           )}
 
           {status === 'กิจกรรมที่ผ่านมา' && pastEvents.length > 0 && (
-            <div className="flex flex-col gap-[20px] border-[2px] border-[#28C3D7] rounded-[20px]">
+            <div className="flex flex-col gap-[20px] rounded-[20px]">
               {pastEvents.map(event => (
                 <Link to={`/events/${event.id}`} key={event.id}>
                   <EventBox
@@ -104,6 +106,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
                     startDate={new Date(event.startDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     endDate={new Date(event.endDate).toLocaleDateString('th-TH', { year: '2-digit', month: 'short', day: 'numeric' })}
                     location={event.location}
+                    type='past'
                   />
                 </Link>
               ))}
@@ -117,7 +120,7 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
 
 const Members: React.FC = () => {
     const { id } = useParams<{ id?: string }>(); // Make id optional in case it's undefined
-  
+
     if (!id) {
       // Handle the case when id is not present in the URL
       return <div>No club ID found</div>;

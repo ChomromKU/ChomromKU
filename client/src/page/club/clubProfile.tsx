@@ -80,8 +80,6 @@ export default function ClubProfile() {
 		};
 		fetchEvents();
 	}, [id]);
-	
-	
 
 	useEffect(() => {
 		const fetchMembers = async () => {
@@ -176,6 +174,7 @@ export default function ClubProfile() {
 									new Date(event.endDate),
 								)}
 								location={event.location}
+								type='upcoming'
 							/>
 						</Link>
 					))}
