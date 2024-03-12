@@ -7,8 +7,8 @@ import EventBox from '../components/EventBox';
 // import ClubPosts from "./_components/ClubPosts";
 
 import { getCategoryInThai } from "../../lib/event";
-// import FollowClubButton from "@/components/FollowClubButton";
-// import RegisterButton from "./_components/RegisterButton";
+import FollowClubButton from "../components/FollowClubButton";
+import RegisterButton from "../components/RegisterButton";
 
 import eventImage from '../../images/event.png'
 import lineIcon from '../../images/line.svg'
@@ -55,45 +55,47 @@ export default function ClubProfile() {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
-                // console.log(data);
+
+				const currentDate = new Date().getTime();
+				const presentEvents = data.events.filter((event: Event) => {
+					const startDate = new Date(event.startDate).getTime();
+					const endDate = new Date(event.endDate).getTime();
+					return startDate <= currentDate && currentDate <= endDate;
+				});
+				const upcomingEvents = data.events.filter((event: Event) => {
+					const startDate = new Date(event.startDate).getTime();
+					return startDate > currentDate;
+				});
+
+				const combinedEvents = [...presentEvents, ...upcomingEvents];
+
+				if (data.events) {
+					setUpcomingEvents(combinedEvents.sort((a, b) => {
+						const startDateA = new Date(a.startDate).getTime();
+						const startDateB = new Date(b.startDate).getTime();
+						return startDateA - startDateB;
+					}));
+				} else {
+					console.error('Events data not found in response:', data);
+				}
+
+				if (data.members) {
+					setMembers(data.members);
+				} else {
+					console.error('Members data not found in response:', data);
+				}
+
 			} catch (error) {
 				console.error('Error fetching clubs:', error);
 			}
 		};
 		fetchClubs();
 	}, [id]);
+
+	if (!club) {
+		return <div>No club ID found</div>;
+	}
 	
-	
-
-	useEffect(() => {
-		const fetchEvents = async () => {
-			try {
-				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
-				if (data.events) {
-					setUpcomingEvents(data.events);
-				} else {
-					console.error('Events data not found in response:', data);
-				}
-			} catch (error) {
-				console.error('Error fetching events:', error);
-			}
-		};
-		fetchEvents();
-	}, [id]);
-
-	useEffect(() => {
-		const fetchMembers = async () => {
-			try {
-				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/members`);
-				setMembers(data);
-			} catch (error) {
-				console.error('Error fetching club members:', error);
-			}
-		};
-		fetchMembers();
-	}, [id]);	
-
-    
 	return (
         <div>
 			{/* ------------------------------ images ------------------------------*/}
@@ -126,12 +128,17 @@ export default function ClubProfile() {
 				</div>
 				<div className="flex justify-between">
 					<div className="flex gap-[5px]">
-						{/* <FollowClubButton
-							role={member?.role}
+						<FollowClubButton
+							// role={member?.role}
+							role='NORMAL'
 							clubId={club.id}
-							isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
+							// isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
 						/>
-						<RegisterButton member={member} clubId={club.id} /> */}
+						<RegisterButton 
+							// member={member} 
+							member={null}
+							clubId={club.id}
+						/>
 					</div>
 					{/* {club.socialMedia && ( */}
 						<div className="flex gap-[10px]">
@@ -185,7 +192,7 @@ export default function ClubProfile() {
 
 			<div className="bg-[#FFFFDD]">
 				<div className="flex justify-between px-[24px] pt-[24px]">
-				<h1 className="font-bold">จำนวนสมาชิก {club?.members?.length ?? 0} คน</h1>
+				<h1 className="font-bold">จำนวนสมาชิก {members.length ?? 0} คน</h1>
 					<Link
 						to={`/clubs/${club?.id}/members`}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
@@ -194,7 +201,7 @@ export default function ClubProfile() {
 					</Link>
 				</div>
 				<div className="flex gap-[15px] px-[24px] pb-[24px] pt-[15px] overflow-auto">
-					{club?.members?.map((member) => (
+					{members.map((member) => (
 						<div className="w-min h-min flex flex-col whitespace-nowrap gap-[10px]" key={member.id}>
 							<div className="bg-[#006664] w-[32px] h-[32px] rounded-[20px] text-center flex items-center justify-center">
 								<p className="text-white">{member.user.firstNameEn[0]}</p>

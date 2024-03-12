@@ -98,6 +98,26 @@ app.get('/clubs/:id/members', async (req, res) => {
     }
 });
 
+
+// get /api/clubs/${clubId}/follow?status=${status}
+app.get('/clubs/:id/follow', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.query;
+    try {
+        const members = await prisma.member.findMany({
+            where: {
+                clubId: parseInt(id),
+                status: status,
+            },
+            include: { user: true },
+        });
+        res.json(members);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching club members' });
+    }
+});
+
 // get http://localhost:3001/events?clubId=${clubId}&status=${status}
 // app.get('/events', async (req, res) => {
 //     const { clubId, status } = req.query;

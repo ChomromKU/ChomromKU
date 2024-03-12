@@ -57,6 +57,24 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
         return endDate < currentDate;
     });
 
+    upcomingEvents.sort((a, b) => {
+      const startDateA = new Date(a.startDate).getTime();
+      const startDateB = new Date(b.startDate).getTime();
+      return startDateA - startDateB; // Ascending order
+  });
+  
+  presentEvents.sort((a, b) => {
+      const startDateA = new Date(a.startDate).getTime();
+      const startDateB = new Date(b.startDate).getTime();
+      return startDateA - startDateB; // Ascending order
+  });
+  
+  pastEvents.sort((a, b) => {
+      const endDateA = new Date(a.endDate).getTime();
+      const endDateB = new Date(b.endDate).getTime();
+      return endDateB - endDateA; // Descending order
+  });
+
   return (
     <div className="flex flex-col gap-[20px]">
       <p>{status}</p>
