@@ -114,7 +114,7 @@ export default function ClubProfile() {
 			{/* ------------------------------ club detail ------------------------------*/}
 
 			<div className="bg-[#006664] w-ful flex flex-col gap-[15px] p-[24px] text-white rounded-t-[20px] relative -mt-[20px]">
-				<h1 className="font-bold">{club?.label}</h1>
+				<h1 className="font-bold text-[24px]">{club?.label}</h1>
 				<div>
 					<p>
 						หมวดหมู่: {club?.category && <span>{getCategoryInThai(club.category)}</span>}
@@ -127,12 +127,13 @@ export default function ClubProfile() {
 					</p>
 				</div>
 				<div className="flex justify-between">
-					<div className="flex gap-[5px]">
+					<div className="flex gap-[10px]">
 						<FollowClubButton
 							// role={member?.role}
 							role='NORMAL'
 							clubId={club.id}
 							// isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
+							// isFollowing=
 						/>
 						<RegisterButton 
 							// member={member} 
@@ -143,13 +144,13 @@ export default function ClubProfile() {
 					{/* {club.socialMedia && ( */}
 						<div className="flex gap-[10px]">
 							<Link to='/' className="flex items-center">
-								<img alt="facebook" src={facebookIcon} width="16" height="16" />
+								<img alt="facebook" src={facebookIcon} width="20" height="20" />
 							</Link>
 							<Link to='/' className="flex items-center">
-								<img alt="instagram" src={instagramIcon} width="16" height="16" />
+								<img alt="instagram" src={instagramIcon} width="20" height="20" />
 							</Link>
 							<Link to='/' className="flex items-center">
-								<img alt="line" src={lineIcon} width="20" height="20" />
+								<img alt="line" src={lineIcon} width="24" height="24" />
 							</Link>
 						</div>
 					{/* )} */}
