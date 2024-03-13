@@ -1,15 +1,19 @@
+const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const cors = require('cors');
-const { PrismaClient } = require('@prisma/client');
-
+const crypto = require('crypto');
+const axios = require('axios');
 const app = express();
-
 const prisma = new PrismaClient();
+const publicCBP = 'https://myapi.ku.th/common/publicCBP'
+const appKey = process.env.KU_APP_KEY
+
 
 app.use(express.json());
 app.use(cors());
 
 const PORT = process.env.PORT || 3001;
+const loginLink = 'https://myapi.ku.th/auth/login'
 
 app.get('/clubs', async (req, res) => {
     try {
@@ -117,6 +121,63 @@ app.get('/clubs/:id/follow', async (req, res) => {
         res.status(500).json({ error: 'Error fetching club members' });
     }
 });
+
+app.post('/login', async (req, res) => {
+    try {
+      const encodedBody = {
+        username: encodeString(req.body.username),
+        password: encodeString(req.body.password)
+      }
+      
+      const response = await axios.post(loginLink, encodedBody, {
+        headers: {
+          'app-key': appKey
+        }
+      })
+      
+      res.json(response.data)
+      console.log("Login/ Done")
+  
+    } catch (e) {
+      console.log(e)
+      try{
+        res.status(e.response.status).json(e)
+        console.log("Login/ Fail, success ku api")
+      } catch {
+        res.status(400).json({"code" :"Fail to login"})
+        console.log("Login/ Fail, unsuccess ku api")
+      }
+    }
+  })
+    
+
+app.post('/encode', async (req, res) => {
+try {
+    const encodedBody = {
+    username: encodeString(req.body.username),
+    password: encodeString(req.body.password)
+    }
+    return res.json(encodedBody)
+} catch (e) {
+    console.log("fail to encode")
+    return res.status(400).json({})
+}
+})
+
+
+const KU_PUBLIC_KEY = process.env.KU_PUBLIC_KEY?.replace(/\\n/gm, "\n");
+  
+const encodeString = (data) => {
+return crypto
+    .publicEncrypt(
+        {
+            key: KU_PUBLIC_KEY,
+            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        },
+        Buffer.from(data, "utf8")
+    )
+    .toString("base64");
+};     
 
 // get http://localhost:3001/events?clubId=${clubId}&status=${status}
 // app.get('/events', async (req, res) => {
