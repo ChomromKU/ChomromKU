@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+// import { useAuth } from "../../hooks/useAuth";
 import { z } from "zod";
 import close from "../../images/close.svg";
 import logo from "../../images/logo.svg"
+import axios from "axios";
 
 const loginSchema = z.object({
   username: z.string(),
@@ -10,23 +11,27 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  // const { login } = useAuth();
   const [formData, setFormData] = useState<LoginForm>({
     username: "",
     password: "",
   });
   const [isFormError, setIsFormError] = useState<boolean>(false);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const validation = loginSchema.safeParse(formData);
 
     if (!validation.success) {
       setIsFormError(true);
     } else {
       const { username, password } = formData;
-      if(username === "username" && password === "password") {
-        login({ id: 1, stdId: "test_id", stdCode: "test_code", titleTh: "-", titleEn: "-", firstNameTh:"test_name", lastNameTh:"-", firstNameEn:"test name", lastNameEn:"-", campusNameTh:"-", campusNameEn:"-"});
-        console.log(formData);
+      if(username === formData.username && password === formData.password) {
+        try {
+          const response = await axios.post(`http://localhost:3001/login`, formData);
+        } catch (error) {
+          console.error('Error logging in:', error);
+          setIsFormError(true);
+        }
       } else {
         setIsFormError(true);
       }

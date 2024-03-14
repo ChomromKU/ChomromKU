@@ -1,19 +1,28 @@
+// require
 const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const axios = require('axios');
-const app = express();
-const prisma = new PrismaClient();
-const publicCBP = 'https://myapi.ku.th/common/publicCBP'
+
+// process
+const PORT = process.env.PORT || 3001;
 const appKey = process.env.KU_APP_KEY
+const KU_PUBLIC_KEY = process.env.KU_PUBLIC_KEY?.replace(/\\n/gm, "\n");
 
+// link
+const loginLink = 'https://myapi.ku.th/auth/login'
+const publicCBP = 'https://myapi.ku.th/common/publicCBP'
 
+const prisma = new PrismaClient();
+
+const app = express();
 app.use(express.json());
 app.use(cors());
 
-const PORT = process.env.PORT || 3001;
-const loginLink = 'https://myapi.ku.th/auth/login'
+
+
+// Clubs
 
 app.get('/clubs', async (req, res) => {
     try {
@@ -47,6 +56,10 @@ app.get('/clubs/:id', async (req, res) => {
     }
 });
 
+
+
+// Events
+
 app.get('/events', async (req, res) => {
     try {
         const events = await prisma.event.findMany();
@@ -77,6 +90,10 @@ app.get('/events/:id', async (req, res) => {
     }
 });
 
+
+
+// Users
+
 app.get('/users', async (req, res) => {
     try {
         const users = await prisma.user.findMany();
@@ -103,6 +120,7 @@ app.get('/clubs/:id/members', async (req, res) => {
 });
 
 
+
 // get /api/clubs/${clubId}/follow?status=${status}
 app.get('/clubs/:id/follow', async (req, res) => {
     const { id } = req.params;
@@ -122,6 +140,10 @@ app.get('/clubs/:id/follow', async (req, res) => {
     }
 });
 
+
+
+// Authentication TODO:
+
 app.post('/login', async (req, res) => {
     try {
       const encodedBody = {
@@ -134,6 +156,13 @@ app.post('/login', async (req, res) => {
           'app-key': appKey
         }
       })
+
+      const student = response.data.user.student
+      const { studentYear, facultyNameEn, majorNameEn, stdId, majorCode } = student
+
+      if (response.data.code == "success") {
+        console.log('Login/ success', facultyNameEn, ",", majorCode, majorNameEn, ",", studentYear);
+      }
       
       res.json(response.data)
       console.log("Login/ Done")
@@ -145,28 +174,26 @@ app.post('/login', async (req, res) => {
         console.log("Login/ Fail, success ku api")
       } catch {
         res.status(400).json({"code" :"Fail to login"})
-        console.log("Login/ Fail, unsuccess ku api")
+        console.log("Login/ Fail, unsuccess ku api (No response)")
       }
     }
   })
     
 
 app.post('/encode', async (req, res) => {
-try {
-    const encodedBody = {
-    username: encodeString(req.body.username),
-    password: encodeString(req.body.password)
+    try {
+        const encodedBody = {
+        username: encodeString(req.body.username),
+        password: encodeString(req.body.password)
+        }
+        return res.json(encodedBody)
+    } catch (e) {
+        console.log("fail to encode")
+        return res.status(400).json({})
     }
-    return res.json(encodedBody)
-} catch (e) {
-    console.log("fail to encode")
-    return res.status(400).json({})
-}
 })
 
-
-const KU_PUBLIC_KEY = process.env.KU_PUBLIC_KEY?.replace(/\\n/gm, "\n");
-  
+// Encode username & password  
 const encodeString = (data) => {
 return crypto
     .publicEncrypt(
