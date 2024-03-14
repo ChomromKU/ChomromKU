@@ -1,23 +1,18 @@
 import React from "react";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-type Member = {
-    id: number;
-    role: string;
-    user: {
-        firstNameTh: string;
-        firstNameEn: string;
-    };
-};
+import { ClubMember } from '../../types/club';
 
 interface RegisterButtonProps {
-    member: Member | null;
+    member: ClubMember | null;
     clubId: number;
+    editing: boolean
 }
 
-const RegisterButton: React.FC<RegisterButtonProps> = ({ member, clubId }) => {
+const RegisterButton: React.FC<RegisterButtonProps> = ({ member, clubId, editing }) => {
     // const router = useRouter();
     const navigate = useNavigate();
+    const { id } = useParams();
 
     // const onClick = (path: string) => {
     //     router.push(/clubs/${clubId}/members/${path});
@@ -35,13 +30,14 @@ const RegisterButton: React.FC<RegisterButtonProps> = ({ member, clubId }) => {
 
     if (!member) {
         return (
-            <button
+            <Link
+                to={`/clubs/${id}/members/applyForm`}
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.25)", color: "#fff", fontWeight: "400" }}
-                className="text-sm py-1 px-4 rounded-full"
+                className={`text-sm py-1 px-4 rounded-full ${editing === true ? 'invisible' : 'visible'}`}
                 // onClick={() => onClick("new")}
             >
                 สมัครเข้าชมรม
-            </button>
+            </Link>
         );
     }
 

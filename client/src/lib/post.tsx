@@ -1,23 +1,25 @@
 // import { PostType } from "@prisma/client";
 
-export const postTypeToColorMap = (type: string) => {
+import { PostType } from "../types/post";
+
+export const postTypeToColorMap = (type: PostType) => {
 	switch (type) {
-		case 'NORMAL_POST':
+		case PostType.NORMAL_POST:
 			return "bg-[#28C3D7]";
-		case 'NEWS':
+		case PostType.NEWS:
 			return "bg-[#03A96B]";
-		case 'QA':
+		case PostType.QA:
 			return "bg-[#F2914B]";
 	}
 };
 
-export const postTypeToLabelPost = (type: string) => {
+export const postTypeToLabelPost = (type: PostType) => {
 	switch (type) {
-		case 'NORMAL_POST':
+		case PostType.NORMAL_POST:
 			return "โพสต์ทั่วไป";
-		case 'NEWS':
+		case PostType.NEWS:
 			return "news";
-		case 'QA':
+		case PostType.QA:
 			return "Q&A";
 	}
 };

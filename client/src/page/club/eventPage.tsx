@@ -2,13 +2,7 @@ import { useEffect, useState } from 'react';
 import EventBox from '../components/EventBox';
 import { useParams, Link } from 'react-router-dom'; // Import useParams hook
 
-interface Event {
-  id: number;
-  title: string;
-  startDate: string;
-  endDate: string;
-  location: string;
-}
+import { ClubEvent } from '../../types/club';
 
 interface MembersComponentProps {
   clubId: string;
@@ -16,7 +10,7 @@ interface MembersComponentProps {
 }
 
 const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<ClubEvent[]>([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -36,11 +30,6 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
 
     fetchEvents();
   }, [clubId, status]);
-
-//   const currentDate = new Date();
-//   const presentEvents = events.filter(event => new Date(event.startDate) <= currentDate && currentDate <= new Date(event.endDate));
-//   const upcomingEvents = events.filter(event => new Date(event.startDate) > currentDate);
-//   const pastEvents = events.filter(event => new Date(event.endDate) < currentDate);
 
     const currentDate = new Date().getTime();
     const presentEvents = events.filter(event => {

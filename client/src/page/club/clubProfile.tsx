@@ -4,7 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 
 // import EventBox from "@/components/EventBox";
 import EventBox from '../components/EventBox';
-// import ClubPosts from "./_components/ClubPosts";
+import ClubPosts from "../components/ClubPosts";
 
 import { getCategoryInThai } from "../../lib/event";
 import FollowClubButton from "../components/FollowClubButton";
@@ -14,55 +14,95 @@ import eventImage from '../../images/event.png'
 import lineIcon from '../../images/line.svg'
 import facebookIcon from '../../images/facebook.svg'
 import instagramIcon from '../../images/instagram.svg'
+import { PostType } from '../../types/post';
+import { Club, ClubMember, SocialMedia, ClubEvent } from '../../types/club';
 
 
 
-type Club = {
-	id: number;
-	label: string;
-	branch: string;
-    category: string;
-    location: string;
-    phoneNumber: string;
-	members?: Member[];
-};
+const posts = [{
+    id: 1,
+    title: 'Sample Title 1',
+    type: PostType.NORMAL_POST,
+    content: 'Lorem ipsum dolor sit amet 1.',
+    imageUrl: 'some-url-1',
+    approved: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    likes: [],
+    comments: [],
+    club: { id: 1, label: 'Sample Club', branch: 'Some Branch', category: 'Some Category', location: 'Some Location', phoneNumber: '1234567890', socialMedia: {facebook: '', instagram: '', twitter: ''}},
+    clubId: 1,
+    owner: {
+		id: 1,
+		stdId: "1234567890",
+		stdCode: "ABC123",
+		titleTh: "นาย",
+		titleEn: "Mr.",
+		firstNameTh: "ชื่อไทย",
+		lastNameTh: "นามสกุลไทย",
+		firstNameEn: "First Name",
+		lastNameEn: "Last Name",
+		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
+		campusNameEn: "College Name (English)"
+	  },
+    ownerId: 1,
+}, 
+{
+    id: 2,
+    title: 'Sample Title 2',
+    type: PostType.NORMAL_POST,
+    content: 'Lorem ipsum dolor sit amet 2.',
+    imageUrl: 'some-url-2',
+    approved: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    likes: [],
+    comments: [],
+    club: { id: 2, label: 'Sample Club 2', branch: 'Some Branch 2', category: 'Some Category 2', location: 'Some Location 2', phoneNumber: '9876543210', socialMedia: {facebook: '', instagram: '', twitter: ''}},
+    clubId: 2,
+    owner: {
+		id: 1,
+		stdId: "1234567890",
+		stdCode: "ABC123",
+		titleTh: "นาย",
+		titleEn: "Mr.",
+		firstNameTh: "ชื่อไทย",
+		lastNameTh: "นามสกุลไทย",
+		firstNameEn: "First Name",
+		lastNameEn: "Last Name",
+		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
+		campusNameEn: "College Name (English)"
+	  },
+    ownerId: 2,
+}];
 
-type Event = {
-	id: number;
-	title: string;
-	startDate: string;
-	endDate: string;
-	location: string;
-};
-
-type Member = {
-	id: number;
-	role: string;
-	user: {
-		firstNameTh: string;
-		firstNameEn: string;
-	};
-};
 
 export default function ClubProfile() {
     const { id } = useParams();
     const [club, setClub] = useState<Club>();
-	const [members, setMembers] = useState<Member[]>([]);
-	const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
+	const [members, setMembers] = useState<ClubMember[]>([]);
+    const [upcomingEvents, setUpcomingEvents] = useState<ClubEvent[]>([]);
+    const [socialMedia, setSocialMedia] = useState<SocialMedia>()
+    const [editing, setEditing] = useState<boolean>(false);
+    const [editedFields, setEditedFields] = useState<Partial<Club>>({});
+
+    const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
 		const fetchClubs = async () => {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
+				setError(false);
+				console.log(data);
 
 				const currentDate = new Date().getTime();
-				const presentEvents = data.events.filter((event: Event) => {
+				const presentEvents = data.events.filter((event: ClubEvent) => {
 					const startDate = new Date(event.startDate).getTime();
 					const endDate = new Date(event.endDate).getTime();
 					return startDate <= currentDate && currentDate <= endDate;
 				});
-				const upcomingEvents = data.events.filter((event: Event) => {
+				const upcomingEvents = data.events.filter((event: ClubEvent) => {
 					const startDate = new Date(event.startDate).getTime();
 					return startDate > currentDate;
 				});
@@ -84,16 +124,41 @@ export default function ClubProfile() {
 				} else {
 					console.error('Members data not found in response:', data);
 				}
+				if (data.socialMedia) {
+                    setSocialMedia(data.socialMedia);
+                } else {
+                    console.error('Social Media data not found in response:', data);
+                }
 
-			} catch (error) {
-				console.error('Error fetching clubs:', error);
-			}
+            } catch (error) {
+                console.error('Error fetching clubs:', error);
+                setError(true)
+            }
 		};
 		fetchClubs();
 	}, [id]);
 
+	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {
+        setEditedFields((prevFields) => ({ ...prevFields, [fieldName]: value }));
+    };
+
+    const updateClub = async () => {
+        try {
+          await axios.put(`http://localhost:3001/clubs/${id}`, editedFields);
+          setClub((prevClub) => {
+            if (!prevClub) return prevClub;
+            return { ...prevClub, ...editedFields };
+          });
+          setEditing(false);
+        } catch (error) {
+          console.error('Error updating club:', error);
+        }
+    };
+
 	if (!club) {
-		return <div>No club ID found</div>;
+		return <div>Loading</div>;
+    } else if(error) {
+        return <div>Club id not found</div>;
 	}
 	
 	return (
@@ -117,43 +182,134 @@ export default function ClubProfile() {
 				<h1 className="font-bold text-[24px]">{club?.label}</h1>
 				<div>
 					<p>
-						หมวดหมู่: {club?.category && <span>{getCategoryInThai(club.category)}</span>}
+						หมวดหมู่: {editing ? (
+							<input
+							type="text"
+							value={editedFields.category}
+							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
+							onChange={(e) => handleFieldChange('category', e.target.value)}
+							/>
+						) : (
+							<span>{getCategoryInThai(club.category)}</span>
+						)}
 					</p>
 					<p>
-						ที่อยู่: {club?.location && <span>{club.location}</span>}
+						ที่อยู่: {editing ? (
+							<textarea
+								value={editedFields.location}
+								onChange={(e) => handleFieldChange('location', e.target.value)}
+								className='bg-transparent border-b opacity-70 w-full resize-none focus-visible:outline-none'
+								rows={3} // Set the number of rows
+							/>
+						) : (
+							<span>{club.location}</span>
+						)}
 					</p>
 					<p>
-						โทรศัพท์: {club?.phoneNumber && <span>{club.phoneNumber}</span>}
+						โทรศัพท์: {editing ? (
+							<input
+							type="text"
+							value={editedFields.phoneNumber}
+							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
+							onChange={(e) => handleFieldChange('phoneNumber', e.target.value)}
+							/>
+						) : (
+							<span>{club.phoneNumber}</span>
+						)}
 					</p>
+					{editing && (
+						<>
+							<p>
+								Facebook:
+							</p>
+							<input
+							type="text"
+							value={editedFields.socialMedia?.facebook}
+							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
+							onChange={(e) =>
+								handleFieldChange('socialMedia', {
+								  ...editedFields.socialMedia,
+								  facebook: e.target.value,
+								})
+							  }
+							/>
+						</>
+						
+					)}
+					{editing && (
+						<>
+							<p>
+							Instagram:
+							</p>
+							<input
+							type="text"
+							value={editedFields.socialMedia?.instagram}
+							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
+							onChange={(e) =>
+								handleFieldChange('socialMedia', {
+								  ...editedFields.socialMedia,
+								  instagram: e.target.value,
+								})
+							  }
+							/>
+						</>
+						
+					)}
+					{editing && (
+						<>
+							<p>
+								Line:
+							</p>
+							<input
+							type="text"
+							value={editedFields.socialMedia?.twitter}
+							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
+							onChange={(e) =>
+								handleFieldChange('socialMedia', {
+								  ...editedFields.socialMedia,
+								  twitter: e.target.value,
+								})
+							  }
+							/>
+						</>
+						
+					)}
 				</div>
 				<div className="flex justify-between">
 					<div className="flex gap-[10px]">
 						<FollowClubButton
 							// role={member?.role}
-							role='NORMAL'
+							club={club}
+							role='PRESIDENT'
 							clubId={club.id}
 							// isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
-							// isFollowing=
+							isFollowing={false}
+							editing={editing} 
+							setEditing={setEditing}
+							updateClub={updateClub}
+							setEditedFields={setEditedFields}
 						/>
 						<RegisterButton 
 							// member={member} 
 							member={null}
 							clubId={club.id}
+							editing={editing}
 						/>
 					</div>
 					{/* {club.socialMedia && ( */}
+					{!editing && (
 						<div className="flex gap-[10px]">
-							<Link to='/' className="flex items-center">
+							<Link to={socialMedia?.facebook ? socialMedia?.facebook : '/'} className="flex items-center">
 								<img alt="facebook" src={facebookIcon} width="20" height="20" />
 							</Link>
-							<Link to='/' className="flex items-center">
+							<Link to={socialMedia?.instagram ? socialMedia?.instagram : '/'} className="flex items-center">
 								<img alt="instagram" src={instagramIcon} width="20" height="20" />
 							</Link>
-							<Link to='/' className="flex items-center">
+							<Link to={socialMedia?.twitter ? socialMedia?.twitter : '/'} className="flex items-center">
 								<img alt="line" src={lineIcon} width="24" height="24" />
 							</Link>
 						</div>
-					{/* )} */}
+					)}
 				</div>
 			</div>
 
@@ -218,14 +374,14 @@ export default function ClubProfile() {
 			<div className="p-[24px] flex flex-col gap-[20px]">
 				<div className="flex">
 					<p className="font-bold text-[24px] w-full ">โพสต์</p>
-					{/* {session && member && (
-						<Link href={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
+					{/* {session && member && ( */}
+						<Link to={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
 							โพสต์ที่รออนุมัติ
 						</Link>
-					)} */}
+					{/* )} */}
 				</div>
 
-				{/* <ClubPosts posts={club.posts} clubId={club.id} /> */}
+				<ClubPosts posts={posts} clubId={club.id} />
 			</div>
 		</div>
 	);

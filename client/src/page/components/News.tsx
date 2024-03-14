@@ -16,10 +16,12 @@ import { useDisclosure } from "@mantine/hooks";
 import eventImage from '../../images/event.png'
 import commentIcon from '../../images/chat.svg'
 import sendIcon from '../../images/send.svg'
+import { Like, Post } from "../../types/post";
+import { SocialMedia } from "../../types/club";
 // import Modal from "@/components/CustomModal";
 // import { useRouter } from "next/navigation";
 interface NewsProps {
-	post: {id: number, club: string, owner: string, likes: number, content: string, type: string };
+	post: Post;
 	role?: String;
 }
 
@@ -38,7 +40,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 	// const isAuthenticated = session.status === "authenticated";
 	// const router = useRouter();
 
-	const [likeCount, setLikeCount] = useState<number>(post.likes);
+	const [likeCount, setLikeCount] = useState<Like[]>(post.likes);
 	// const [isLike, setIsLike] = useState<boolean>(
 	// 	isAuthenticated ? post.likes.some((like) => like.userId === session.data.user.id) : false,
 	// );
@@ -88,8 +90,8 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 					<p className="h-1/2 text-xs font-light">owner first name</p>
 				</div>
 				<div className="">
-					<Tag tagName={postTypeToLabelPost(post.type) as string}
-                    color={postTypeToColorMap(post.type) as string} 
+					<Tag tagName={postTypeToLabelPost(post.type)}
+                    color={postTypeToColorMap(post.type)} 
                     />
 				</div>
 			</header>
@@ -119,7 +121,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 						<img src={sendIcon} height={16} width={16} alt={"share"} />
 					</div>
 					<div className="flex justify-between gap-2">
-						<p className="h-1/2 font-light text-xs">{likeCount} likes</p>
+						<p className="h-1/2 font-light text-xs">{likeCount.length} likes</p>
 						{/* <p className="h-1/2 font-light text-xs">{getPreviousTime(post.createdAt)}</p> */}
 					</div>
 				</div>

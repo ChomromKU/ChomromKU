@@ -44,6 +44,7 @@ app.get('/clubs/:id', async (req, res) => {
                 events: { where: { approved: true } },
                 members: { select: { id: true, user: true } },
                 posts: { include: { owner: true, likes: true, club: true } },
+                socialMedia: true,
             },
         });
         if (!club) {
@@ -56,6 +57,53 @@ app.get('/clubs/:id', async (req, res) => {
     }
 });
 
+app.put('/clubs/:id', async (req, res) => {
+    const { id } = req.params;
+    const updatedFields = req.body; // Assuming the payload is sent as JSON in the request body
+    console.log('Updated fields:', updatedFields);
+    try {
+        // Check if SocialMedia record exists for the club
+        const socialMediaExists = await prisma.socialMedia.findUnique({
+            where: { clubId: parseInt(id) }
+        });
+
+        // If SocialMedia record does not exist, handle it based on your requirements
+        if (!socialMediaExists) {
+            // Handle missing SocialMedia record (create a new record or handle differently)
+            // For example, you can create a new SocialMedia record here
+            await prisma.socialMedia.create({
+                data: {
+                    clubId: parseInt(id),
+                    facebook: updatedFields.socialMedia?.facebook,
+                    instagram: updatedFields.socialMedia?.instagram,
+                    twitter: updatedFields.socialMedia?.twitter,
+                }
+            });
+        }
+
+        // Update the club after ensuring the SocialMedia record exists
+        const updatedClub = await prisma.club.update({
+            where: { id: parseInt(id) },
+            data: {
+                category: updatedFields.category,
+                location: updatedFields.location,
+                phoneNumber: updatedFields.phoneNumber,
+                socialMedia: {
+                    update: {
+                        facebook: updatedFields.socialMedia?.facebook,
+                        instagram: updatedFields.socialMedia?.instagram,
+                        twitter: updatedFields.socialMedia?.twitter,
+                    },
+                },
+            },
+        });
+
+        res.json(updatedClub);
+    } catch (error) {
+        console.error('Error updating club:', error);
+        res.status(500).json({ error: 'Error updating club' });
+    }
+});
 
 
 // Events

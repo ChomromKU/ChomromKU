@@ -3,12 +3,8 @@ import axios from 'axios';
 import Search from "../components/Search";
 import ClubBox from "../components/ClubBox";
 import { useEffect, useState } from "react";
+import { Club } from "../../types/club";
 
-type Club = {
-	id: number;
-	label: string;
-	branch: string;
-};
 
 export default function Clubs() {
 	const [clubs, setClubs] = useState<Club[]>([]);

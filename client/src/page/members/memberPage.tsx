@@ -21,7 +21,7 @@ type Member = {
       firstNameTh: string;
       lastNameTh: string;
     };
-  };
+};
 
 const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role }) => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -43,7 +43,7 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role 
     fetchMembers();
   
   }, [clubId]);
-  
+
   return (
     <div className="flex flex-col gap-[20px]">
       <p>{name}</p>
