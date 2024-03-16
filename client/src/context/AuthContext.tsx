@@ -1,12 +1,60 @@
-import { createContext } from "react";
+import React, { createContext, useContext, useReducer } from "react";
 import { User } from "../types/auth";
 
-interface AuthContext {
+interface AuthState {
+  isAuthenticated: boolean;
   user: User | null;
-  setUser: (user: User |  null) => void;
 }
 
-export const AuthContext = createContext<AuthContext>({
+interface AuthAction {
+  type: 'LOGIN' | 'LOGOUT';
+  payload?: User | null;
+}
+
+interface AuthContextType extends AuthState {
+  setUser: (isAuthenticate: boolean, user: User | null) => void;
+}
+
+const initialState: AuthState = {
+  isAuthenticated: false,
   user: null,
+};
+
+const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+  switch (action.type) {
+    case 'LOGIN':
+      return {
+        isAuthenticated: true,
+        user: action.payload || null,
+      };
+    case 'LOGOUT':
+      return initialState;
+    default:
+      return state;
+  }
+};
+
+export const AuthContext = createContext<AuthContextType>({
+  ...initialState,
   setUser: () => {},
 });
+
+export const useAuth = () => useContext(AuthContext);
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [state, dispatch] = useReducer(authReducer, initialState);
+
+  const setUser = (isAuthenticated: boolean, user: User | null) => {
+    dispatch({ type: isAuthenticated ? 'LOGIN' : 'LOGOUT', payload: user });
+  };
+
+  return (
+    <AuthContext.Provider value={{ ...state, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};

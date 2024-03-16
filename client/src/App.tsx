@@ -1,11 +1,12 @@
+import React from 'react';
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-} from 'react-router-dom'
+} from 'react-router-dom';
 import Navbar from './page/components/Navbar';
-import Main from './page/main'
-import Clubs from './page/club/clubs'
+import Main from './page/main';
+import Clubs from './page/club/clubs';
 import ClubProfile from './page/club/clubProfile';
 import EventPage from './page/club/eventPage';
 import LoginPage from './page/login/loginPage';
@@ -14,13 +15,12 @@ import { useAuth } from './hooks/useAuth';
 import Members from './page/members/memberPage';
 import NewMemberPage from './page/members/newMemberPage';
 
-
 export default function App() {
-  const { user, login, logout, setUser } = useAuth();
+  const { user, setUser } = useAuth();
+  const isAuthenticated = user !== null;
   
   return (
-
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, setUser }}>
       <Router>
         <Navbar />
         <Routes>

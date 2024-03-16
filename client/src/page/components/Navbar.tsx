@@ -1,9 +1,8 @@
 // import authOptions from "@/app/api/auth/[...nextauth]/options";
 // import { getServerSession } from "next-auth";
 // import { signOut, useSession } from "next-auth/react";
-// import Image from "next/image";
-// import Link from "next/link";
 // import { usePathname } from "next/navigation";
+import { useAuth } from '../../hooks/useAuth';
 import { useState } from "react";
 import logo from '../../images/logo.svg'
 import { Link } from "react-router-dom";
@@ -11,6 +10,7 @@ import { Link } from "react-router-dom";
 export default function Navbar() {
 	// const pathname = usePathname();
 	// const { status, data } = useSession();
+	const { user, login, logout, setUser } = useAuth();
 	const [isUserTabOpen, setIsUserTabOpen] = useState(false);
 
 	// if (pathname.includes("login")) {
@@ -45,7 +45,7 @@ export default function Navbar() {
 			</ul>
 			{isUserTabOpen && (
 				<div
-					// onClick={() => signOut()}
+					onClick={() => {logout}}
 					className="cursor-pointer bg-slate-100 rounded absolute -bottom-5 shadow right-4 z-10"
 				>
 					<span className="p-4 rounded">ออกจากระบบ</span>
