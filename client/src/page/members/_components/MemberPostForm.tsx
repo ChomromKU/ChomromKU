@@ -22,12 +22,12 @@ const postFormSchema = z.object({
 
 type PostForm = z.infer<typeof postFormSchema>;
 
-type PostFormProps = {
+type MemberPostFormProps = {
 	user: ClubMember;
 	clubId: string;
 };
 
-export default function MemberPostForm({ user, clubId }: PostFormProps) {
+export default function MemberPostForm({ user, clubId }: MemberPostFormProps) {
 	const [opened, { open, close }] = useDisclosure(false);
 	// const router = useRouter();
 	// const { data } = registerMemberData

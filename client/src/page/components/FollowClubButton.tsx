@@ -16,7 +16,7 @@ type FollowClubButtonProps = {
 };
 
 export default function FollowClubButton({ club, role, clubId, isFollowing, editing, setEditing, updateClub, setEditedFields }: FollowClubButtonProps) {
-	const navigate = useNavigate(); // Initialize useNavigate hook
+	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 
 	async function handleClick() {

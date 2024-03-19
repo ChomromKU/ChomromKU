@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import MemberBox from "../components/MemberBox";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { ClubMember } from "../../types/club";
 
 // interface MembersPageProps {
 //   params: { id: string };
@@ -13,18 +14,9 @@ interface MembersComponentProps {
   role: string;
 }
 
-type Member = {
-    id: number;
-    role: string;
-    user: {
-      titleTh: string;
-      firstNameTh: string;
-      lastNameTh: string;
-    };
-};
 
 const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role }) => {
-  const [members, setMembers] = useState<Member[]>([]);
+  const [members, setMembers] = useState<ClubMember[]>([]);
 
   useEffect(() => {
     const fetchMembers = async () => {

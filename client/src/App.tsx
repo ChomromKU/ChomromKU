@@ -14,6 +14,7 @@ import { AuthContext } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import Members from './page/members/memberPage';
 import NewMemberPage from './page/members/newMemberPage';
+import PostForm from './page/components/PostForm';
 
 export default function App() {
   const { user, setUser } = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
           <Route path='/login' element={<LoginPage />} />
           <Route path='/clubs/:id/members' element={<Members />} />
           <Route path='/clubs/:id/members/applyForm' element={<NewMemberPage />} />
+          <Route path='/clubs/:id/posts/new' element={<PostForm />} />
         </Routes>
       </Router>
     </AuthContext.Provider>
