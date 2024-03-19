@@ -9,7 +9,8 @@ export const useUser = () => {
   const { setItem } = useLocalStorage();
 
   const addUser = (user: User) =>{
-    setUser(isAuthenticated, user);
+    // console.log('addUser', user);
+    setUser(true, user);
     setItem("user", JSON.stringify(user));
   };
 

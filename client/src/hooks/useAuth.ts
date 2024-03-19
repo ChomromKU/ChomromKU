@@ -9,6 +9,7 @@ export const useAuth = () => {
   
   useEffect(() => {
     const user = getItem("user");
+    console.log('user', user);
     if (user) {
       addUser(JSON.parse(user));
     }
@@ -16,6 +17,7 @@ export const useAuth = () => {
 
   const login = (user: User) => {
     addUser(user);
+    // console.log(user);
   };
 
   const logout = () => {

@@ -205,16 +205,31 @@ app.post('/login', async (req, res) => {
         }
       })
 
-      const student = response.data.user.student
-      const { studentYear, facultyNameEn, majorNameEn, stdId, majorCode } = student
+      const { stdId, ...userData } = response.data.user.student;
 
       if (response.data.code == "success") {
-        console.log('Login/ success', facultyNameEn, ",", majorCode, majorNameEn, ",", studentYear);
+		const updatedUserData = {
+			titleTh: userData.titleTh,
+			titleEn: userData.titleEn,
+			firstNameTh: userData.firstNameTh,
+			lastNameTh: userData.lastNameTh,
+			firstNameEn: userData.firstNameEn,
+			lastNameEn: userData.lastNameEn,
+			campusNameTh: userData.campusNameTh,
+			campusNameEn: userData.campusNameEn,
+		};
+
+		const newUser = await prisma.user.upsert({
+			where: { stdId: stdId },
+			update: updatedUserData,
+			create: { stdId: stdId, ...updatedUserData },
+		});
+        res.json(response.data)
+        console.log('Login/ success', stdId);
       }
       
-      res.json(response.data)
-      console.log("Login/ Done")
-  
+    //   console.log(response.data)
+    //   console.log("Login/ Done")
     } catch (e) {
       console.log(e)
       try{
