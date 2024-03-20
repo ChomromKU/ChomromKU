@@ -1,41 +1,15 @@
-import React, { createContext, useContext, useReducer } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../types/auth";
 
-interface AuthState {
+interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-}
-
-interface AuthAction {
-  type: 'LOGIN' | 'LOGOUT';
-  payload?: User | null;
-}
-
-interface AuthContextType extends AuthState {
   setUser: (isAuthenticate: boolean, user: User | null) => void;
 }
 
-const initialState: AuthState = {
+export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
-};
-
-const authReducer = (state: AuthState, action: AuthAction): AuthState => {
-  switch (action.type) {
-    case 'LOGIN':
-      return {
-        isAuthenticated: true,
-        user: action.payload || null,
-      };
-    case 'LOGOUT':
-      return initialState;
-    default:
-      return state;
-  }
-};
-
-export const AuthContext = createContext<AuthContextType>({
-  ...initialState,
   setUser: () => {},
 });
 
@@ -46,15 +20,25 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [authState, setAuthState] = useState(() => {
+    const storedAuthState = localStorage.getItem("authState");
+    if (storedAuthState) {
+      return JSON.parse(storedAuthState);
+    } else {
+      return {
+        isAuthenticated: false,
+        user: null,
+      };
+    }
+  });
 
   const setUser = (isAuthenticated: boolean, user: User | null) => {
-    dispatch({ type: isAuthenticated ? 'LOGIN' : 'LOGOUT', payload: user });
+    setAuthState({ isAuthenticated, user });
+    localStorage.setItem("authState", JSON.stringify({ isAuthenticated, user }));
   };
-  
 
   return (
-    <AuthContext.Provider value={{ ...state, setUser }}>
+    <AuthContext.Provider value={{ ...authState, setUser }}>
       {children}
     </AuthContext.Provider>
   );

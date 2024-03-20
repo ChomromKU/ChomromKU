@@ -16,8 +16,7 @@ import Members from './pages/members/memberPage';
 import NewMemberPage from './pages/members/newMemberPage';
 import PostForm from './pages/components/PostForm';
 
-export default function App() {
-  
+export default function App() {  
   return (
     <AuthProvider>
       <Router>

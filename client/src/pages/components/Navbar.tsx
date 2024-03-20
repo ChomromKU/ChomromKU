@@ -12,6 +12,7 @@ const Navbar = () => {
 		setIsUserTabOpen(false);
 		logout();
 	};
+
 	
 	return (
 		<nav className="bg-white w-full flex items-center justify-between h-16 px-4 text-[#006664] border-b border-b-[#F2F2F2] relative">
