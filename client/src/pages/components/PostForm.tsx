@@ -8,7 +8,7 @@ import { PostFormType } from "../../types/post";
 import { useNavigate } from 'react-router-dom';
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createPostSchema, createEventSchema } from "../../../src/lib/validator"
+import { createPostSchema, createEventSchema } from "../../lib/validator"
 import { Group } from '@mantine/core';
 import { DatePickerInput, TimeInput } from 'react-hook-form-mantine';
 // // import { useS3Upload } from 'next-s3-upload';

@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { MantineProvider } from '@mantine/core';
-import Navber from './page/components/Navbar'
+import Navber from './pages/components/Navbar'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

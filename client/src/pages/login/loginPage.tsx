@@ -12,7 +12,7 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginForm>({
     username: "",
@@ -31,8 +31,8 @@ export default function LoginPage() {
         try {
           const response = await axios.post(`http://localhost:3001/login`, formData);
           if (response.status === 200) {
-            login(response.data);
-            console.log(response.data);
+            login(response.data.user);
+            setUser(true, response.data.user)
             navigate("/");
           } else {
             console.error("Failed to login");

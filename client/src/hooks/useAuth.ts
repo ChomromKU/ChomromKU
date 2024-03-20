@@ -5,22 +5,13 @@ import { useLocalStorage } from "./useLocalStorage";
 
 export const useAuth = () => {
   const { user, addUser, removeUser, setUser } = useUser();
-  const { getItem } =  useLocalStorage();
-  
-  useEffect(() => {
-    const user = getItem("user");
-    console.log('user', user);
-    if (user) {
-      addUser(JSON.parse(user));
-    }
-  }, [addUser, getItem]);
+  const { getItem } = useLocalStorage();
 
-  const login = (user: User) => {
+  const login = async (user: User) => {
     addUser(user);
-    // console.log(user);
   };
 
-  const logout = () => {
+  const logout = async () => {
     removeUser();
   };
 

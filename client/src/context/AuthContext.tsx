@@ -48,10 +48,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
-  //TODO: the setUser function is not being used
-  //implement the setUser function to set the user state
   const setUser = (isAuthenticated: boolean, user: User | null) => {
-    console.log('Setting user:', { isAuthenticated, user });
     dispatch({ type: isAuthenticated ? 'LOGIN' : 'LOGOUT', payload: user });
   };
   

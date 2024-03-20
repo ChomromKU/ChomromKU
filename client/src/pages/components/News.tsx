@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/th";
 // import { Post, PostType, Role } from "@prisma/client";
-import Tag from "../components/Tag";
+import Tag from "./Tag";
 // import Link from "next/link";
 // import { PostInclude } from "@/app/page";
 // import LikeButton from "@/components/LikeButton";

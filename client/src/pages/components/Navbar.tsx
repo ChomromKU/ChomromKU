@@ -4,15 +4,15 @@ import { useEffect, useState } from "react";
 import logo from '../../images/logo.svg';
 
 const Navbar = () => {
-	const { user, setUser } = useAuth();
-	// const { login, logout } = useAuth();
+
+	const { user, logout } = useAuth();
 	const [isUserTabOpen, setIsUserTabOpen] = useState(false);
 
 	const handleLogout = () => {
-		// Perform logout logic here
-		setUser(false, null); // Assuming this updates the user context to indicate logout
+		setIsUserTabOpen(false);
+		logout();
 	};
-
+	
 	return (
 		<nav className="bg-white w-full flex items-center justify-between h-16 px-4 text-[#006664] border-b border-b-[#F2F2F2] relative">
 			<Link to="/">
