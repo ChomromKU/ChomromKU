@@ -5,11 +5,11 @@ import { User } from "../types/auth";
 
 
 export const useUser = () => {
-  const { user, isAuthenticated, setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const { setItem } = useLocalStorage();
 
   const addUser = (user: User) =>{
-    setUser(isAuthenticated, user);
+    setUser(true, user);
     setItem("user", JSON.stringify(user));
   };
 

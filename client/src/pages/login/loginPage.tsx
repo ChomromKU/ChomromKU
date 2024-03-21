@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-// import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import { z } from "zod";
 import close from "../../images/close.svg";
 import logo from "../../images/logo.svg"
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   username: z.string(),
@@ -11,7 +12,8 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
-  // const { login } = useAuth();
+  const { login, setUser } = useAuth();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginForm>({
     username: "",
     password: "",
@@ -28,6 +30,14 @@ export default function LoginPage() {
       if(username === formData.username && password === formData.password) {
         try {
           const response = await axios.post(`http://localhost:3001/login`, formData);
+          if (response.status === 200) {
+            login(response.data.user);
+            setUser(true, response.data.user)
+            navigate("/");
+          } else {
+            console.error("Failed to login");
+            setIsFormError(true);
+          }
         } catch (error) {
           console.error('Error logging in:', error);
           setIsFormError(true);

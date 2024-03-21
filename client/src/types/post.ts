@@ -11,7 +11,7 @@ export interface Like {
     event?: Event;
     eventId?: number;
 }
-  
+
 export interface Comment {
     id: number;
     message: string;
@@ -23,7 +23,7 @@ export interface Comment {
     event?: Event; // Optional event property
     eventId?: number; // Optional eventId property
 }
-  
+
 export interface Post {
     id: number;
     title: string;
