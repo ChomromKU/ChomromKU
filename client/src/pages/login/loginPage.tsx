@@ -31,8 +31,8 @@ export default function LoginPage() {
         try {
           const response = await axios.post(`http://localhost:3001/login`, formData);
           if (response.status === 200) {
-            login(response.data.user);
-            setUser(true, response.data.user)
+            login(response.data.user.student);
+            setUser(true, response.data.user.student)
             navigate("/");
           } else {
             console.error("Failed to login");

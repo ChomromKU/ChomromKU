@@ -42,7 +42,7 @@ app.get('/clubs/:id', async (req, res) => {
             include: {
                 subscribers: true,
                 events: { where: { approved: true } },
-                members: { select: { id: true, user: true } },
+                members: { select: { id: true, user: true, role: true } },
                 posts: { include: { owner: true, likes: true, club: true } },
                 socialMedia: true,
             },

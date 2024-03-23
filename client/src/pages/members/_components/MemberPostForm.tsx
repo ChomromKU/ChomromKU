@@ -24,7 +24,7 @@ type PostForm = z.infer<typeof postFormSchema>;
 
 type MemberPostFormProps = {
 	user: ClubMember;
-	clubId: string;
+	clubId: number;
 };
 
 export default function MemberPostForm({ user, clubId }: MemberPostFormProps) {

@@ -94,7 +94,7 @@ export default function ClubProfile() {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
 				setError(false);
-				console.log(data);
+				// console.log(data);
 
 				const currentDate = new Date().getTime();
 				const presentEvents = data.events.filter((event: ClubEvent) => {
