@@ -11,6 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createPostSchema, createEventSchema } from "../../lib/validator"
 import { Group } from '@mantine/core';
 import { DatePickerInput, TimeInput } from 'react-hook-form-mantine';
+import { useAuth } from './../../hooks/useAuth';
+
 // // import { useS3Upload } from 'next-s3-upload';
 
 
@@ -22,16 +24,13 @@ const postFormSchema = z
 	.omit({ clubId: true });
 type PostForm = z.infer<typeof postFormSchema>;
 
-// type PostFormProps = {
-//     member: ClubMember | null;
-//     clubId: string;
-// };
 
 export default function PostForm() {
-    const { clubId } = useParams();
+  const { id } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [postType, setPostType] = useState<PostFormType>('normal_post');
-//   const [members, setMembers] = useState<ClubMember[]>([]);
+  const [member, setMembers] = useState<ClubMember>();
   const {
     control,
     register,
@@ -44,36 +43,40 @@ export default function PostForm() {
     url: ''
   });
 
-//   useEffect(() => {
-//     const fetchMembers = async () => {
-//       try {
-//         const response = await axios.get(`http://localhost:3001/clubs/${clubId}/members`);
-//         if (response.status === 200) {
-//           setMembers(response.data);
-//         } else {
-//           console.error('Failed to fetch events');
-//         }
-//       } catch (error) {
-//         console.error("Error fetching members:", error);
-//       }
-//     };
-  
-//     fetchMembers();
-  
-//   }, [clubId]);
 
-  const onSubmit: SubmitHandler<PostForm> = async (data) => {
-    if (!image.url) {
-      alert('กรุณาอัพโหลดรูปภาพ');
-      return;
-    }
-    try {
-    //   await axios.post(`/api/posts?type=${postType}`, { ...data, clubId, imageUrl: image.url });
-    //   history.push(`/clubs/${clubId}`);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/clubs/${id}/members`);
+        if (response.status === 200) {
+          const member = response.data.find((member: ClubMember ) => member.user.stdId === user?.stdId);
+          setMembers(member);
+          console.log(member)
+        } else {
+          console.error('Failed to fetch members');
+        }
+      } catch (error) {
+        console.error("Error fetching members:", error);
+      }
+    };
+    fetchMembers();
+  }, [id, user?.stdId]);
+
+
+
+const onSubmit: SubmitHandler<PostForm> = async (data) => {
+  if (!image.url) {
+    alert("กรุณาอัพโหลดรูปภาพ");
+    return;
+  }
+  try {
+    await axios.post(`http://localhost:3001/posts?type=${postType}`, { ...data, id, imageUrl: image.url });
+    navigate(`/clubs/${id}`);
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   function onPostTypeChange(value: PostFormType) {
     setPostType(value);
@@ -98,10 +101,10 @@ export default function PostForm() {
         <div className="flex items-center">
           <h1 className="text-2xl font-bold">สร้างโพสต์ใหม่</h1>
           <div className="w-28 ml-2.5">
-            {/* <PostSelector role={member ? member.role : null} value={postType} onChange={onPostTypeChange} /> */}
+            <PostSelector role={ member? member.role : null} value={postType} onChange={onPostTypeChange} />
           </div>
         </div>
-        <Link to={`/clubs/${clubId}`}>
+        <Link to={`/clubs/${id}`}>
           <img src="/icons/close.svg" alt="close" width={12} height={12} />
         </Link>
       </div>

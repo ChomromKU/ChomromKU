@@ -42,9 +42,10 @@ app.get('/clubs/:id', async (req, res) => {
             include: {
                 subscribers: true,
                 events: { where: { approved: true } },
-                members: { select: { id: true, user: true, role: true } },
+                members: { select: { id: true, role: true, user: true } },
                 posts: { include: { owner: true, likes: true, club: true } },
                 socialMedia: true,
+                memberRequestForm: true
             },
         });
         if (!club) {
@@ -105,6 +106,22 @@ app.put('/clubs/:id', async (req, res) => {
     }
 });
 
+// Posts
+
+app.post('/posts', async (req, res) => {
+    try {
+        const postData = req.body;
+        const newPost = await prisma.post.create({
+            data: postData,
+        });
+        res.json(newPost);
+        console.log('New post created:', newPost);
+    } catch (error) {
+        console.error('Error creating post:', error);
+        res.status(500).json({ error: 'Error creating post' });
+    }
+});
+
 
 // Events
 
@@ -152,6 +169,25 @@ app.get('/users', async (req, res) => {
     }
 });
 
+app.get('/users/:userStdId', async (req, res) => {
+    const userStdId = req.params.userStdId;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                stdId: userStdId
+            }
+        });
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching user' });
+    }
+});
+
 
 app.get('/clubs/:id/members', async (req, res) => {
     const { id } = req.params;
@@ -167,7 +203,52 @@ app.get('/clubs/:id/members', async (req, res) => {
     }
 });
 
+// member request form
 
+app.get('/clubs/:id/user/:userId/applyForm', async (req, res) => {
+    const { id, userId } = req.params;
+    try {
+        const memberRequestForm = await prisma.memberRequestForm.findUnique({
+            where: {
+                clubId: parseInt(id),
+                userId: parseInt(userId)
+            }
+        });
+        if (memberRequestForm) {
+            res.json(memberRequestForm);
+        } else {
+            res.status(404).json({ error: 'Member Request Form not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching Member Request Form' });
+    }
+});
+
+app.put('/clubs/:id/user/:userId/applyForm', async (req, res) => {
+    const { id, userId } = req.params;
+    const insertFields = req.body;
+    console.log('Insert fields:', insertFields);
+    try {
+        const newMemberRequestForm = await prisma.memberRequestForm.create({
+            data: {
+                clubId: parseInt(id),
+                userId: parseInt(userId),
+                year: insertFields.year,
+                faculty: insertFields.faculty,
+                department: insertFields.department,
+                email: insertFields.email,
+                phoneNumber: insertFields.phone,
+                reason: insertFields.reason,
+                createdAt: new Date()
+            }
+        });
+        res.json(newMemberRequestForm);
+    } catch (error) {
+        console.error('Error updating club:', error);
+        res.status(500).json({ error: 'Error updating club' });
+    }
+});
 
 // get /api/clubs/${clubId}/follow?status=${status}
 app.get('/clubs/:id/follow', async (req, res) => {

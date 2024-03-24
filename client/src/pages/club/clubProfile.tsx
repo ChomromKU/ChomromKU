@@ -16,8 +16,8 @@ import facebookIcon from '../../images/facebook.svg'
 import instagramIcon from '../../images/instagram.svg'
 import { PostType } from '../../types/post';
 import { Club, ClubMember, SocialMedia, ClubEvent } from '../../types/club';
-
-
+import { useAuth } from '../../hooks/useAuth';
+import { User } from '../../types/auth';
 
 const posts = [{
     id: 1,
@@ -78,9 +78,11 @@ const posts = [{
 
 
 export default function ClubProfile() {
+	const { user } = useAuth()
     const { id } = useParams();
     const [club, setClub] = useState<Club>();
 	const [members, setMembers] = useState<ClubMember[]>([]);
+	const [currentUser, setCurrentUser] = useState<User>()
     const [upcomingEvents, setUpcomingEvents] = useState<ClubEvent[]>([]);
     const [socialMedia, setSocialMedia] = useState<SocialMedia>()
     const [editing, setEditing] = useState<boolean>(false);
@@ -94,7 +96,7 @@ export default function ClubProfile() {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
 				setError(false);
-				// console.log(data);
+				console.log(data);
 
 				const currentDate = new Date().getTime();
 				const presentEvents = data.events.filter((event: ClubEvent) => {
@@ -124,6 +126,7 @@ export default function ClubProfile() {
 				} else {
 					console.error('Members data not found in response:', data);
 				}
+
 				if (data.socialMedia) {
                     setSocialMedia(data.socialMedia);
                 } else {
@@ -135,7 +138,16 @@ export default function ClubProfile() {
                 setError(true)
             }
 		};
+		const fetchCurrentMember = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+				setCurrentUser(data);
+			} catch (error) {
+				console.error('Error fetching clubs:', error);
+			}
+		};
 		fetchClubs();
+		fetchCurrentMember()
 	}, [id]);
 
 	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {
@@ -278,9 +290,8 @@ export default function ClubProfile() {
 				<div className="flex justify-between">
 					<div className="flex gap-[10px]">
 						<FollowClubButton
-							// role={member?.role}
+							member={members.find(member => member.user.stdId === user?.stdId)}
 							club={club}
-							role='PRESIDENT'
 							clubId={club.id}
 							// isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
 							isFollowing={false}
@@ -289,10 +300,9 @@ export default function ClubProfile() {
 							updateClub={updateClub}
 							setEditedFields={setEditedFields}
 						/>
-						<RegisterButton 
-							// member={member} 
-							member={null}
-							clubId={club.id}
+						<RegisterButton
+							member={members.find(member => member.user.stdId === user?.stdId)}
+							userId={currentUser?.id}
 							editing={editing}
 						/>
 					</div>

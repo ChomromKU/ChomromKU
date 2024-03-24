@@ -2,11 +2,11 @@ import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 
-import { Club } from '../../types/club';
+import { Club, ClubMember } from '../../types/club';
 
 type FollowClubButtonProps = {
+	member: ClubMember | undefined
 	club: Club
-    role: string;
     clubId: number;
     isFollowing?: boolean;
 	editing: boolean;
@@ -15,7 +15,7 @@ type FollowClubButtonProps = {
   	setEditedFields: React.Dispatch<React.SetStateAction<Partial<Club>>>;
 };
 
-export default function FollowClubButton({ club, role, clubId, isFollowing, editing, setEditing, updateClub, setEditedFields }: FollowClubButtonProps) {
+export default function FollowClubButton({ member, club, clubId, isFollowing, editing, setEditing, updateClub, setEditedFields }: FollowClubButtonProps) {
 	const navigate = useNavigate();
 	const [showModal, setShowModal] = useState(false);
 
@@ -52,8 +52,8 @@ export default function FollowClubButton({ club, role, clubId, isFollowing, edit
 		setShowModal(false)
 	}
 
-	console.log(role);
-	if (role === 'PRESIDENT' || role === 'VICE_PRESIDENT') {
+	console.log(member?.role);
+	if (member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT') {
 		return (
 			<>
 				{editing ? 

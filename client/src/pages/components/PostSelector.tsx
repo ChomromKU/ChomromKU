@@ -1,10 +1,11 @@
 import { PostFormType } from "../../types/post";
 import { Select } from "@mantine/core";
-import arrow_down from "../../public/icons/arrow-down.svg";
+import arrow_down from "../../images/arrow-down.svg";
 import { useEffect, useState } from "react";
+import { Role } from "../../types/club";
 
 
-type Role = "PRESIDENT" | "VICE_PRESIDENT" | "ADMIN" | "NORMAL";
+
 
 type PostSelectorProps = {
 	role: Role | null;

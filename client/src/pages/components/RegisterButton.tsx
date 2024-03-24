@@ -1,40 +1,38 @@
-import React from "react";
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link, LinkProps, useNavigate, useParams } from 'react-router-dom';
 
 import { ClubMember } from '../../types/club';
+import { useAuth } from "../../hooks/useAuth";
+import axios from "axios";
 
 interface RegisterButtonProps {
-    member: ClubMember | null;
-    clubId: number;
+    member: ClubMember | undefined
+    userId: number | undefined;
     editing: boolean
 }
 
-const RegisterButton: React.FC<RegisterButtonProps> = ({ member, clubId, editing }) => {
-    // const router = useRouter();
+// Define the CustomLinkProps interface extending LinkProps
+interface CustomLinkProps extends LinkProps {
+    state?: {
+      member: ClubMember;
+    };
+}
+
+// Define the CustomLink component using CustomLinkProps
+const CustomLink: React.FC<CustomLinkProps> = ({ state, ...rest }) => (
+    <Link {...rest} to={rest.to} state={state} />
+);
+
+const RegisterButton: React.FC<RegisterButtonProps> = ({ member, userId, editing }) => {
     const navigate = useNavigate();
     const { id } = useParams();
-
-    // const onClick = (path: string) => {
-    //     router.push(/clubs/${clubId}/members/${path});
-    // };
-
-    // async function handleClick() {
-    //     const status = isFollowing ? "unfollow" : "follow";
-    //     try {
-    //         const res = await axios.post(/api/clubs/${clubId}/follow?status=${status});
-    //         navigate('/', { replace: true }); // Use navigate to refresh the page
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // }
 
     if (!member) {
         return (
             <Link
-                to={`/clubs/${id}/members/applyForm`}
+                to={`/clubs/${id}/user/${userId}/applyForm`}
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.25)", color: "#fff", fontWeight: "400" }}
                 className={`text-sm py-1 px-4 rounded-full ${editing === true ? 'invisible' : 'visible'}`}
-                // onClick={() => onClick("new")}
             >
                 สมัครเข้าชมรม
             </Link>
@@ -43,16 +41,16 @@ const RegisterButton: React.FC<RegisterButtonProps> = ({ member, clubId, editing
 
     if (member.role === 'PRESIDENT' || member.role === 'VICE_PRESIDENT') {
         return (
-            <button
+            <CustomLink
+                to={`/clubs/${id}/user/${userId}/applyForm`}
+                state={{ member: member }}
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.25)", color: "#fff", fontWeight: "400" }}
                 className="text-sm py-1 px-4 border rounded-full"
-                // onClick={() => onClick("requested")}
             >
                 ผู้สมัครเข้าชมรม
-            </button>
+            </CustomLink>
         );
     }
-
     return null;
 };
 

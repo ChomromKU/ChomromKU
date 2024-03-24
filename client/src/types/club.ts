@@ -8,7 +8,8 @@ export type Club = {
     location: string;
     phoneNumber: string;
     members?: ClubMember[];
-    socialMedia: SocialMedia
+    socialMedia: SocialMedia;
+    memberRequestForm?: MemberRequestForm[]
 };
 
 export type ClubEvent = {
@@ -21,7 +22,7 @@ export type ClubEvent = {
 
 export type ClubMember = {
     id: number;
-    role: string;
+    role: Role;
     user: User;
 };
 
@@ -30,4 +31,18 @@ export type SocialMedia = {
     instagram?: string,
     twitter?: string
 }
+
+export type MemberRequestForm = {
+    id: number,
+    year: string,
+    faculty : string,
+    department : string,
+    email: string,
+    phoneNumber: string,
+    reason: string,
+}
+
+
+export type Role = "PRESIDENT" | "VICE_PRESIDENT" | "ADMIN" | "NORMAL";
+
 

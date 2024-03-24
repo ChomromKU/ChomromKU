@@ -16,7 +16,7 @@ import Members from './pages/members/memberPage';
 import NewMemberPage from './pages/members/newMemberPage';
 import PostForm from './pages/components/PostForm';
 
-export default function App() {  
+export default function App() {
   return (
     <AuthProvider>
       <Router>
@@ -28,7 +28,7 @@ export default function App() {
           <Route path='/clubs/:id/events' element={<EventPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/clubs/:id/members' element={<Members />} />
-          <Route path='/clubs/:id/members/applyForm' element={<NewMemberPage />} />
+          <Route path='/clubs/:id/user/:userId/applyForm' element={<NewMemberPage />} />
           <Route path='/clubs/:id/posts/new' element={<PostForm />} />
         </Routes>
       </Router>
