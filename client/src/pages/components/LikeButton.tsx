@@ -25,7 +25,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 		}
 
 		try {
-			await axios.post(`/api/posts/${postId}/like`, {
+			await axios.post(`http://localhost:3001/posts/${postId}/like`, {
 				type,
 			});
 			like();
@@ -41,7 +41,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 		}
 
 		try {
-			await axios.delete(`/api/posts/${postId}/like?type=${type}`);
+			await axios.delete(`http://localhost:3001/posts/${postId}/like?type=${type}`);
 			unlike();
 		} catch (error) {
 			console.error("Unlike failed: ", error);

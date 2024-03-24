@@ -16,7 +16,7 @@ export default function CommentInput({ postId, type }: CommentInputProps) {
 		e.preventDefault();
 
 		try {
-			await axios.post(`/api/posts/${postId}/comment`, {
+			await axios.post(`http://localhost:3001/posts/${postId}/comment`, {
 				type: type,
 				message: comment,
 			});

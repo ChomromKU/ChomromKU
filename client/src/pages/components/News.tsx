@@ -51,7 +51,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 
 	const approveByPostId = async (postId: number, type: PostType, clubId: number) => {
 		try {
-			await axios.post(`/api/posts/${postId}/approve?type=${type}`, { clubId });
+			await axios.post(`http://localhost:3001/posts/${postId}/approve?type=${type}`, { clubId });
 			// router.push(`/clubs/${post.clubId}`);
 			navigate(`/clubs/${clubId}`);
 			// console.log(res);

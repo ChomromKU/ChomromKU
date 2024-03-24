@@ -5,6 +5,7 @@ import {
   Routes,
 } from 'react-router-dom';
 import Navbar from './pages/components/Navbar';
+import Footer from './pages/components/Footer';
 import Main from './pages/main';
 import Clubs from './pages/club/clubs';
 import ClubProfile from './pages/club/clubProfile';
@@ -33,6 +34,7 @@ export default function App() {
           <Route path='/clubs/:id/posts/new' element={<PostForm />} />
           <Route path='/posts/:id' element={<PostDetailPage />} />
         </Routes>
+        <Footer />
       </Router>
     </AuthProvider>
   );
