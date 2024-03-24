@@ -15,6 +15,7 @@ import { useAuth } from './hooks/useAuth';
 import Members from './pages/members/memberPage';
 import NewMemberPage from './pages/members/newMemberPage';
 import PostForm from './pages/components/PostForm';
+import PostDetailPage from './pages/post/page';
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
           <Route path='/clubs/:id/members' element={<Members />} />
           <Route path='/clubs/:id/user/:userId/applyForm' element={<NewMemberPage />} />
           <Route path='/clubs/:id/posts/new' element={<PostForm />} />
+          <Route path='/posts/:id' element={<PostDetailPage />} />
         </Routes>
       </Router>
     </AuthProvider>

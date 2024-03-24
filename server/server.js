@@ -106,7 +106,19 @@ app.put('/clubs/:id', async (req, res) => {
     }
 });
 
+
+
 // Posts
+
+app.get('/posts', async (req, res) => {
+    try {
+        const posts = await prisma.post.findMany();
+        res.json(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching book stores' });
+    }
+});
 
 app.post('/posts', async (req, res) => {
     try {
@@ -121,6 +133,30 @@ app.post('/posts', async (req, res) => {
         res.status(500).json({ error: 'Error creating post' });
     }
 });
+
+app.get('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const post = await prisma.post.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                likes: true,
+                comments: true,
+                club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, twitter: true}}}},
+                owner:true,
+                // SocialMedia:true,
+            },
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        res.json(post);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching post' });
+    }
+});
+
 
 
 // Events
