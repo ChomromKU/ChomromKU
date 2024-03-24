@@ -5,7 +5,6 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/th";
 import { Link } from "react-router-dom";
 import Tag from "./Tag";
-import { PostIncludeAll } from "../../types/post";
 import LikeButton from "./LikeButton";
 // import { ChatBubbleOvalLeftIcon, PaperAirplaneIcon } from "@heroicons/react/24/outline";
 import axios from "axios";
@@ -18,9 +17,8 @@ import { Like, Post } from "../../types/post";
 import { SocialMedia } from "../../types/club";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
-// import Modal from "@/components/CustomModal";
 import Modal from "./CustomModal";
-// import { useRouter } from "next/navigation";
+
 
 import { PostType } from "../../types/post";
 interface NewsProps {
@@ -87,7 +85,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${post.clubId}`}>
 						<div className="flex justify-between items-center">
-						    <p className="h-1/2 leading-[20px] font-normal">club label</p>
+						    <p className="h-1/2 leading-[20px] font-normal">{post.club.label}</p>
 						</div>
 					</Link>
 					<p className="h-1/2 text-xs font-light">owner first name</p>

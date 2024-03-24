@@ -49,11 +49,38 @@ export enum PostType {
 
 export type PostFormType = "normal_post" | "news" | "qna" | "event";
 
-export interface PostIncludeAll {
+// export interface PostIncludeAll {
+//     club: Club;
+//     owner: User;
+//     likes: Like[];
+//     comments: Comment[];
+// }
+
+// export interface EventIncludeAll {
+//     club: Club;
+//     owner: Owner;
+//     likes: Like[];
+//     comments: Comment[];
+// }
+
+export interface Events {
+    id: number;
+    title: string;
+    content: string;
+    imageUrl: string;
+    startDate: Date;
+    endDate: Date;
+    startTime: string;
+    endTime: string;
+    location: string;
     club: Club;
+    clubId: number;
     owner: User;
+    ownerId: number;
     likes: Like[];
     comments: Comment[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Owner {
