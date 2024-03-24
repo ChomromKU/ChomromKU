@@ -1,6 +1,6 @@
 "use client";
 import { Carousel } from "@mantine/carousel";
-import { Post } from "../../../../types/post";
+import { Post } from "../../../types/post";
 import React from "react";
 
 const CarouselWrapper = ({ post }: { post: Post }) => {

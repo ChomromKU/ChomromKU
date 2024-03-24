@@ -3,9 +3,9 @@
 import { GoHeartFill } from "react-icons/go";
 import { GoHeart } from "react-icons/go";
 import axios from "axios";
-// import { useSession } from "next-auth/react";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa6";
+import { useAuth } from "../../hooks/useAuth";
 
 type LikeButtonProps = {
 	isLike: boolean;
@@ -16,13 +16,13 @@ type LikeButtonProps = {
 };
 
 export default function LikeButton({ isLike, like, unlike, postId, type }: LikeButtonProps) {
-	// const { status } = useSession();
+	const { user } = useAuth();
 
 	async function handleClickLike() {
-		// if (status !== "authenticated") {
-		// 	alert("กรุณาเข้าสู่ระบบ");
-		// 	return;
-		// }
+		if (!user) {
+			alert("กรุณาเข้าสู่ระบบ");
+			return;
+		}
 
 		try {
 			await axios.post(`/api/posts/${postId}/like`, {
@@ -35,10 +35,10 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 	}
 
 	async function handleClickUnlike() {
-		// if (status !== "authenticated") {
-		// 	alert("กรุณาเข้าสู่ระบบ");
-		// 	return;
-		// }
+		if (!user) {
+			alert("กรุณาเข้าสู่ระบบ");
+			return;
+		}
 
 		try {
 			await axios.delete(`/api/posts/${postId}/like?type=${type}`);

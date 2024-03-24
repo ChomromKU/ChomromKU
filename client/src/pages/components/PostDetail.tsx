@@ -8,35 +8,34 @@ import { FaRegComment } from "react-icons/fa6";
 import { postTypeToColorMap, postTypeToLabelPost } from "../../lib/post"
 import CommentInput from "./CommentInput";
 import LikeButton from "./LikeButton";
-// import { useSession } from "next-auth/react";
+import { useAuth } from "../../hooks/useAuth";
 
 type PostDetailProps = {
 	post: Post;
 };
 
 const PostDetail = ({ post }: PostDetailProps) => {
-	// const session = useSession();
-	// const isAuthenticated = UserActivation.status === "authenticated";
+	const { user } = useAuth();
 
 	const [likeCount, setLikeCount] = useState<number>(post.likes.length);
-	// const [isLike, setIsLike] = useState<boolean>(
-	// 	isAuthenticated ? post.likes.some((like) => like.userId === session.data.user.id) : false,
-	// );
+	const [isLike, setIsLike] = useState<boolean>(
+		user ? post.likes.some((like) => like.userId === user.id) : false,
+	);
 
-	// useEffect(() => {
-	// 	if (isAuthenticated) {
-	// 		setIsLike(post.likes.some((like) => like.userId === session.data.user.id));
-	// 	} else {
-	// 		setIsLike(false);
-	// 	}
-	// }, [isAuthenticated, session, post]);
+	useEffect(() => {
+		if (user) {
+			setIsLike(post.likes.some((like) => like.userId === user.id));
+		} else {
+			setIsLike(false);
+		}
+	}, [user, post]);
 
 	const like = () => {
-		// setIsLike((prev) => !prev);
+		setIsLike((prev) => !prev);
 		setLikeCount((prev) => prev + 1);
 	};
 	const unlike = async () => {
-		// setIsLike((prev) => !prev);
+		setIsLike((prev) => !prev);
 		setLikeCount((prev) => prev - 1);
 	};
 
@@ -47,13 +46,15 @@ const PostDetail = ({ post }: PostDetailProps) => {
 					<span>
 						โดย {post.owner.firstNameTh} {post.owner.lastNameTh}
 					</span>
-					<span>
-						{post.createdAt.toLocaleDateString("th-TH", {
+					{post.createdAt && typeof post.createdAt === 'object' ? (
+						<span>{post.createdAt.toLocaleDateString("th-TH", {
 							year: "numeric",
 							month: "long",
 							day: "numeric",
-						})}
-					</span>
+						})}</span>
+					) : (
+						<span>No date available</span>
+					)}
 				</div>
 				<span className="text-2xl font-bold">{post.title}</span>
 			</header>
@@ -61,7 +62,7 @@ const PostDetail = ({ post }: PostDetailProps) => {
 				<Tag tagName={postTypeToLabelPost(post.type)} color={postTypeToColorMap(post.type)} />
 				<p className="break-all font-light">{post.content}</p>
 				<div className="flex gap-2">
-					<LikeButton isLike={true/*isLike*/} like={like} unlike={unlike} postId={post.id} type="post" />
+					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={post.id} type="post" />
 					<FiSend className="h-5 w-5" />
 				</div>
 				{likeCount > 0 && <p className="font-light text-sm">{likeCount} likes</p>}
