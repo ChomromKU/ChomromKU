@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const axios = require('axios');
+const z = require('zod');
 
 // process
 const PORT = process.env.PORT || 3001;
@@ -157,6 +158,63 @@ app.get('/posts/:id', async (req, res) => {
     }
 });
 
+
+
+// Like
+
+const createLikeSchema = z.object({
+    type: z.enum(["event", "post"]),
+});
+
+app.post('/posts/:id/like', async (req, res) => {
+    const { id } = req.params;
+    const body = req.body;
+    const validator = createLikeSchema.safeParse(body);
+    if (!validator.success) {
+        return res.status(400).json("กรุณากรอกข้อมูลให้ถูกต้อง");
+    }
+    const { type } = validator.data;
+    try {
+        const newLike = await prisma.like.create({
+            data: {
+                userId: body.userId,
+                createdAt: new Date(),
+                postId: type === "post" ? parseInt(id) : undefined,
+                eventId: type === "event" ? parseInt(id) : undefined,
+            },
+        });
+        res.status(201).json(newLike);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Error creating like" });
+    }
+});
+
+app.delete('/posts/:id/like', async (req, res) => {
+    const { id: postId } = req.params;
+    const { userId } = req.body;
+    const { type } = req.query; 
+  
+    try {
+        const like = await prisma.like.findFirst({
+            where: {
+              postId: parseInt(postId),
+              userId: userId,
+            },
+          });
+
+        if (!like) {
+            return res.status(404).json({ error: "Like not found" });
+        }
+
+        const deletedLike = await prisma.like.delete({ where: { id: like.id } });
+        res.status(200).json(deletedLike);
+    } catch (error) {
+        console.error("Error deleting like:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+  
 
 
 // Events
