@@ -18,12 +18,13 @@ import { SocialMedia } from "../../types/club";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
 import Modal from "./CustomModal";
-
+import { User } from "../../types/auth";
 
 import { PostType } from "../../types/post";
+
 interface NewsProps {
 	post: Post;
-	role?: String;
+	role?: string;
 }
 
 const canApprove = (role?: string) => {
@@ -47,6 +48,8 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [canApprove, setCanApprove] = useState<boolean>(false);
 
+	const [postOwner, setPostOwner] = useState<User>();
+
 	const approveByPostId = async (postId: number, type: PostType, clubId: number) => {
 		try {
 			await axios.post(`http://localhost:3001/posts/${postId}/approve?type=${type}`, { clubId });
@@ -65,6 +68,19 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 			setIsLike(false);
 		}
 	}, [user, post]);
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/users`);
+				setPostOwner(data.find((user: User) => user.id === post.ownerId))
+			} catch (e) {
+				console.log(e);
+			}
+		}
+		fetchUser()
+	},[post.ownerId])
+
 
 	const like = () => {
 		setIsLike((prev) => !prev);
@@ -88,7 +104,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 						    <p className="h-1/2 leading-[20px] font-normal">{post.club.label}</p>
 						</div>
 					</Link>
-					<p className="h-1/2 text-xs font-light">owner first name</p>
+					<p className="h-1/2 text-xs font-light">{postOwner?.firstNameEn} {postOwner?.lastNameEn}</p>
 				</div>
 				<div className="">
 					<Tag tagName={postTypeToLabelPost(post.type)}
@@ -139,7 +155,7 @@ const News: React.FC<NewsProps> = ({ post, role }) => {
 			<Modal centered opened={opened} onClose={close} withCloseButton={false}>
 				<p className="font-light mb-2">
 					คุณตกลงอนุมัติโพสต์หัวข้อ <span className="font-bold">{post.title}</span>
-					<p>โดย {post.owner.titleTh + post.owner.firstNameTh + " " + post.owner.lastNameTh} ใช่หรือไม่</p>
+					<p>โดย {postOwner?.titleTh} + {postOwner?.firstNameTh} + " " + {postOwner?.lastNameTh} ใช่หรือไม่</p>
 				</p>
 				<div className="flex gap-2 pt-2 items-center justify-center">
 					<button

@@ -1,5 +1,3 @@
-"use client";
-
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -19,10 +17,13 @@ import Modal from "./CustomModal";
 import { useNavigate } from "react-router-dom";
 import { FaRegComment } from "react-icons/fa6";
 import { FiSend } from "react-icons/fi";
+import { Club } from "../../types/club";
 
 interface NewsEventProps {
 	event: Events;
 	role?: Role;
+	club: Club;
+
 }
 
 const canApprove = (role?: string) => {
@@ -36,12 +37,13 @@ const canApprove = (role?: string) => {
 dayjs.extend(relativeTime);
 dayjs.locale("th");
 
-const NewsEvent: React.FC<NewsEventProps> = ({ event, role }) => {
-	const { user, logout } = useAuth();
+const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
+	const { user } = useAuth();
     const navigate = useNavigate();
+	const [postOwner, setPostOwner] = useState<User>();
     console.log(event)
 
-	const [likeCount, setLikeCount] = useState<number>(event.likes.length);
+	const [likeCount, setLikeCount] = useState<number>(event.likes ? event.likes.length : 0);
 	const [isLike, setIsLike] = useState<boolean>(false);
 	const [opened, { open, close }] = useDisclosure(false);
 
@@ -55,13 +57,30 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role }) => {
 		}
 	};
 
+	// useEffect(() => {
+	// 	if (user) {
+	// 		setIsLike(event.likes.some((like) => like.userId === user.id));
+	// 	} else {
+	// 		setIsLike(false);
+	// 	}
+	// }, [user, event]);
+	
+
 	useEffect(() => {
-		if (user) {
-			setIsLike(event.likes.some((like) => like.userId === user.id));
-		} else {
-			setIsLike(false);
+		const fetchUser = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/users`);
+				setPostOwner(data.find((user: User) => user.id === event.ownerId)) 
+			} catch (e) {
+				console.log(e);
+			}
 		}
-	}, [user, event]);
+		fetchUser()
+	},[event.ownerId])
+
+	console.log(event);
+	console.log(club);
+	
 
 	const like = async () => {
 		setIsLike((prev) => !prev);
@@ -80,12 +99,12 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role }) => {
 			<header className="flex items-center gap-2 mb-4">
 				<div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-orange-400 color-white">A</div>
 				<div className="w-full flex-1 flex flex-col">
-					<Link to={`/clubs/${event.club.id}`}>
+					<Link to={`/clubs/${event.clubId}`}>
 						<div className="flex justify-between items-center">
-							<p className="h-1/2 font-normal">{event.club.label}</p>
+							<p className="h-1/2 font-normal">{club.label}</p>
 						</div>
 					</Link>
-					<p className="h-1/2 text-xs font-light">{event.owner.firstNameTh}</p>
+					<p className="h-1/2 text-xs font-light">{postOwner?.firstNameEn} {postOwner?.lastNameEn}</p>
 				</div>
 				<div className="">
 					<Tag tagName="อีเว้นท์" color="bg-[#F24B4B]" />
@@ -132,9 +151,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role }) => {
 			<Modal centered opened={opened} onClose={close} withCloseButton={false}>
 				<p className="font-light mb-2">
 					คุณตกลงอนุมัติโพสต์หัวข้อ <span className="font-bold">{event.title}</span>
-					<p>
-						โดย {event.owner.titleTh + event.owner.firstNameTh + " " + event.owner.lastNameTh} ใช่หรือไม่
-					</p>
+					<p>โดย {postOwner?.titleTh} + {postOwner?.firstNameTh} + " " + {postOwner?.lastNameTh} ใช่หรือไม่</p>
 				</p>
 				<div className="flex gap-2 pt-2 items-center justify-center">
 					<button

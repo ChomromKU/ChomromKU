@@ -4,11 +4,11 @@ import { useForm ,SubmitHandler, FieldValues } from "react-hook-form";
 import axios from "axios";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ClubMember } from "../../../types/club";
+import { ClubMember } from "../../../../../types/club";
 // import { DynamicSelect } from "../../components/DynamicSelect";
-import { useAuth } from "../../../hooks/useAuth";
+import { useAuth } from "../../../../../hooks/useAuth";
 import { useEffect, useState } from "react";
-import closeIcon from '../../../images/close.svg'
+import closeIcon from '../../../../../images/close.svg'
 
 const postFormSchema = z.object({
   year: z.string().min(1),

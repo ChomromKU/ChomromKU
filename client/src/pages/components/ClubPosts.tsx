@@ -1,6 +1,6 @@
 // import Link from 'next/link';
 import { Link } from "react-router-dom";
-import News from "./News";
+import News from "./NewsPost";
 import { useEffect, useState } from "react";
 import { Like, PostType } from "../../types/post";
 import { Post } from "../../types/post";

@@ -9,14 +9,16 @@ import Footer from './pages/components/Footer';
 import Main from './pages/main';
 import Clubs from './pages/club/clubs';
 import ClubProfile from './pages/club/clubProfile';
-import EventPage from './pages/club/eventPage';
+import EventPage from './pages/club/events/eventPage';
 import LoginPage from './pages/login/loginPage';
 import { AuthContext, AuthProvider } from './context/AuthContext';
 import { useAuth } from './hooks/useAuth';
-import Members from './pages/members/memberPage';
-import NewMemberPage from './pages/members/newMemberPage';
+import Members from './pages/club/members/page';
+import NewMemberPage from './pages/club/members/new/newMemberPage';
 import PostForm from './pages/components/PostForm';
 import PostDetailPage from './pages/post/page';
+import NewEventPage from './pages/club/posts/new/newEventPage';
+import RequestedPostsPage from './pages/club/posts/requested/requestedPostsPage';
 
 export default function App() {
   return (
@@ -31,9 +33,10 @@ export default function App() {
           <Route path='/login' element={<LoginPage />} />
           <Route path='/clubs/:id/members' element={<Members />} />
           <Route path='/clubs/:id/user/:userId/applyForm' element={<NewMemberPage />} />
-          <Route path='/clubs/:id/posts/new' element={<PostForm />} />
+          <Route path='/clubs/:id/posts/new' element={<NewEventPage />} />
           <Route path='/posts/:id' element={<PostDetailPage />} />
           <Route path='/posts/:id/like'/>
+          <Route path='/clubs/:id/posts/requested' element={<RequestedPostsPage />} />
         </Routes>
         <Footer />
       </Router>

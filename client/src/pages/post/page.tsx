@@ -4,7 +4,7 @@ import { Post } from '../../types/post';
 import CarouselWrapper from './_components/CarouselWrapper';
 import CommentBox from '../components/CommentBox';
 import { useAuth } from '../../hooks/useAuth';
-import News from '../components/News';
+import News from '../components/NewsPost';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 

@@ -123,6 +123,7 @@ export default function ClubProfile() {
 
 				if (data.members) {
 					setMembers(data.members);
+					// console.log(data.members);
 				} else {
 					console.error('Members data not found in response:', data);
 				}
@@ -146,8 +147,17 @@ export default function ClubProfile() {
 				console.error('Error fetching clubs:', error);
 			}
 		};
+		const fetchPosts = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/posts`);
+				console.log(data);
+			} catch (error) {
+				console.error('Error fetching clubs:', error);
+			}
+		}
 		fetchClubs();
 		fetchCurrentMember()
+		fetchPosts()
 	}, [id]);
 
 	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {

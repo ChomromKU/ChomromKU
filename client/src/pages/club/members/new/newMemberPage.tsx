@@ -5,7 +5,7 @@ import MemberPostForm from "./_components/MemberPostForm";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import { Club } from "../../types/club";
+import { Club } from "../../../../types/club";
 // import { cache } from "react";
 // import prisma from "@/lib/prisma";
 

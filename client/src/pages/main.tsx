@@ -1,6 +1,6 @@
 import AutocompleteWrapper from './components/AutocompleteWrapper';
 import CalendarWrapper from './components/CalendarWrapper'
-import News from './components/News';
+import News from './components/NewsPost';
 import { PostType } from '../types/post';
 // import { SocialMedia } from '../types/club';
 

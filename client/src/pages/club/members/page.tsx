@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import MemberBox from "../components/MemberBox";
+import MemberBox from "../../components/MemberBox";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { ClubMember } from "../../types/club";
+import { ClubMember } from "../../../types/club";
 
 // interface MembersPageProps {
 //   params: { id: string };

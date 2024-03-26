@@ -444,22 +444,7 @@ return crypto
     .toString("base64");
 };     
 
-// get http://localhost:3001/events?clubId=${clubId}&status=${status}
-// app.get('/events', async (req, res) => {
-//     const { clubId, status } = req.query;
-//     try {
-//         const events = await prisma.event.findMany({
-//             where: {
-//                 clubId: parseInt(clubId),
-//                 status: status,
-//             },
-//         });
-//         res.json(events);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: 'Error fetching events' });
-//     }
-// });
+
 
 
 

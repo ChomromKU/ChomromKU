@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import EventBox from '../components/EventBox';
+import EventBox from '../../components/EventBox';
 import { useParams, Link } from 'react-router-dom'; // Import useParams hook
 
-import { ClubEvent } from '../../types/club';
+import { ClubEvent } from '../../../types/club';
 
 interface MembersComponentProps {
   clubId: string;
