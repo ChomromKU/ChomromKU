@@ -35,7 +35,7 @@ export default function App() {
           <Route path='/clubs/:id/user/:userId/applyForm' element={<NewMemberPage />} />
           <Route path='/clubs/:id/posts/new' element={<NewEventPage />} />
           <Route path='/posts/:id' element={<PostDetailPage />} />
-          <Route path='/posts/:id/like'/>
+          {/* <Route path='/posts/:id/like'/> */}
           <Route path='/clubs/:id/posts/requested' element={<RequestedPostsPage />} />
         </Routes>
         <Footer />

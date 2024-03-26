@@ -160,7 +160,7 @@ app.get('/posts/:id', async (req, res) => {
 
 
 
-// Like
+// Like & Comment
 
 const createLikeSchema = z.object({
     type: z.enum(["event", "post"]),
@@ -174,7 +174,19 @@ app.post('/posts/:id/like', async (req, res) => {
         return res.status(400).json("กรุณากรอกข้อมูลให้ถูกต้อง");
     }
     const { type } = validator.data;
+
     try {
+        // Check if the user has already liked this post
+        const existingLike = await prisma.like.findFirst({
+            where: {
+                userId: body.userId,
+                postId: parseInt(id),
+            },
+        });
+        if (existingLike) {
+            return res.status(400).json({ error: "User has already liked this post" });
+        }
+
         const newLike = await prisma.like.create({
             data: {
                 userId: body.userId,
@@ -191,14 +203,14 @@ app.post('/posts/:id/like', async (req, res) => {
 });
 
 app.delete('/posts/:id/like', async (req, res) => {
-    const { id: postId } = req.params;
+    const { id } = req.params;
     const { userId } = req.body;
     const { type } = req.query; 
   
     try {
         const like = await prisma.like.findFirst({
             where: {
-              postId: parseInt(postId),
+              postId: parseInt(id),
               userId: userId,
             },
           });
@@ -215,7 +227,61 @@ app.delete('/posts/:id/like', async (req, res) => {
     }
 });
   
+const createCommentSchema = z.object({
+	message: z.string().min(1).max(1000),
+	type: z.enum(["event", "post"]),
+});
 
+app.post('/posts/:id/comment', async (req, res) => {
+    const { id } = req.params;
+	const body = req.body;
+
+	const validator = createCommentSchema.safeParse(body);
+	if (!validator.success) {
+		res.json("กรุณากรอกข้อมูลให้ถูกต้อง", { status: 400 });
+	}
+	const { type, message } = validator.data;
+
+	try {
+		const newComment = await prisma.comment.create({
+			data: {
+				message: message,
+				userId: body.userId,
+				postId: type === "post" ? parseInt(id) : undefined,
+				eventId: type === "event" ? parseInt(id) : undefined,
+			},
+		});
+        console.log(newComment);
+		res.status(201).json(newComment);
+	} catch (error) {
+		res.json({ error: error }, { status: 500 });
+	}
+});
+
+app.get('/posts/:id/comment', async (req, res) => {
+    const { id } = req.params;
+  
+    try {      const comments = await prisma.comment.findMany({
+        where: {
+          OR: [
+            { postId: parseInt(id) },
+            { eventId: parseInt(id) },
+          ],
+        },
+        include: {
+          user: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+  
+      res.status(200).json(comments);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+      res.status(500).json({ error: 'Error fetching comments' });
+    }
+  });
 
 // Events
 
