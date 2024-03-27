@@ -288,7 +288,7 @@ app.get('/posts/:id/comment', async (req, res) => {
 app.get('/events', async (req, res) => {
     try {
         const events = await prisma.event.findMany();
-        res.json(events);
+        res.status(200).json(events);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching events' });

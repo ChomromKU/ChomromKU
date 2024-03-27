@@ -10,6 +10,7 @@ export type Club = {
     members?: ClubMember[];
     socialMedia: SocialMedia;
     memberRequestForm?: MemberRequestForm[]
+    subscribers: User[];
 };
 
 export type ClubEvent = {

@@ -11,9 +11,3 @@ export interface User {
   campusNameTh: string;
   campusNameEn: string;
 }
-
-
-export interface Session {
-  user: User;
-
-}

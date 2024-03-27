@@ -81,6 +81,7 @@ export interface Events {
     comments: Comment[];
     createdAt: Date;
     updatedAt: Date;
+    followers: User[];
 }
 
 export interface Owner {

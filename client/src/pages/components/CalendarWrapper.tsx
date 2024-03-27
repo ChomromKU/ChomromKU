@@ -4,24 +4,27 @@ import { DatePicker, DatePickerProps, DateValue } from "@mantine/dates";
 import "dayjs/locale/th";
 import dayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
-// import { Club, Event, User } from "@prisma/client";
 import { Indicator } from "@mantine/core";
 import EventBox from "./Event";
 import { animated, useSpring, useTransition } from "@react-spring/web";
 import { Link } from 'react-router-dom'
+import { Club } from "../../types/club";
+import { User } from "../../types/auth";
+import { Events } from "../../types/post";
 
 dayjs.extend(localeData);
 dayjs.locale("th");
 
-interface EventWithClub extends Event {
-	// club: Club;
+interface EventWithClub extends Events {
+	club: Club;
 }
 
 interface EventWithClubWithFollwer extends EventWithClub {
   startDate: Date;
   endDate: Date;
-  // followers: User[]
+  followers: User[];
 }
+
 export interface CalendarWrapperProps {
 	events: EventWithClubWithFollwer[];
 }
@@ -84,26 +87,31 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
 	};
 
 	const checkDateInRange = (startDate: Date, date: Date, endDate: Date) => {
-		const day = {
-			start: startDate.getDate(),
-			actual: date.getDate(),
-			endDate: endDate.getDate(),
-		};
-
-		const month = {
-			start: startDate.getMonth(),
-			actual: date.getMonth(),
-			endDate: endDate.getMonth(),
-		};
-
-		const year = {
-			start: startDate.getUTCFullYear(),
-			actual: date.getUTCFullYear(),
-			endDate: endDate.getUTCFullYear(),
-		};
-
-		return [day, month, year].filter((v) => v.start <= v.actual && v.actual <= v.endDate).length === 3;
-	};
+    if (!(startDate instanceof Date) || !(date instanceof Date) || !(endDate instanceof Date)) {
+      throw new Error('Invalid Date objects passed to checkDateInRange function');
+    }
+  
+    const day = {
+      start: startDate.getDate(),
+      actual: date.getDate(),
+      endDate: endDate.getDate(),
+    };
+  
+    const month = {
+      start: startDate.getMonth(),
+      actual: date.getMonth(),
+      endDate: endDate.getMonth(),
+    };
+  
+    const year = {
+      start: startDate.getFullYear(),
+      actual: date.getFullYear(),
+      endDate: endDate.getFullYear(),
+    };
+  
+    return [day, month, year].filter((v) => v.start <= v.actual && v.actual <= v.endDate).length === 3;
+  };
+  
 
   return (
     <div className="w-full">
@@ -172,16 +180,16 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
       <div className="w-full flex flex-col gap-[20px]">
         {eventTransition((style, item) =>
         (<animated.div style={style}>
-          {/* <Link href={"/events/" + item.id}>
+          <Link to={`/events/${item.id}`}>
             <EventBox
-              clubName={item.club.name}
+              clubName={item.club.label}
               eventName={item.title}
               startDate={item.startDate}
               endDate={item.endDate}
               location={item.location}
               key={item.id}
             />
-          </Link> */}
+          </Link>
         </animated.div>)
       )}
       {<animated.p style={props}>ไม่มีกิจกรรมในช่วงเวลานี้</animated.p>}

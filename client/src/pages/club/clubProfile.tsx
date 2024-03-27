@@ -18,6 +18,7 @@ import { PostType } from '../../types/post';
 import { Club, ClubMember, SocialMedia, ClubEvent } from '../../types/club';
 import { useAuth } from '../../hooks/useAuth';
 import { User } from '../../types/auth';
+import { subscribe } from 'diagnostics_channel';
 
 const posts = [{
     id: 1,
@@ -30,7 +31,7 @@ const posts = [{
     updatedAt: new Date(),
     likes: [],
     comments: [],
-    club: { id: 1, label: 'Sample Club', branch: 'Some Branch', category: 'Some Category', location: 'Some Location', phoneNumber: '1234567890', socialMedia: {facebook: '', instagram: '', twitter: ''}},
+    club: { id: 1, label: 'Sample Club', branch: 'Some Branch', category: 'Some Category', location: 'Some Location', phoneNumber: '1234567890', socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[]},
     clubId: 1,
     owner: {
 		id: 1,
@@ -58,7 +59,7 @@ const posts = [{
     updatedAt: new Date(),
     likes: [],
     comments: [],
-    club: { id: 2, label: 'Sample Club 2', branch: 'Some Branch 2', category: 'Some Category 2', location: 'Some Location 2', phoneNumber: '9876543210', socialMedia: {facebook: '', instagram: '', twitter: ''}},
+    club: { id: 2, label: 'Sample Club 2', branch: 'Some Branch 2', category: 'Some Category 2', location: 'Some Location 2', phoneNumber: '9876543210', socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[]},
     clubId: 2,
     owner: {
 		id: 1,
