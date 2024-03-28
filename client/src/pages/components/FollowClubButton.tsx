@@ -52,7 +52,6 @@ export default function FollowClubButton({ member, club, clubId, isFollowing, ed
 		setShowModal(false)
 	}
 
-	console.log(member?.role);
 	if (member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT') {
 		return (
 			<>
@@ -82,7 +81,7 @@ export default function FollowClubButton({ member, club, clubId, isFollowing, ed
 					<>
 						<div className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none ">
 							<div className="relative w-auto my-6 mx-auto max-w-3xl">
-								<div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+								<div className="border-0 rounded-lg shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] relative flex flex-col w-full bg-white outline-none focus:outline-none">
 									<div className="flex justify-between p-[25px] flex-col text-black gap-[15px]">
 										<p>ยืนยันการเปลี่ยนแปลง</p>
 										<div className="flex gap-[10px]">

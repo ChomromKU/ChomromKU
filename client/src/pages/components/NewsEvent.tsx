@@ -22,39 +22,40 @@ import { Club } from "../../types/club";
 interface NewsEventProps {
 	event: Events;
 	role?: Role;
-	club: Club;
-
+	clubLabel: string;
+	reFetchPost?: () => Promise<void>;
 }
 
 const canApprove = (role?: string) => {
 	if (!role) {
 		return false;
 	}
-	return role === 'PRESIDENT' || role === 'VICE_PRESIDENT';
+	return role === 'PRESIDENT' || role === 'VICE_PRESIDENT' || role === 'ADMIN';
 };
 
 
 dayjs.extend(relativeTime);
 dayjs.locale("th");
 
-const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
+const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPost }) => {
 	const { user } = useAuth();
     const navigate = useNavigate();
+
+	const [openedAccept, { open: openAccept, close: closeAccept }] = useDisclosure(false);
+    const [openedDecline, { open: openDecline, close: closeDecline }] = useDisclosure(false);
+	const [sending, setSending] = useState<boolean>(false)
+	const [successModalOpened, setSuccessModalOpened] = useState(false);
+
 	const [postOwner, setPostOwner] = useState<User>();
-    console.log(event)
 
 	const [likeCount, setLikeCount] = useState<number>(event.likes ? event.likes.length : 0);
 	const [isLike, setIsLike] = useState<boolean>(false);
-	const [opened, { open, close }] = useDisclosure(false);
 
-	const approveByPostId = async (eventId: number, clubId: number) => {
-		try {
-			await axios.post(`/api/posts/${eventId}/approve?type=event`, { clubId });
-			navigate(`/clubs/${clubId}`);
-			// console.log(res);
-		} catch (e) {
-			console.log(e);
-		}
+	const openSuccessModal = () => {
+		setSuccessModalOpened(true);
+	};
+	const closeSuccessModal = () => {
+		setSuccessModalOpened(false);
 	};
 
 	// useEffect(() => {
@@ -64,8 +65,40 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 	// 		setIsLike(false);
 	// 	}
 	// }, [user, event]);
-	
 
+	const onDeletes = async (eventId: number) => {
+		try {
+            setSending(true)
+            await axios.delete(`http://localhost:3001/events/${eventId}`);
+            closeDecline()
+            openSuccessModal();
+            setTimeout(() => {
+                setSending(false)
+				closeSuccessModal()
+				reFetchPost?.()
+            }, 3000);
+		} catch (error) {
+		console.error(error);
+		}
+	};
+
+	const approvedPost = async (eventId: number) => {
+		try {
+			console.log(eventId);
+            setSending(true)
+            await axios.put(`http://localhost:3001/events/${eventId}/approve`);
+            closeAccept()
+            openSuccessModal();
+            setTimeout(() => {
+                setSending(false)
+				closeSuccessModal()
+				reFetchPost?.()
+            }, 3000);
+		} catch (error) {
+		console.error(error);
+		}
+	};
+	
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
@@ -77,10 +110,6 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 		}
 		fetchUser()
 	},[event.ownerId])
-
-	console.log(event);
-	console.log(club);
-	
 
 	const like = async () => {
 		setIsLike((prev) => !prev);
@@ -95,13 +124,13 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 	const getPreviousTime = (date: Date) => dayjs(date).fromNow();
 
 	return (
-		<div className="w-full p-4 border rounded-md shadow-sm">
+		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)"}}>
 			<header className="flex items-center gap-2 mb-4">
 				<div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-orange-400 color-white">A</div>
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${event.clubId}`}>
 						<div className="flex justify-between items-center">
-							<p className="h-1/2 font-normal">{club.label}</p>
+							<p className="h-1/2 font-normal">{clubLabel}</p>
 						</div>
 					</Link>
 					<p className="h-1/2 text-xs font-light">{postOwner?.firstNameEn} {postOwner?.lastNameEn}</p>
@@ -112,7 +141,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 			</header>
 			<div className="mb-2">
 				<span className="mr-2 break-all">{truncateText(event.content)}</span>
-				<Link to={`/posts/${event.id}`}>
+				<Link to={`/events/${event.id}`}>
 					<span style={{ color: "#006664", textDecoration: "underline" }}>อ่านเพิ่มเติม</span>
 				</Link>
 			</div>
@@ -122,7 +151,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 					width={0}
 					height={0}
 					sizes="100vw"
-					style={{ width: "100%", height: "auto" }}
+					style={{ width: "100%", height: "auto" , borderRadius: '10px'}}
 					alt={"event"}
 				/>
 			</div>
@@ -138,38 +167,75 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, club }) => {
 						<p className="h-1/2 font-light text-xs">{getPreviousTime(event.createdAt)}</p>
 					</div>
 				</div>
-			) : (
+			) : ( 
 				<div className="flex flex-row">
-					<button className="block text-sm text-white py-1 px-4 border mr-1 bg-[#006664] rounded-full" onClick={open}>
+					<button 
+						className="block text-sm text-white py-1 px-4 border mr-1 bg-[#006664] rounded-full"
+						onClick={openAccept}
+					>
 						อนุมัติ
 					</button>
-					<button className="block text-sm text-[#F24B4B] py-1 px-4 border border-[#F24B4B] rounded-full">
+					<button 
+						className="block text-sm text-[#F24B4B] py-1 px-4 border border-[#F24B4B] rounded-full"
+						onClick={openDecline}
+					>
 						ปฏิเสธ
 					</button>
 				</div>
 			)}
-			<Modal centered opened={opened} onClose={close} withCloseButton={false}>
-				<p className="font-light mb-2">
-					คุณตกลงอนุมัติโพสต์หัวข้อ <span className="font-bold">{event.title}</span>
-					<p>โดย {postOwner?.titleTh} + {postOwner?.firstNameTh} + " " + {postOwner?.lastNameTh} ใช่หรือไม่</p>
+			<Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+				<p className="font-light mb-[15px] leading-[25px]">
+					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold">{event.title}</span>
+					<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
 				</p>
-				<div className="flex gap-2 pt-2 items-center justify-center">
+				<div className="flex gap-2 items-center justify-center">
 					<button
-						onClick={() => {
-							approveByPostId(event.id, event.clubId);
-						}}
+						onClick={() => approvedPost(event.id)}
 						className="py-1 px-4 rounded-full bg-[#006664] text-white"
 					>
 						ตกลง
 					</button>
 					<button
 						type="submit"
-						onClick={close}
+						onClick={closeAccept}
 						className="py-1 px-4 rounded-full border border-[#F24B4B] text-[#F24B4B]"
 					>
 						ยกเลิก
 					</button>
 				</div>
+			</Modal>
+			<Modal centered opened={openedDecline} onClose={closeDecline} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedDecline && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+				{ sending ? <p>กำลังลบข้อมูล</p>:
+					<>
+						<p className="font-light mb-[15px] leading-[25px]">
+						คุณปฏิเสธโพสต์หัวข้อ <br/><span className="font-bold">{event.title}</span>
+						<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
+						</p>
+						<div className="flex gap-2 items-center justify-center">
+							<button
+								className="py-[4px] px-[15px] rounded-full bg-[#006664] text-white"
+								onClick={() => onDeletes(event.id)}
+							>
+								ตกลง
+							</button>
+							<button
+								onClick={closeDecline}
+								className="py-2 px-4 rounded-full border border-[#F24B4B] text-[#F24B4B]"
+							>
+								ยกเลิก
+							</button>
+						</div>
+					</>
+				}
+			</Modal>
+			<Modal
+				centered
+				opened={successModalOpened}
+				onClose={closeSuccessModal}
+				withCloseButton={false}
+				className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
+			>
+				<p>สำเร็จ</p>
 			</Modal>
 		</div>
 	);

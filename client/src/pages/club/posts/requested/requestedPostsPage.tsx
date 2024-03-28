@@ -14,54 +14,36 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Club } from "../../../../types/club";
 
-
-// const fetchPostsNotApprovedPost = cache((clubId: number) =>
-// 	prisma.post.findMany({
-// 		where: { clubId: clubId, approved: false },
-// 		include: { club: true, owner: true, likes: true },
-// 	}),
-// );
-
-// const fetchEventsNotApprovedPost = cache((clubId: number) =>
-// 	prisma.event.findMany({
-// 		where: { clubId: clubId, approved: false },
-// 		include: { club: true, owner: true, likes: true },
-// 	}),
-// );
-
-// const fetchMemberByUserId = cache((userId: number) =>
-// 	prisma.member.findUnique({
-// 		where: { userId: userId },
-// 	}),
-// );
-
-// const fetchUserByUserId = cache((userId: number) =>
-// 	prisma.user.findUnique({
-// 		where: { id: userId },
-// 	}),
-// );
-
 export default function RequestedPostsPage() {
 	const { id } = useParams();
-	// const [clubs, setClubs] = useState<Club>();
 	const [clubs, setClubs] = useState<Club | null>(null);
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [events, setEvents] = useState<Events[]>([]);
 	const [members, setMembers] = useState<ClubMember[]>([]);
 	const { user } = useAuth();
 
+	const fetchUnApprovedPosts = async () => {
+		try {
+			const { data } = await axios.get(`http://localhost:3001/clubs/${id}/posts/unapproved`);
+			setPosts(data);
+		} catch (error) {
+			console.error('Error fetching UnApprovedPosts:', error);
+		}
+	};
+
+	const reFetchPost = async () => {
+        try {
+            fetchUnApprovedPosts();
+        } catch (error) {
+            console.error('Error deleting member:', error);
+        }
+    };
+
     useEffect(() => {
         const fetchClubs = async () => {
             try {
                 const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClubs(data);
-
-                if (data.posts) {
-					setPosts(data.posts);
-				} else {
-					console.error('Post data not found in response:', data);
-				}
-
 				if (data.events) {
 					setEvents(data.events);
 				} else {
@@ -79,7 +61,8 @@ export default function RequestedPostsPage() {
             }
         };
 		fetchClubs();
-    }, [id]);
+		fetchUnApprovedPosts();
+    }, []);
 
 
 	// const club = await prisma.club.findUnique({
@@ -108,24 +91,31 @@ export default function RequestedPostsPage() {
 				<span className="text-[#2F3337] text-2xl font-bold">{clubs.label}</span>
 			</div>
 
-			<div className="p-[24px] flex flex-col gap-[20px] ">
+			<div className="p-[24px] flex flex-col">
 				<p className="font-bold text-base">อนุมัติโพสต์</p>
-				<div className="items-center">
+				<div className="flex flex-col gap-[20px]">
 					<div className="flex justify-between w-full"></div>
-					{events
-						? events.map((p) => (
+					{events.filter((event) => !event.approved)
+						? events.filter((event) => !event.approved).map((p) => (
 								<div key={p.id}>
 									<NewsEvent 
-									event={p} 
-									role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
-									club={clubs} />
+									// <ClubPosts posts={posts.filter(post => post.approved)} clubId={club.id} />
+										event={p} 
+										role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
+										clubLabel={clubs.label}
+										reFetchPost={reFetchPost}
+									/>
 								</div>
 						  ))
 						: "No waiting requested posts"}
-					{posts
-						? posts.map((p) => (
+					{posts.filter((post) => !post.approved)
+						? posts.filter((post) => !post.approved).map((p) => (
 								<div key={p.id}>
-									<News post={p} role={(members.find(member => member.user.stdId === user?.stdId))?.role} />
+									<News 
+										post={p} 
+										role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
+										reFetchPost={reFetchPost}
+									/>
 								</div>
 						  ))
 						: "No waiting requested posts"}

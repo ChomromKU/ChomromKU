@@ -4,7 +4,7 @@ export const createEventSchema = z.object({
     title: z.string().min(1).max(255),
     content: z.string().min(1),
     imageUrl: z.string().url(),
-    location: z.string().min(1).max(255),
+    location: z.string().max(255),
     startDate: z
         .string()
         .or(z.date())

@@ -1,6 +1,6 @@
 interface TagProps {
-	tagName: string;
-	color: string;
+	tagName: string | undefined;
+	color: string | undefined;
 }
 
 const Tag = ({ tagName, color }: TagProps) => {

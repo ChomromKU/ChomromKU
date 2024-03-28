@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link, LinkProps, useNavigate, useParams } from 'react-router-dom';
 
 // import EventBox from "@/components/EventBox";
 import EventBox from '../components/EventBox';
@@ -14,80 +14,37 @@ import eventImage from '../../images/event.png'
 import lineIcon from '../../images/line.svg'
 import facebookIcon from '../../images/facebook.svg'
 import instagramIcon from '../../images/instagram.svg'
-import { PostType } from '../../types/post';
+import { Events, Post, PostType } from '../../types/post';
 import { Club, ClubMember, SocialMedia, ClubEvent } from '../../types/club';
 import { useAuth } from '../../hooks/useAuth';
 import { User } from '../../types/auth';
-import { subscribe } from 'diagnostics_channel';
+import { set } from 'zod';
 
-const posts = [{
-    id: 1,
-    title: 'Sample Title 1',
-    type: PostType.NORMAL_POST,
-    content: 'Lorem ipsum dolor sit amet 1.',
-    imageUrl: 'some-url-1',
-    approved: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likes: [],
-    comments: [],
-    club: { id: 1, label: 'Sample Club', branch: 'Some Branch', category: 'Some Category', location: 'Some Location', phoneNumber: '1234567890', socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[]},
-    clubId: 1,
-    owner: {
-		id: 1,
-		stdId: "1234567890",
-		stdCode: "ABC123",
-		titleTh: "นาย",
-		titleEn: "Mr.",
-		firstNameTh: "ชื่อไทย",
-		lastNameTh: "นามสกุลไทย",
-		firstNameEn: "First Name",
-		lastNameEn: "Last Name",
-		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
-		campusNameEn: "College Name (English)"
-	  },
-    ownerId: 1,
-}, 
-{
-    id: 2,
-    title: 'Sample Title 2',
-    type: PostType.NORMAL_POST,
-    content: 'Lorem ipsum dolor sit amet 2.',
-    imageUrl: 'some-url-2',
-    approved: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likes: [],
-    comments: [],
-    club: { id: 2, label: 'Sample Club 2', branch: 'Some Branch 2', category: 'Some Category 2', location: 'Some Location 2', phoneNumber: '9876543210', socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[]},
-    clubId: 2,
-    owner: {
-		id: 1,
-		stdId: "1234567890",
-		stdCode: "ABC123",
-		titleTh: "นาย",
-		titleEn: "Mr.",
-		firstNameTh: "ชื่อไทย",
-		lastNameTh: "นามสกุลไทย",
-		firstNameEn: "First Name",
-		lastNameEn: "Last Name",
-		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
-		campusNameEn: "College Name (English)"
-	  },
-    ownerId: 2,
-}];
+interface CustomLinkProps extends LinkProps {
+	state?: {
+		role: string | undefined;
+		clubLabel: string
+	};
+}
 
+
+const CustomLink: React.FC<CustomLinkProps> = ({ state, ...rest }) => (
+	<Link {...rest} to={rest.to} state={state} />
+);
 
 export default function ClubProfile() {
 	const { user } = useAuth()
+	const [roleUser, setRoleUser] = useState<string>("")
     const { id } = useParams();
     const [club, setClub] = useState<Club>();
 	const [members, setMembers] = useState<ClubMember[]>([]);
 	const [currentUser, setCurrentUser] = useState<User>()
-    const [upcomingEvents, setUpcomingEvents] = useState<ClubEvent[]>([]);
+    const [upcomingEvents, setUpcomingEvents] = useState<Events[]>([]);
     const [socialMedia, setSocialMedia] = useState<SocialMedia>()
     const [editing, setEditing] = useState<boolean>(false);
     const [editedFields, setEditedFields] = useState<Partial<Club>>({});
+	const [posts, setPosts] = useState<Post[]>([]);
+	const [events, setEvents] = useState<Events[]>([]);
 
     const [error, setError] = useState<boolean>(false)
 
@@ -97,8 +54,6 @@ export default function ClubProfile() {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
                 setClub(data);
 				setError(false);
-				console.log(data);
-
 				const currentDate = new Date().getTime();
 				const presentEvents = data.events.filter((event: ClubEvent) => {
 					const startDate = new Date(event.startDate).getTime();
@@ -118,13 +73,14 @@ export default function ClubProfile() {
 						const startDateB = new Date(b.startDate).getTime();
 						return startDateA - startDateB;
 					}));
+					setEvents(data.events)
 				} else {
 					console.error('Events data not found in response:', data);
 				}
 
 				if (data.members) {
 					setMembers(data.members);
-					// console.log(data.members);
+					setRoleUser(data.members.find((member: ClubMember) => member.user.stdId === user?.stdId)?.role)
 				} else {
 					console.error('Members data not found in response:', data);
 				}
@@ -133,6 +89,12 @@ export default function ClubProfile() {
                     setSocialMedia(data.socialMedia);
                 } else {
                     console.error('Social Media data not found in response:', data);
+                }
+
+				if(data.posts) {
+					setPosts(data.posts);
+				} else {
+                    console.error('Post data not found in response:', data);
                 }
 
             } catch (error) {
@@ -148,17 +110,8 @@ export default function ClubProfile() {
 				console.error('Error fetching clubs:', error);
 			}
 		};
-		const fetchPosts = async () => {
-			try {
-				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/posts`);
-				console.log(data);
-			} catch (error) {
-				console.error('Error fetching clubs:', error);
-			}
-		}
 		fetchClubs();
 		fetchCurrentMember()
-		fetchPosts()
 	}, [id]);
 
 	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {
@@ -311,11 +264,14 @@ export default function ClubProfile() {
 							updateClub={updateClub}
 							setEditedFields={setEditedFields}
 						/>
-						<RegisterButton
-							member={members.find(member => member.user.stdId === user?.stdId)}
-							userId={currentUser?.id}
-							editing={editing}
-						/>
+						{!editing && 
+							<RegisterButton
+								clubLabel={club.label}
+								member={members.find(member => member.user.stdId === user?.stdId)}
+								userId={currentUser?.id}
+								editing={editing}
+							/>
+						}
 					</div>
 					{/* {club.socialMedia && ( */}
 					{!editing && (
@@ -371,12 +327,13 @@ export default function ClubProfile() {
 			<div className="bg-[#FFFFDD]">
 				<div className="flex justify-between px-[24px] pt-[24px]">
 				<h1 className="font-bold">จำนวนสมาชิก {members.length ?? 0} คน</h1>
-					<Link
+					<CustomLink
 						to={`/clubs/${club?.id}/members`}
+						state={{ role: (members.find(member => member.user.stdId === user?.stdId)?.role), clubLabel: club.label }}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
 					>
 						ดูสมาชิกทั้งหมด
-					</Link>
+					</CustomLink>
 				</div>
 				<div className="flex gap-[15px] px-[24px] pb-[24px] pt-[15px] overflow-auto">
 					{members.map((member) => (
@@ -395,14 +352,14 @@ export default function ClubProfile() {
 			<div className="p-[24px] flex flex-col gap-[20px]">
 				<div className="flex">
 					<p className="font-bold text-[24px] w-full ">โพสต์</p>
-					{/* {session && member && ( */}
+					{(roleUser === "PRESIDENT" || roleUser === "VICE_PRESIDENT" || roleUser === "ADMIN") && (
 						<Link to={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
 							โพสต์ที่รออนุมัติ
 						</Link>
-					{/* )} */}
+					)}
 				</div>
 
-				<ClubPosts posts={posts} clubId={club.id} />
+				<ClubPosts posts={posts.filter(post => post.approved)} events={events} clubId={club.id} clubLabel={club.label} />
 			</div>
 		</div>
 	);

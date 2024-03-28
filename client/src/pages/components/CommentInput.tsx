@@ -1,5 +1,3 @@
-"use client";
-
 import axios from "axios";
 import { VscSend } from "react-icons/vsc";
 import { useAuth } from "../../hooks/useAuth";

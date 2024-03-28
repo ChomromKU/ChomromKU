@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { Link, LinkProps, useNavigate, useParams } from 'react-router-dom';
+import { Link, LinkProps, useParams } from 'react-router-dom';
 
 import { ClubMember } from '../../types/club';
-import { useAuth } from "../../hooks/useAuth";
-import axios from "axios";
 
 interface RegisterButtonProps {
     member: ClubMember | undefined
     userId: number | undefined;
     editing: boolean
+    clubLabel: string
 }
 
-// Define the CustomLinkProps interface extending LinkProps
 interface CustomLinkProps extends LinkProps {
     state?: {
-      member: ClubMember;
+        clubLabel: string;
     };
 }
 
-// Define the CustomLink component using CustomLinkProps
 const CustomLink: React.FC<CustomLinkProps> = ({ state, ...rest }) => (
     <Link {...rest} to={rest.to} state={state} />
 );
 
-const RegisterButton: React.FC<RegisterButtonProps> = ({ member, userId, editing }) => {
-    const navigate = useNavigate();
+const RegisterButton: React.FC<RegisterButtonProps> = ({ clubLabel, member, userId, editing }) => {
     const { id } = useParams();
 
     if (!member) {
@@ -42,10 +37,10 @@ const RegisterButton: React.FC<RegisterButtonProps> = ({ member, userId, editing
     if (member.role === 'PRESIDENT' || member.role === 'VICE_PRESIDENT') {
         return (
             <CustomLink
-                to={`/clubs/${id}/user/${userId}/applyForm`}
-                state={{ member: member }}
+                to={`/clubs/${id}/requestedMember`}
+                state={{ clubLabel: clubLabel }}
                 style={{ backgroundColor: "rgba(255, 255, 255, 0.25)", color: "#fff", fontWeight: "400" }}
-                className="text-sm py-1 px-4 border rounded-full"
+                className="text-sm py-1 px-4 rounded-full flex items-center"
             >
                 ผู้สมัครเข้าชมรม
             </CustomLink>

@@ -1,19 +1,37 @@
-// import Link from 'next/link';
 import { Link } from "react-router-dom";
 import News from "./NewsPost";
+import NewsEvent from "./NewsEvent";
 import { useEffect, useState } from "react";
-import { Like, PostType } from "../../types/post";
+import { Events, Like, PostType } from "../../types/post";
 import { Post } from "../../types/post";
 import plusIcon from '../../images/plus-icon.svg'
-
+import {getPostTypeEnumValue} from "../../lib/post";
 
 interface ClubPostsProps {
   posts: Post[];
+  events: Events[];
   clubId: number;
+  clubLabel: string
 }
 
-export default function ClubPosts({ posts, clubId }: ClubPostsProps) {
+export default function ClubPosts({ posts, events,clubId, clubLabel }: ClubPostsProps) {
   const [selectedTypes, setSelectedTypes] = useState<PostType[]>([]);
+  const [filteredData, setFilteredData] = useState<(Post | Events)[]>([]);
+  const [combinedData, setCombinedData] = useState<(Post | Events)[]>([]);
+
+  useEffect(() => {
+    if(selectedTypes.length === 0 && combinedData.length === 0){
+      const combinedData = [...events, ...posts];
+      setCombinedData(combinedData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+    } else if(selectedTypes.length !== 0) {
+        const newData = combinedData.filter((item) => {
+          const postType = getPostTypeEnumValue((item as Post).type || 'EVENT');
+          return postType !== undefined && selectedTypes.includes(postType);
+        })
+        setFilteredData(newData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+      }
+    ;
+  }, [selectedTypes]);
 
   const handleButtonClick = (type: PostType) => {
     if (selectedTypes.includes(type)) {
@@ -22,8 +40,6 @@ export default function ClubPosts({ posts, clubId }: ClubPostsProps) {
       setSelectedTypes((prevSelectedTypes) => [...prevSelectedTypes, type]);
     }
   };
-
-  const filteredPosts = posts.filter((post) => selectedTypes.includes(post.type));
 
   return (
     <>
@@ -58,21 +74,35 @@ export default function ClubPosts({ posts, clubId }: ClubPostsProps) {
         >
           Q&A
         </button>
+        <button
+          onClick={() => handleButtonClick(PostType.EVENT)}
+          className={`px-[15px] py-[4px] w-min h-fit whitespace-nowrap border border-1 rounded-[20px] ${
+            selectedTypes.includes(PostType.EVENT)
+              ? "bg-[#F24B4B] border-[#F24B4B] text-white"
+              : "border-[#F24B4B] text-[#F24B4B]"
+          }`}
+        >
+          event
+        </button>
       </div>
       {selectedTypes.length === 0
-        ? // If selectedTypes is empty, show all posts
-          posts.map((p) => (
-            <div key={p.id}>
-              <News post={p} key={p.id} />
+        ?
+          combinedData.map((item) => (
+            <div key={`${item.id}-${item.title}`}>
+              {item.hasOwnProperty("type") ? <News post={item as Post} key={`${item.id}-${item.title}`} /> 
+              : 
+              <NewsEvent event={item as Events} clubLabel={clubLabel} key={`${item.id}-${item.title}`} />}
             </div>
           ))
-        : // If selectedTypes is not empty, show filtered posts
-          filteredPosts.map((p) => (
-            <div key={p.id}>
-              <News post={p} key={p.id} />
+        :
+          filteredData.map((item) => (
+            <div key={`${item.id}-${item.title}`}>
+              {item.hasOwnProperty("type") ? <News post={item as Post} key={`${item.id}-${item.title}`} /> 
+              : 
+              <NewsEvent event={item as Events} clubLabel={clubLabel} key={`${item.id}-${item.title}`} />}
             </div>
           ))}
-      {filteredPosts.length === 0 && selectedTypes.length !== 0 && <p>ไม่พบข้อมูล</p>}
+      {filteredData.length === 0 && selectedTypes.length !== 0 && <p>ไม่พบข้อมูล</p>}
       <Link to={`/clubs/${clubId}/posts/new`} className="fixed bottom-[24px] right-[24px] z-50">
         <img alt="line" src={plusIcon} width="64" height="64" />
       </Link>

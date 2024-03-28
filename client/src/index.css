@@ -93,7 +93,6 @@ input:focus-visible, textarea:focus-visible {
 }
 
 select {
-
   /* styling */
   background-color: white;
   border: thin solid blue;

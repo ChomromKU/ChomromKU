@@ -42,12 +42,13 @@ export interface Post {
 }
 
 export enum PostType {
-    NORMAL_POST,
-    QA,
-    NEWS
+    NORMAL_POST = 0,
+    QA = 1,
+    NEWS = 2,
+    EVENT = 3,
 }
 
-export type PostFormType = "normal_post" | "news" | "qna" | "event";
+export type PostFormType = "normal_post" | "news" | "qa" | "event";
 
 // export interface PostIncludeAll {
 //     club: Club;
@@ -82,6 +83,7 @@ export interface Events {
     createdAt: Date;
     updatedAt: Date;
     followers: User[];
+    approved: boolean;
 }
 
 export interface Owner {

@@ -21,8 +21,6 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-
-
 // Clubs
 
 app.get('/clubs', async (req, res) => {
@@ -42,7 +40,7 @@ app.get('/clubs/:id', async (req, res) => {
             where: { id: parseInt(id) },
             include: {
                 subscribers: true,
-                events: { where: { approved: true } },
+                events: true,
                 members: { select: { id: true, role: true, user: true } },
                 posts: { include: { owner: true, likes: true, club: true } },
                 socialMedia: true,
@@ -61,18 +59,13 @@ app.get('/clubs/:id', async (req, res) => {
 
 app.put('/clubs/:id', async (req, res) => {
     const { id } = req.params;
-    const updatedFields = req.body; // Assuming the payload is sent as JSON in the request body
+    const updatedFields = req.body;
     console.log('Updated fields:', updatedFields);
     try {
-        // Check if SocialMedia record exists for the club
         const socialMediaExists = await prisma.socialMedia.findUnique({
             where: { clubId: parseInt(id) }
         });
-
-        // If SocialMedia record does not exist, handle it based on your requirements
         if (!socialMediaExists) {
-            // Handle missing SocialMedia record (create a new record or handle differently)
-            // For example, you can create a new SocialMedia record here
             await prisma.socialMedia.create({
                 data: {
                     clubId: parseInt(id),
@@ -107,8 +100,6 @@ app.put('/clubs/:id', async (req, res) => {
     }
 });
 
-
-
 // Posts
 
 app.get('/posts', async (req, res) => {
@@ -122,10 +113,25 @@ app.get('/posts', async (req, res) => {
 });
 
 app.post('/posts', async (req, res) => {
+    const postData = req.body;
+    console.log('Post data:', postData);
     try {
-        const postData = req.body;
         const newPost = await prisma.post.create({
-            data: postData,
+            data: {
+                title: postData.title,
+                type: postData.type,
+                content: postData.content,
+                imageUrl: postData.imageUrl,
+                approved: postData.approved,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                club: {
+                  connect: { id: parseInt(postData.clubId) } 
+                },
+                owner: {
+                  connect: { id: parseInt(postData.ownerId) } 
+                },
+              },
         });
         res.json(newPost);
         console.log('New post created:', newPost);
@@ -145,7 +151,6 @@ app.get('/posts/:id', async (req, res) => {
                 comments: true,
                 club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, twitter: true}}}},
                 owner:true,
-                // SocialMedia:true,
             },
         });
         if (!post) {
@@ -158,7 +163,59 @@ app.get('/posts/:id', async (req, res) => {
     }
 });
 
+app.put('/posts/:id/approve', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const post = await prisma.post.findUnique({
+            where: { id: parseInt(id) },
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        await prisma.post.update({
+            where: { id: parseInt(id) },
+            data: { approved: true },
+        });
+        res.json({ message: 'Approve post successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error updating post' });
+    }
+});
 
+app.delete('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await prisma.post.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json({ message: 'Delete post successfully' });
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Error deleting member' });
+    }
+});
+
+app.get('/clubs/:id/posts/unapproved', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const clubPosts = await prisma.post.findMany({
+            where: { 
+                clubId: parseInt(id),
+                approved: false
+            },
+            include: { 
+                owner: true, 
+                likes: true, 
+                club: true 
+            },
+        });
+        res.json(clubPosts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching unapproved club posts' });
+    }
+});
 
 // Like & Comment
 
@@ -295,6 +352,39 @@ app.get('/events', async (req, res) => {
     }
 });
 
+app.post('/events', async (req, res) => {
+    const eventPostData = req.body;
+    console.log('Event Post data:', eventPostData);
+    try {
+        const newEventPost = await prisma.event.create({
+            data: {
+                title: eventPostData.title,
+                content: eventPostData.content,
+                imageUrl: eventPostData.imageUrl,
+                approved: eventPostData.approved,
+                location: eventPostData.location,
+                startDate: eventPostData.startDate ? new Date(eventPostData.startDate) : new Date(),
+                endDate: eventPostData.endDate ? new Date(eventPostData.endDate) : new Date(),
+                startTime: eventPostData.startTime ? eventPostData.startTime : '',
+                endTime: eventPostData.endTime ? eventPostData.endTime : '', 
+                status: 'OPEN',
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                club: {
+                  connect: { id: parseInt(eventPostData.clubId) } 
+                },
+                owner: {
+                  connect: { id: parseInt(eventPostData.ownerId) } 
+                },
+              },
+        });
+        res.json(newEventPost);
+        console.log('New post created:', newEventPost);
+    } catch (error) {
+        console.error('Error creating post:', error);
+        res.status(500).json({ error: 'Error creating post' });
+    }
+});
 
 app.get('/events/:id', async (req, res) => {
     const { id } = req.params;
@@ -315,6 +405,38 @@ app.get('/events/:id', async (req, res) => {
     }
 });
 
+app.put('/events/:id/approve', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const post = await prisma.event.findUnique({
+            where: { id: parseInt(id) },
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Event post not found' });
+        }
+        await prisma.event.update({
+            where: { id: parseInt(id) },
+            data: { approved: true },
+        });
+        res.json({ message: 'Approve post event successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error updating event approval status' });
+    }
+});
+
+app.delete('/events/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        await prisma.event.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json({ message: 'Delete event post successfully' });
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Error deleting member' });
+    }
+});
 
 
 // Users
@@ -363,7 +485,69 @@ app.get('/clubs/:id/members', async (req, res) => {
     }
 });
 
+app.put('/clubs/:id/members', async (req, res) => {
+    const insertFields = req.body;
+    try {
+        const newMember = await prisma.member.create({
+            data: {
+                role: insertFields.role,
+                clubId: insertFields.clubId,
+                userId: insertFields.userId,
+            }
+        });
+        res.json(newMember);
+    } catch (error) {
+        console.error('Error Creating Member:', error);
+        res.status(500).json({ error: 'Error Creating Member' });
+    }
+});
+
+
+app.put('/clubs/:id/members/:memberId/role', async (req, res) => {
+    const { id, memberId } = req.params;
+    const insertFields = req.body;
+    try {
+        const member = await prisma.member.findUnique({
+            where: {id: parseInt(memberId),
+                clubId: parseInt(id)
+            }
+        })
+        if (!member){
+            return res.status(404).json({error: "Member is not found"})
+        }
+        const updateMemberRole = await prisma.member.update({
+            where: {id: parseInt(memberId),
+                clubId: parseInt(id)
+            },
+            data: {
+                role: insertFields.role,
+            }
+        });
+        res.json(updateMemberRole);
+    } catch (error) {
+        console.error('Error Creating Member:', error);
+        res.status(500).json({ error: 'Error Creating Member' });
+    }
+});
+
 // member request form
+
+app.get('/clubs/:id/requestedMember', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const memberRequestForm = await prisma.memberRequestForm.findMany({
+            where: { clubId: parseInt(id) }
+        });
+        if (memberRequestForm) {
+            res.json(memberRequestForm);
+        } else {
+            res.status(404).json({ error: 'Member Request Form not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching Member Request Form' });
+    }
+});
 
 app.get('/clubs/:id/user/:userId/applyForm', async (req, res) => {
     const { id, userId } = req.params;
@@ -407,6 +591,22 @@ app.put('/clubs/:id/user/:userId/applyForm', async (req, res) => {
     } catch (error) {
         console.error('Error updating club:', error);
         res.status(500).json({ error: 'Error updating club' });
+    }
+});
+
+app.delete('/clubs/:id/user/:userId/applyForm', async (req, res) => {
+    const { id, userId } = req.params;
+    try {
+        await prisma.memberRequestForm.delete({
+            where: {
+                clubId: parseInt(id),
+                userId: parseInt(userId),
+            },
+        });
+        res.json({ message: 'Member Requested Form deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting member:', error);
+        res.status(500).json({ error: 'Error deleting member' });
     }
 });
 

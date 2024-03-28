@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from "react";
 import MemberBox from "../../components/MemberBox";
 import axios from "axios";
-import { useParams } from "react-router-dom";
 import { ClubMember } from "../../../types/club";
+import { Link, LinkProps, useLocation, useParams } from 'react-router-dom';
 
-// interface MembersPageProps {
-//   params: { id: string };
-// }
+
 
 interface MembersComponentProps {
   clubId: string;
   name: string;
   role: string;
+  userRole?: string;
 }
 
+interface CustomLinkProps extends LinkProps {
+	state?: {
+		clubLabel: string | undefined;
+	};
+  }
+  
+  const CustomLink: React.FC<CustomLinkProps> = ({ state, ...rest }) => (
+	<Link {...rest} to={rest.to} state={state} />
+  );
+  
 
-const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role }) => {
+const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role, userRole }) => {
   const [members, setMembers] = useState<ClubMember[]>([]);
+
+  console.log(members)
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -46,6 +57,10 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role 
               <MemberBox
                 key={member.id}
                 name={`${member?.user?.titleTh} ${member?.user?.firstNameTh} ${member?.user?.lastNameTh}`}
+                role={member.role} // Pass the role of the member
+                memberId={member.id}
+                userRole={userRole}
+
               />
             )}
           </>
@@ -59,7 +74,9 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role 
 
 const Members: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    // console.log("Club ID:", id);
+    const location = useLocation();
+    const { role, clubLabel } = location.state || {};
+    const [showButtons, setShowButtons] = useState(false);
 
     if (!id) {
       return <div>No club ID found</div>;
@@ -71,17 +88,39 @@ const Members: React.FC = () => {
       { clubId: id, name: "Admin", role: 'ADMIN' },
       { clubId: id, name: "สมาชิกทั่วไป", role: 'NORMAL'}
     ];
+
+    const handleButtonClick = () => {
+      setShowButtons(true);
+    };
+    
   
     return (
       <div className="p-[24px]  flex flex-col gap-[20px]">
-        <h1 className="text-[24px] font-bold">ชมรมดนตรีสากลมหาวิทยาลยเกษตรศาสตร์ (เค ยู แบนด์)</h1>
-        <p className="font-bold">สมาชิกทั้งหมด</p>
+        <h1 className="text-[24px] font-bold">{clubLabel}</h1>
+        {(role === 'PRESIDENT' || role === 'VICE_PRESIDENT') && 
+          <CustomLink
+              to={`/clubs/${id}/requestedMember`}
+              state={{ clubLabel: clubLabel }}
+              className="text-sm py-1 px-4 rounded-full flex items-center w-fit border text-[#006664] border-[#006664]"
+          >
+              ผู้สมัครเข้าชมรม
+          </CustomLink>
+        }
+        <p className="font-bold flex items-center">
+          สมาชิกทั้งหมด
+          {(role === 'PRESIDENT' || role === 'VICE_PRESIDENT') && 
+            <button onClick={handleButtonClick} className="text-[12px] font-light ml-auto underline underline-offset-2">
+              จัดการสมาชิก
+            </button>
+          }
+        </p>
         {membersComponentInputs.map((input, index) => (
           <MembersComponent
+              key={index}
               clubId={input.clubId}
               name={input.name}
               role={input.role}
-              key={index}
+              userRole={role}
           />
         ))}
       </div>
