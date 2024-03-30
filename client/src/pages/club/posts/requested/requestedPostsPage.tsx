@@ -95,30 +95,35 @@ export default function RequestedPostsPage() {
 				<p className="font-bold text-base">อนุมัติโพสต์</p>
 				<div className="flex flex-col gap-[20px]">
 					<div className="flex justify-between w-full"></div>
-					{events.filter((event) => !event.approved)
-						? events.filter((event) => !event.approved).map((p) => (
-								<div key={p.id}>
-									<NewsEvent 
-									// <ClubPosts posts={posts.filter(post => post.approved)} clubId={club.id} />
-										event={p} 
-										role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
-										clubLabel={clubs.label}
-										reFetchPost={reFetchPost}
-									/>
-								</div>
-						  ))
-						: "No waiting requested posts"}
-					{posts.filter((post) => !post.approved)
-						? posts.filter((post) => !post.approved).map((p) => (
-								<div key={p.id}>
-									<News 
-										post={p} 
-										role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
-										reFetchPost={reFetchPost}
-									/>
-								</div>
-						  ))
-						: "No waiting requested posts"}
+					{(events.filter((event) => !event.approved).length > 0 || posts.filter((post) => !post.approved).length > 0) ? (
+						<>
+							{events.filter((event) => !event.approved).length > 0 && (
+								events.filter((event) => !event.approved).map((p) => (
+									<div key={p.id}>
+										<NewsEvent 
+											event={p} 
+											role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
+											clubLabel={clubs.label}
+											reFetchPost={reFetchPost}
+										/>
+									</div>
+								))
+							)}
+							{posts.filter((post) => !post.approved).length > 0 && (
+								posts.filter((post) => !post.approved).map((p) => (
+									<div key={p.id}>
+										<News 
+											post={p} 
+											role={(members.find(member => member.user.stdId === user?.stdId))?.role} 
+											reFetchPost={reFetchPost}
+										/>
+									</div>
+								))
+							)}
+						</>
+					) : (
+						"No waiting requested posts"
+					)}
 				</div>
 			</div>
 		</div>

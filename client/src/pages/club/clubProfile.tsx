@@ -2,7 +2,6 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Link, LinkProps, useNavigate, useParams } from 'react-router-dom';
 
-// import EventBox from "@/components/EventBox";
 import EventBox from '../components/EventBox';
 import ClubPosts from "../components/ClubPosts";
 

@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { FaRegComment } from "react-icons/fa6";
 import { FiSend } from "react-icons/fi";
 import { Club } from "../../types/club";
+import eventImage from '../../images/event.png'
 
 interface NewsEventProps {
 	event: Events;
@@ -147,7 +148,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 			</div>
 			<div className="w-full relative mb-2">
 				<img
-					src={event.imageUrl || "/event.png"}
+					src={eventImage}
 					width={0}
 					height={0}
 					sizes="100vw"

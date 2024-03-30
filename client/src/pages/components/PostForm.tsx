@@ -15,6 +15,7 @@ import { useAuth } from './../../hooks/useAuth';
 import close from "../../images/close.svg";
 import { PostType } from '../../types/post';
 
+
 // // import { useS3Upload } from 'next-s3-upload';
 
 // const postFormSchema = z
@@ -52,6 +53,7 @@ export default function PostForm() {
     name: '',
     url: ''
   });
+  
   const fetchCurrentUser = async () => {
     try {
       const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
@@ -74,7 +76,7 @@ export default function PostForm() {
           if(member) {
             setMembers(member);
           } else {
-            fetchCurrentUser()
+            await fetchCurrentUser()
           }
         } else {
           console.error('Failed to fetch members');
@@ -86,35 +88,74 @@ export default function PostForm() {
     fetchMembers();
   }, []);
 
-const onSubmit: SubmitHandler<PostForm> = async (data) => {
+// const onSubmit: SubmitHandler<PostForm> = async (data) => {
   // if (!image.url) {
   //   alert("กรุณาอัพโหลดรูปภาพ");
   //   return;
   // }
+//   try {
+//     if (postType === 'event') {
+//       await axios.post(`http://localhost:3001/events`, {
+//         ...data,
+//         clubId: id,
+//         imageUrl: image.url || "",
+//         approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
+//         ownerId: member?.user.id,
+//       });
+//     } else {
+//       await axios.post(`http://localhost:3001/posts`, {
+//         ...data,
+//         clubId: id,
+//         imageUrl: image.url || "",
+//         type: postType.toUpperCase(),
+//         approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
+//         ownerId: member?.user.id,
+//       });
+//     }
+//     navigate(`/clubs/${id}`);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+const onSubmit: SubmitHandler<PostForm> = async (data) => {
   try {
+    // Fetch the current user's Member record
+    let memberId = member?.id;
+    if (!memberId) {
+      // If member is not found by clubId, fetch it by stdId
+      const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+      if (response.status === 200) {
+        memberId = response.data?.member?.id;
+      } else {
+        console.error('Failed to fetch member');
+        return;
+      }
+    }
+
+    // Create the event post
+    const postData = {
+      ...data,
+      clubId: id,
+      imageUrl: image.url || "",
+      approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
+      ownerId: memberId,
+    };
+
     if (postType === 'event') {
-      await axios.post(`http://localhost:3001/events`, {
-        ...data,
-        clubId: id,
-        imageUrl: image.url || "",
-        approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
-        ownerId: member?.user.id,
-      });
+      await axios.post(`http://localhost:3001/events`, postData);
     } else {
       await axios.post(`http://localhost:3001/posts`, {
-        ...data,
-        clubId: id,
-        imageUrl: image.url || "",
+        ...postData,
         type: postType.toUpperCase(),
-        approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
-        ownerId: member?.user.id,
       });
     }
     navigate(`/clubs/${id}`);
   } catch (error) {
-    console.error(error);
+    console.error('Error creating post:', error);
   }
 };
+
 
   function onPostTypeChange(value: PostFormType) {
     setPostType(value);
@@ -166,20 +207,22 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
             <div className="text-sm absolute bottom-[58px]">
               <Fragment>
                 <Group className="pb-1">
-                  วันเริ่มต้นและสิ้นสุด:
-                  <DatePickerInput control={control} name={'startDate'} placeholder="วันเริ่มต้น" variant="unstyled" />
-                  -
+                  วันเริ่มต้นและสิ้นสุด: 
+                  <DatePickerInput 
+                  control={control} 
+                  name={'startDate'} 
+                  placeholder="เลือกวันเริ่มต้น" 
+                  variant="unstyled" />
                   <DatePickerInput
                     control={control}
                     name={'endDate'}
-                    placeholder="วันสิ้นสุด"
-                    style={{ fontFamily: `'__Prompt_2d0d9b', '__Prompt_Fallback_2d0d9b'` }}
+                    placeholder="เลือกวันสิ้นสุด"
                     variant="unstyled"
                   />
                 </Group>
                 <Group className="pb-1">
                   ช่วงเวลา:
-                  <TimeInput control={control} name={'startTime'} variant="unstyled" /> -
+                  <TimeInput control={control} name={'startTime'} variant="unstyled" /> ถึง
                   <TimeInput control={control} name={'endTime'} variant="unstyled" />
                 </Group>
                 <Group className="pb-1">
