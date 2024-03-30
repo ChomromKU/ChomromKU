@@ -44,7 +44,7 @@ export default function ClubProfile() {
     const [editedFields, setEditedFields] = useState<Partial<Club>>({});
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [events, setEvents] = useState<Events[]>([]);
-
+	const [userId, setUserId] = useState<number>(0);
     const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
@@ -109,9 +109,25 @@ export default function ClubProfile() {
 				console.error('Error fetching clubs:', error);
 			}
 		};
+		const fetchUserId = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+        if (response.status === 200) {
+          const fetchedUserId = response.data.id;
+          setUserId(fetchedUserId); 
+        } else {
+          console.error('Failed to fetch user id');
+        }
+      } catch (error) {
+        console.error('Error fetching user id:', error);
+      }
+    };
+    if (user?.stdId) {
+      fetchUserId();
+    }
 		fetchClubs();
 		fetchCurrentMember()
-	}, [id]);
+	}, [id, user?.stdId, userId]);
 
 	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {
         setEditedFields((prevFields) => ({ ...prevFields, [fieldName]: value }));
@@ -256,8 +272,7 @@ export default function ClubProfile() {
 							member={members.find(member => member.user.stdId === user?.stdId)}
 							club={club}
 							clubId={club.id}
-							// isFollowing={club.subscribers.some((s) => s.id === session?.user.id)}
-							isFollowing={false}
+							isFollowing={club.subscribers.some((s) => s.id === userId)}
 							editing={editing} 
 							setEditing={setEditing}
 							updateClub={updateClub}

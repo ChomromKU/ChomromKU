@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import PostDetail from '../components/PostDetail';
+import PostDetail from './_components/PostDetail';
 import { Post } from '../../types/post';
 import CarouselWrapper from './_components/CarouselWrapper';
 import CommentBox from '../components/CommentBox';
@@ -7,19 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 import News from '../components/NewsPost';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-
-interface Comment {
-  id: number;
-  message: string;
-  createdAt: Date;
-  userId: number; // Assuming userId is sent from the server
-  user: {
-    id: number;
-    firstNameTh: string;
-    lastNameTh: string;
-    firstNameEn: string;
-  };
-}
+import { Comment } from '../../types/post';
 
 const PostDetailPage: React.FC = () => {
   const { user } = useAuth();
@@ -35,17 +23,16 @@ const PostDetailPage: React.FC = () => {
 					const response = await axios.get(`http://localhost:3001/posts/${id}`);
 					if (response.status === 200) {
 						setPost(response.data);
+            console.log('success fetch post');
 					} else {
 						console.log('Failed to fetch post');
 					};
-					if (post) {
-						const response = await axios.get(`http://localhost:3001/clubs/${id}`);
-						if (response.status === 200) {
-							setClub(response.data);
-							console.log('succes fetch club')
-						} else {
-							console.log('Failed to fetch club');
-						};
+					const clubResponse = await axios.get(`http://localhost:3001/clubs/${post?.clubId}`);
+					if (clubResponse.status === 200) {
+						setClub(clubResponse.data);
+						console.log('success fetch club');
+					} else {
+						console.log('Failed to fetch club');
 					};
 				} catch (error) {
 					console.error('Error fetching data:', error);
@@ -55,28 +42,12 @@ const PostDetailPage: React.FC = () => {
     fetchPostAndClub();
   }, [id]);
 
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const commentsResponse = await axios.get(`http://localhost:3001/posts/${id}/comment`);
-        if (commentsResponse.status === 200) {
-          setComments(commentsResponse.data);
-        } else {
-          console.log('Failed to fetch comments');
-        }
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      }
-    };
-    fetchComments();
-  }, [id]);
-
   if (!post) {
     return <div>Post not found</div>;
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-white">
+    <div className="flex min-h-screen flex-col items-center bg-white mt-2">
       <div className="h-fit w-full relative">
         <CarouselWrapper post={post} />
         <div className="absolute w-full -bottom-5 p-3 font-bold bg-[#006664] text-white rounded-t-xl">
@@ -85,12 +56,12 @@ const PostDetailPage: React.FC = () => {
       </div>
       <PostDetail post={post} />
       <div className="w-full px-[24px] pb-[24px] flex flex-col gap-[15px]">
-        {comments.map((c) => (
+        {post.comments.map((c) => (
           <CommentBox
             name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
             message={c.message}
             createdAt={c.createdAt}
-            isYou={user ? user.id === c.userId : false} // Check if the current user is the commenter
+            isYou={user ? user.id === c.userId : false}
             firstChar={c.user.firstNameEn.substring(0, 1)}
             key={c.id}
           />

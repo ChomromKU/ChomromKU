@@ -18,10 +18,10 @@ export interface Comment {
     createdAt: Date;
     user: User;
     userId: number;
-    post?: Post; // Optional post property
-    postId?: number; // Optional postId property
-    event?: Event; // Optional event property
-    eventId?: number; // Optional eventId property
+    post?: Post; 
+    postId?: number; 
+    event?: Event; 
+    eventId?: number; 
 }
 
 export interface Post {

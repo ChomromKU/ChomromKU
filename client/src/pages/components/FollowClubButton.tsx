@@ -1,14 +1,14 @@
 import axios from "axios";
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from 'react-router-dom';
 import { Club, ClubMember } from '../../types/club';
+import { useAuth } from "../../hooks/useAuth";
 
 type FollowClubButtonProps = {
 	member: ClubMember | undefined
 	club: Club
     clubId: number;
-    isFollowing?: boolean;
+    isFollowing: boolean;
 	editing: boolean;
   	setEditing: React.Dispatch<React.SetStateAction<boolean>>;
   	updateClub: () => void;
@@ -16,14 +16,39 @@ type FollowClubButtonProps = {
 };
 
 export default function FollowClubButton({ member, club, clubId, isFollowing, editing, setEditing, updateClub, setEditedFields }: FollowClubButtonProps) {
+	const { id } = useParams();
+  const { user } = useAuth();
 	const navigate = useNavigate();
+	const[userId, setUserId] = useState<number>(0);
 	const [showModal, setShowModal] = useState(false);
+
+	useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+        if (response.status === 200) {
+          const fetchedLikerId = response.data.id;
+          setUserId(fetchedLikerId); 
+        } else {
+          console.error('Failed to fetch user id');
+        }
+      } catch (error) {
+        console.error('Error fetching user id:', error);
+      }
+    };
+
+    if (user?.stdId) {
+      fetchUserId();
+    }
+  }, [id, user?.stdId, userId]);
 
 	async function handleClick() {
 		const status = isFollowing ? "unfollow" : "follow";
 		try {
-			// const res = await axios.post(`/api/clubs/${clubId}/follow?status=${status}`);
-			navigate('/clubs/1', { replace: true }); // Use navigate to refresh the page
+			await axios.post(`http://localhost:3001/clubs/${clubId}/follow?status=${status}`, {
+				userId: userId
+			});
+			window.location.reload();
 		} catch (error) {
 			console.error(error);
 		}

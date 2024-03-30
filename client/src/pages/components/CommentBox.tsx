@@ -3,24 +3,31 @@ import React from "react";
 interface CommentProps {
   name: string;
   message: string;
-  createdAt: Date | string; 
+  createdAt: Date | string;
   isYou: boolean;
   firstChar: string;
 }
 
 const CommentBox: React.FC<CommentProps> = ({ name, message, createdAt, isYou, firstChar }) => {
+  // Function to format date and time
+  const formatDateTime = (dateTime: Date): string => {
+    return `${dateTime.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}
+    เวลา ${dateTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
+  };
+
   let formattedDate: string;
 
   if (createdAt instanceof Date) {
-    formattedDate = createdAt.toLocaleDateString("th-TH", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    formattedDate = formatDateTime(createdAt);
   } else if (typeof createdAt === 'string') {
-    formattedDate = createdAt; 
+    const dateObj = new Date(createdAt);
+    if (!isNaN(dateObj.getTime())) {
+      formattedDate = formatDateTime(dateObj);
+    } else {
+      formattedDate = "Invalid Date";
+    }
   } else {
-    formattedDate = ""; 
+    formattedDate = "ไม่ระบุเวลา";
   }
 
   return (

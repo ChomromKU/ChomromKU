@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-// import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/th";
@@ -19,7 +18,6 @@ import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
 import Modal from "./CustomModal";
 import { User } from "../../types/auth";
-
 import { PostType } from "../../types/post";
 
 interface NewsProps {
@@ -45,8 +43,8 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
     const [openedDecline, { open: openDecline, close: closeDecline }] = useDisclosure(false);
 	const [sending, setSending] = useState<boolean>(false)
 	const [successModalOpened, setSuccessModalOpened] = useState(false);
-
-	const [likeCount, setLikeCount] = useState<number>(post.likes.length);
+	const initialLikeCount = post.likes ? post.likes.length : 0;
+  const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
 	const [isLike, setIsLike] = useState<boolean>(false);
 	const [postOwner, setPostOwner] = useState<User>();
 
@@ -90,7 +88,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	};
 
 	useEffect(() => {
-		if (user) {
+		if (user && post && post.likes && Array.isArray(post.likes)) {
 			setIsLike(post.likes.some((like) => like.userId === user.id));
 		} else {
 			setIsLike(false);
@@ -120,10 +118,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	
 	const truncateText = (text: string) => (text.length >= 50 ? text.substring(0, 49) + "..." : text);
 	const getPreviousTime = (date: Date) => dayjs(date).fromNow();
-
-	// console.log(post);
 	
-
 	return (
 		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)" }}>
  			<header className="flex items-start gap-[10px] mb-[10px]">
@@ -131,7 +126,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${post.clubId}`}>
 						<div className="flex justify-between items-center">
-						    <p className="h-1/2 leading-[20px] font-normal">{post.club.label}</p>
+						    <p className="h-1/2 leading-[20px] font-normal">{post.club?.label}</p>
 						</div>
 					</Link>
 					<p className="h-1/2 text-xs font-light">{postOwner?.firstNameEn} {postOwner?.lastNameEn}</p>

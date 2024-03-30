@@ -1,14 +1,13 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import Tag from "./Tag";
-import { Post } from "../../types/post"
+import { useEffect, useState } from "react";
+import Tag from "../../components/Tag";
+import { Post } from "../../../types/post"
 import { FiSend } from "react-icons/fi";
-import { FaRegComment } from "react-icons/fa6";
-import { postTypeToColorMap, postTypeToLabelPost } from "../../lib/post"
-import CommentInput from "./CommentInput";
-import LikeButton from "./LikeButton";
-import { useAuth } from "../../hooks/useAuth";
+import { postTypeToColorMap, postTypeToLabelPost } from "../../../lib/post"
+import CommentInput from "../../components/CommentInput";
+import LikeButton from "../../components/LikeButton";
+import { useAuth } from "../../../hooks/useAuth";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 type PostDetailProps = {
 	post: Post;
@@ -16,19 +15,38 @@ type PostDetailProps = {
 
 const PostDetail = ({ post }: PostDetailProps) => {
 	const { user } = useAuth();
-
-	const [likeCount, setLikeCount] = useState<number>(post.likes.length);
+	const { id } = useParams< {id?: string}>();
+	const [userId, setUserId] = useState<number>(0);
+	const [likeCount, setLikeCount] = useState<number>(
+		post?.likes?.length !== undefined ? post.likes.length : 0
+	);	
 	const [isLike, setIsLike] = useState<boolean>(
-		user ? post.likes.some((like) => like.userId === user.id) : false,
+		user && post && post.likes ? post.likes.some((like) => like.userId === userId) : false
 	);
 
 	useEffect(() => {
-		if (user) {
-			setIsLike(post.likes.some((like) => like.userId === user.id));
+		const fetchUserId = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+        if (response.status === 200) {
+          const fetchedUserId = response.data.id;
+          setUserId(fetchedUserId); 
+        } else {
+          console.error('Failed to fetch user id');
+        }
+      } catch (error) {
+        console.error('Error fetching user id:', error);
+      }
+    };
+		if (user?.stdId) {
+      fetchUserId();
+    }
+		if (user && post && post.likes) {
+			setIsLike(post.likes.some((like) => like.userId === userId));
 		} else {
 			setIsLike(false);
 		}
-	}, [user, post]);
+	}, [id, user, post]);
 
 	const like = () => {
 		setIsLike((prev) => !prev);
@@ -42,7 +60,7 @@ const PostDetail = ({ post }: PostDetailProps) => {
 	return (
 		<div className="w-full p-[24px] flex flex-col gap-[10px]">
 			<header>
-				<div className="flex justify-between font-light text-sm mb-[10px]">
+				<div className="flex justify-between font-light text-sm my-[10px]">
 					<span>
 						โดย {post.owner.firstNameTh} {post.owner.lastNameTh}
 					</span>
@@ -53,7 +71,7 @@ const PostDetail = ({ post }: PostDetailProps) => {
 							day: "numeric",
 						})}</span>
 					) : (
-						<span>No date available</span>
+						<span>ไม่ระบุเวลาที่โพส</span>
 					)}
 				</div>
 				<span className="text-2xl font-bold">{post.title}</span>

@@ -25,7 +25,11 @@ app.use(cors());
 
 app.get('/clubs', async (req, res) => {
     try {
-        const clubs = await prisma.club.findMany();
+        const clubs = await prisma.club.findMany({
+            include: {
+                subscribers: true,
+            }
+        });
         res.json(clubs);
     } catch (error) {
         console.error(error);
@@ -103,14 +107,28 @@ app.put('/clubs/:id', async (req, res) => {
 // Posts
 
 app.get('/posts', async (req, res) => {
+    const { limit } = req.query;
     try {
-        const posts = await prisma.post.findMany();
+        let posts;
+        if (limit) {
+            const parsedLimit = parseInt(limit);
+            posts = await prisma.post.findMany({
+                take: parsedLimit,
+                orderBy: { createdAt: 'desc' },
+            });
+        } else {
+            posts = await prisma.post.findMany({
+                orderBy: { createdAt: 'desc' },
+            });
+        }
+
         res.json(posts);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching book stores' });
+        res.status(500).json({ error: 'Error fetching posts' });
     }
 });
+
 
 app.post('/posts', async (req, res) => {
     const postData = req.body;
@@ -148,7 +166,11 @@ app.get('/posts/:id', async (req, res) => {
             where: { id: parseInt(id) },
             include: {
                 likes: true,
-                comments: true,
+                comments: {
+                    include: {
+                        user:true,
+                    },
+                },
                 club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, twitter: true}}}},
                 owner:true,
             },
@@ -233,11 +255,11 @@ app.post('/posts/:id/like', async (req, res) => {
     const { type } = validator.data;
 
     try {
-        // Check if the user has already liked this post
         const existingLike = await prisma.like.findFirst({
             where: {
                 userId: body.userId,
-                postId: parseInt(id),
+                postId: type === "post" ? parseInt(id) : undefined,
+                eventId: type === "event" ? parseInt(id) : undefined,
             },
         });
         if (existingLike) {
@@ -267,7 +289,8 @@ app.delete('/posts/:id/like', async (req, res) => {
     try {
         const like = await prisma.like.findFirst({
             where: {
-              postId: parseInt(id),
+              postId: type === "post" ? parseInt(id) : undefined,
+              eventId: type === "event" ? parseInt(id) : undefined,
               userId: userId,
             },
           });
@@ -317,8 +340,8 @@ app.post('/posts/:id/comment', async (req, res) => {
 
 app.get('/posts/:id/comment', async (req, res) => {
     const { id } = req.params;
-  
-    try {      const comments = await prisma.comment.findMany({
+    try {
+        const comments = await prisma.comment.findMany({
         where: {
           OR: [
             { postId: parseInt(id) },
@@ -344,7 +367,11 @@ app.get('/posts/:id/comment', async (req, res) => {
 
 app.get('/events', async (req, res) => {
     try {
-        const events = await prisma.event.findMany();
+        const events = await prisma.event.findMany({
+            include: {
+                followers:true,
+            }
+        });
         res.status(200).json(events);
     } catch (error) {
         console.error(error);
@@ -393,6 +420,13 @@ app.get('/events/:id', async (req, res) => {
             where: { id: parseInt(id) },
             include: {
                 club: true,
+                followers: true,
+                likes: true,
+                comments: {
+                    include: {
+                        user: true,
+                    },
+                },
             },
         });
         if (!event) {
@@ -438,6 +472,45 @@ app.delete('/events/:id', async (req, res) => {
     }
 });
 
+app.post('/events/:id/follow', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.query;
+    const { userId } = req.body; 
+  
+    try {
+      let updatedUser;
+  
+      if (status === 'follow') {
+        updatedUser = await prisma.user.update({
+          where: { id: userId }, 
+          data: {
+            events: {
+              connect: { id: parseInt(id) },
+            },
+          },
+        });
+      } else if (status === 'unfollow') {
+        updatedUser = await prisma.user.update({
+          where: { id: userId },
+          data: {
+            events: {
+              disconnect: { id: parseInt(id) },
+            },
+          },
+        });
+      } else {
+        return res.status(400).json({ error: 'Invalid status' });
+      }
+  
+      return res.status(200).json(updatedUser);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
+  
 
 // Users
 
@@ -610,22 +683,41 @@ app.delete('/clubs/:id/user/:userId/applyForm', async (req, res) => {
     }
 });
 
-// get /api/clubs/${clubId}/follow?status=${status}
-app.get('/clubs/:id/follow', async (req, res) => {
+
+app.post('/clubs/:id/follow', async (req, res) => {
     const { id } = req.params;
     const { status } = req.query;
+    const { userId } = req.body;
+
     try {
-        const members = await prisma.member.findMany({
-            where: {
-                clubId: parseInt(id),
-                status: status,
-            },
-            include: { user: true },
-        });
-        res.json(members);
+		let updatedUser;
+
+		if (status === "follow") {
+			updatedUser = await prisma.user.update({
+				where: { id: userId },
+				data: {
+					clubs: {
+						connect: { id: parseInt(id) },
+					},
+				},
+			});
+		} else if (status === 'unfollow') {
+			updatedUser = await prisma.user.update({
+				where: { id: userId },
+				data: {
+					clubs: {
+						disconnect: { id: parseInt(id) },
+					},
+				},
+			});
+		} else {
+            return res.status(400).json({ error: 'Invalid status' });
+        }
+
+        return res.status(200).json(updatedUser);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Error fetching club members' });
+        res.status(500).json({ error: 'Error following club' });
     }
 });
 

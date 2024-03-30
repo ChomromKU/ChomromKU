@@ -17,7 +17,7 @@ type LikeButtonProps = {
 export default function LikeButton({ isLike, like, unlike, postId, type }: LikeButtonProps) {
   const { id } = useParams();
   const { user } = useAuth();
-  const [likerId, setLikerId] = useState<number | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUserId = async () => {
@@ -25,7 +25,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
         const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
         if (response.status === 200) {
           const fetchedLikerId = response.data.id;
-          setLikerId(fetchedLikerId); 
+          setUserId(fetchedLikerId); 
         } else {
           console.error('Failed to fetch user id');
         }
@@ -37,7 +37,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
     if (user?.stdId) {
       fetchUserId();
     }
-  }, [id, user?.stdId, likerId]);
+  }, [id, user?.stdId, userId]);
 
 
 	async function handleClickLike() {
@@ -48,7 +48,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 		try {
 			await axios.post(`http://localhost:3001/posts/${postId}/like`, {
 				type,
-				userId: likerId,
+				userId: userId,
 				postId,
 			});
 			like();
@@ -66,7 +66,7 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 
 		try {
 			await axios.delete(`http://localhost:3001/posts/${postId}/like?type=${type}`, {
-				data: { userId: likerId },
+				data: { userId: userId },
 			});
 			unlike();
 		} catch (error) {

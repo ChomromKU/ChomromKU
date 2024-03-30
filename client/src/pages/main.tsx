@@ -1,7 +1,7 @@
 import AutocompleteWrapper from './components/AutocompleteWrapper';
-import CalendarWithFilter from './components/CalendarWithFilter';
+import CalendarWithFilter from './calendar/CalendarWithFilter';
 import News from './components/NewsPost';
-import { PostType } from '../types/post';
+import { Post, PostType } from '../types/post';
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -11,9 +11,9 @@ import { subscribe } from 'diagnostics_channel';
 // import { SocialMedia } from '../types/club';
 
 function Main() {
-
   const[events, setEvents] = useState<Events[]>([]);
   const[clubs, setClubs] = useState<Club[]>([]);
+  const[posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -23,10 +23,10 @@ function Main() {
           const fetchedEvents: Events[] = response.data;
           setEvents(fetchedEvents);
         } else {
-          console.error('Failed to fetch events')
+          console.error('Failed to fetch events');
         }
       } catch (error) {
-        console.error('Error fetching events', error)
+        console.error('Error fetching events', error);
       }
     };
     fetchEvents();
@@ -38,73 +38,30 @@ function Main() {
           const fetchedClubs: Club[] = response.data;
           setClubs(fetchedClubs);
         } else {
-          console.error('Failed to fetch clubs')
+          console.error('Failed to fetch clubs');
         }
       } catch (error) {
-        console.error('Error fetching clubs', error)
+        console.error('Error fetching clubs', error);
       }
     };
     fetchClubs();
+
+    const fetchPosts = async () => {
+      try {
+        const response = await axios.get('http://localhost:3001/posts?limit=10');
+        if (response.status === 200) {
+          const fetchedPosts: Post[] = response.data;
+          setPosts(fetchedPosts);
+        } else {
+          console.error('Failed to fetch posts');
+        }
+      } catch (error) {
+        console.error('Error fetching posts', error);
+      }
+    };
+    fetchPosts();
   }, []);
   
-  const posts = [{
-    id: 1,
-    title: 'Sample Title 1',
-    type: PostType.NORMAL_POST,
-    content: 'Lorem ipsum dolor sit amet 1.',
-    imageUrl: 'some-url-1',
-    approved: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likes: [],
-    comments: [],
-    club: { id: 1, label: 'Sample Club', branch: 'Some Branch', category: 'Some Category', location: 'Some Location', phoneNumber: '1234567890', socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[]},
-    clubId: 1,
-    SocialMedia: { facebook: 'test',intagram: 'test',twitter: 'test'},
-    owner: {
-		id: 1,
-		stdId: "1234567890",
-		stdCode: "ABC123",
-		titleTh: "นาย",
-		titleEn: "Mr.",
-		firstNameTh: "ชื่อไทย",
-		lastNameTh: "นามสกุลไทย",
-		firstNameEn: "First Name",
-		lastNameEn: "Last Name",
-		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
-		campusNameEn: "College Name (English)",
-	  },
-    ownerId: 1,
-}, 
-{
-    id: 2,
-    title: 'Sample Title 2',
-    type: PostType.NORMAL_POST,
-    content: 'Lorem ipsum dolor sit amet 2.',
-    imageUrl: 'some-url-2',
-    approved: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likes: [],
-    comments: [],
-    club: { id: 2, label: 'Sample Club 2', branch: 'Some Branch 2', category: 'Some Category 2', location: 'Some Location 2', phoneNumber: '9876543210',  socialMedia: {facebook: '', instagram: '', twitter: ''}, subscribers:[] },
-    clubId: 2,
-    SocialMedia: { facebook: 'test',intagram: 'test',twitter: 'test'},
-    owner: {
-		id: 1,
-		stdId: "1234567890",
-		stdCode: "ABC123",
-		titleTh: "นาย",
-		titleEn: "Mr.",
-		firstNameTh: "ชื่อไทย",
-		lastNameTh: "นามสกุลไทย",
-		firstNameEn: "First Name",
-		lastNameEn: "Last Name",
-		campusNameTh: "ชื่อวิทยาลัย (ไทย)",
-		campusNameEn: "College Name (English)",
-	  },
-    ownerId: 2,
-}];
   const { user } = useAuth();
 
   return (

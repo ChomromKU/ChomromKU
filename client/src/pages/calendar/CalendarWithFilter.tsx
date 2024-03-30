@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import SelectWrapper from "./SelectWrapper";
-import CalendarWrapper, { CalendarWrapperProps } from "./CalendarWrapper";
+import axios from "axios";
+import SelectWrapper from "./_components/SelectWrapper";
+import CalendarWrapper, { CalendarWrapperProps } from "./_components/CalendarWrapper";
+import FollowFilter from "./_components/FollowFilter";
 import { Club } from "../../types/club";
 import { User } from "../../types/auth"
 import { useAuth } from "../../hooks/useAuth";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import FollowFilter from "./FollowFilter";
+
 
 interface ClubWithSubscriber extends Club {
 	subscribers: User[];
@@ -20,11 +21,10 @@ interface CalendarWithFilterProps extends CalendarWrapperProps {
 const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }) => {
 	const { id } = useParams();
 	const { user } = useAuth();
-	const [authUserId, setAuthUserId] = useState<number>(0);
-	const [campus, setCampus] = useState("บางเขน");
+	const [userId, setUserId] = useState<number>(0);
+	const [campus, setCampus] = useState<string>("บางเขน");
 	const [filterFollowings, setFilterFollowings] = useState({ club: false, event: false });
 	const [fitleredEvents, setFilteredEvents] = useState(events);
-	console.log(user);
 
 	const getThaiBranch = (branch: String) => {
 		switch (branch) {
@@ -43,7 +43,7 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
         const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
         if (response.status === 200) {
           const fetchedUserId = response.data.id;
-          setAuthUserId(fetchedUserId); 
+          setUserId(fetchedUserId); 
         } else {
           console.error('Failed to fetch user id');
         }
@@ -58,21 +58,28 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
 		if (user) {
 			if (filterFollowings.event) {
 				filtered = filtered.filter(e => {
-					return e.followers.map(f => f.id).includes(user.id);
+					return e.followers && Array.isArray(e.followers) && e.followers.map(f => f.id).includes(userId);
 				});
 			}
 			if (filterFollowings.club) {
 				const subscribersId = clubs
 					.map((c) => c.subscribers)
 					.flat()
+					.filter((s) => s && s.id) // Filter out undefined/null values
 					.map((s) => s.id);
-				filtered = filtered.filter((_) => subscribersId.includes(user.id));
+				filtered = filtered.filter((_) => subscribersId.includes(userId));
 			}
 		}
-		filtered = filtered.filter((e) => getThaiBranch(e.club.branch) === campus);
+		filtered = filtered.filter((e) => {
+			const club = e.club;
+			if (club && club.branch) {
+				return getThaiBranch(club.branch) === campus;
+			}
+			return false;
+		});
 		setFilteredEvents(filtered);
 		return () => {};
-	}, [id, user?.stdId, authUserId,campus, filterFollowings]);
+	}, [id, user?.stdId, userId, campus, filterFollowings]);
 
 	return (
 		<>

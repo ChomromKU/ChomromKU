@@ -1,16 +1,15 @@
-"use client";
 import React, { useEffect, useState } from "react";
 import { DatePicker, DatePickerProps, DateValue } from "@mantine/dates";
 import "dayjs/locale/th";
 import dayjs from "dayjs";
 import localeData from "dayjs/plugin/localeData";
 import { Indicator } from "@mantine/core";
-import EventBox from "./Event";
+import EventBox from "../../components/Event";
 import { animated, useSpring, useTransition } from "@react-spring/web";
 import { Link } from 'react-router-dom'
-import { Club } from "../../types/club";
-import { User } from "../../types/auth";
-import { Events } from "../../types/post";
+import { Club } from "../../../types/club";
+import { User } from "../../../types/auth";
+import { Events } from "../../../types/post";
 
 dayjs.extend(localeData);
 dayjs.locale("th");
@@ -138,8 +137,8 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
             },
             monthThead: {
               backgroundColor: "#28C3D7",
-              // height: '66px !important',
-              // width: '66px !important',
+              height: '36px',
+              width: '36px',
               border: "1px solid #F2F2F2",
               paddingBottom: '0px !important',
             },
@@ -176,7 +175,6 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
           renderDay={dayRenderer}
         ></DatePicker>
       </div>
-      
       <div className="w-full flex flex-col gap-[20px]">
         {eventTransition((style, item) =>
         (<animated.div style={style}>
