@@ -44,7 +44,7 @@ const EventDetailPage: React.FC = () => {
 					} else {
 						console.log('Failed to fetch event');
 					};
-					const clubResponse = await axios.get(`http://localhost:3001/clubs/${event?.clubId}`);
+					const clubResponse = await axios.get(`http://localhost:3001/clubs/${response.data?.clubId}`);
 					if (clubResponse.status === 200) {
 						setClub(clubResponse.data);
 						console.log('success fetch club');
