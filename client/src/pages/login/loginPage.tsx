@@ -92,7 +92,7 @@ export default function LoginPage() {
       {isFormError ? (
         <p className="text-red-400">บัญชีผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง</p>
       ) : (
-        <></>
+        null
       )}
       <button
         onClick={onSubmit}

@@ -38,13 +38,12 @@ dayjs.locale("th");
 
 const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	const { user } = useAuth();
-
 	const [openedAccept, { open: openAccept, close: closeAccept }] = useDisclosure(false);
     const [openedDecline, { open: openDecline, close: closeDecline }] = useDisclosure(false);
 	const [sending, setSending] = useState<boolean>(false)
 	const [successModalOpened, setSuccessModalOpened] = useState(false);
 	const initialLikeCount = post.likes ? post.likes.length : 0;
-  const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
+    const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
 	const [isLike, setIsLike] = useState<boolean>(false);
 	const [postOwner, setPostOwner] = useState<User>();
 
@@ -121,8 +120,9 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	
 	return (
 		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)" }}>
+			<Link to={`/posts/${post.id}`}>
  			<header className="flex items-start gap-[10px] mb-[10px]">
-				<div className="rounded-full p-4 h-[35px] w-[35px] flex items-center justify-center bg-orange-400 color-white">A</div>
+				<div className="rounded-full p-4 h-[35px] w-[35px] flex items-center justify-center bg-orange-400 color-white">{postOwner?.firstNameEn[0]}</div>
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${post.clubId}`}>
 						<div className="flex justify-between items-center">
@@ -145,16 +145,21 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 				</Link>
 			</div>
 			<div className="w-full relative mb-[15px]">
-				<img
-					src={eventImage}
-					// src={post.imageUrl || "/event.png"}
+				{post.imageUrl ?(
+					<img
+					// src={eventImage}
+					src={post.imageUrl}
 					width={0}
 					height={0}
 					sizes="100vw"
 					style={{ width: "100%", height: "auto", borderRadius: '10px' }}
 					alt={"event"}
 				/>
+				) : (
+					null
+				)}
 			</div>
+			</Link>
 			{!canApprove(role) ? (
 				<div>
 					<div className="flex gap-[10px] mb-[10px]">

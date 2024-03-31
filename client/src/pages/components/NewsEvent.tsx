@@ -126,8 +126,9 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 
 	return (
 		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)"}}>
-			<header className="flex items-center gap-2 mb-4">
-				<div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-orange-400 color-white">A</div>
+			<Link to={`/events/${event.id}`}>
+			<header className="flex items-center gap-2 mb-4">	
+				<div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-orange-400 color-white">{postOwner?.firstNameEn[0]}</div>
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${event.clubId}`}>
 						<div className="flex justify-between items-center">
@@ -147,15 +148,22 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 				</Link>
 			</div>
 			<div className="w-full relative mb-2">
-				<img
-					src={eventImage}
+				{event.imageUrl ?(
+					<img
+					// src={eventImage}
+					src={event.imageUrl}
+					// src={event.imageUrl? event.imageUrl : eventImage }
 					width={0}
 					height={0}
 					sizes="100vw"
 					style={{ width: "100%", height: "auto" , borderRadius: '10px'}}
 					alt={"event"}
 				/>
+				) : (
+					null
+				)}
 			</div>
+			</Link>
 			{!canApprove(role) ? (
 				<div>
 					<div className="flex gap-1 mb-2">

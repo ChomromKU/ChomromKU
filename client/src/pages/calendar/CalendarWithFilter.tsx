@@ -90,7 +90,7 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
 						<FollowFilter followingCheck={filterFollowings} setFollowingCheck={setFilterFollowings} />
 					</>
 				) : (
-					""
+					null
 				)}
 			</div>
 			<CalendarWrapper events={fitleredEvents} />

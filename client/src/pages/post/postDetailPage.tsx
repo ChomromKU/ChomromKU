@@ -70,7 +70,7 @@ const PostDetailPage: React.FC = () => {
       <p className="font-bold text-[24px] w-full px-8 mb-2">โพสต์ต่างๆจากชมรม</p>
       <div className="w-full px-8 flex flex-col gap-4">
         {club?.posts.map((p: Post) => (
-          <News post={p} key={p.id} />
+          <News post={p} key={p.id}  />
         ))}
       </div>
     </div>
