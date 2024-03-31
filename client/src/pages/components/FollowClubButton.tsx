@@ -1,6 +1,5 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState } from "react";
 import { Club, ClubMember } from '../../types/club';
 import { useAuth } from "../../hooks/useAuth";
 
@@ -16,39 +15,25 @@ type FollowClubButtonProps = {
 };
 
 export default function FollowClubButton({ member, club, clubId, isFollowing, editing, setEditing, updateClub, setEditedFields }: FollowClubButtonProps) {
-	const { id } = useParams();
   const { user } = useAuth();
-	const navigate = useNavigate();
-	const[userId, setUserId] = useState<number>(0);
 	const [showModal, setShowModal] = useState(false);
 
-	useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedLikerId = response.data.id;
-          setUserId(fetchedLikerId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-
-    if (user?.stdId) {
-      fetchUserId();
-    }
-  }, [id, user?.stdId, userId]);
-
 	async function handleClick() {
+		if (!user) {
+			alert("กรุณาเข้าสู่ระบบ");
+			return;
+		}
 		const status = isFollowing ? "unfollow" : "follow";
 		try {
-			await axios.post(`http://localhost:3001/clubs/${clubId}/follow?status=${status}`, {
-				userId: userId
-			});
-			window.location.reload();
+			const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+			if (response.status === 200) {
+				await axios.post(`http://localhost:3001/clubs/${clubId}/follow?status=${status}`, {
+					userId: response.data.id,
+				});
+				window.location.reload();
+			} else {
+        console.error('Failed to fetch user id');
+      }
 		} catch (error) {
 			console.error(error);
 		}

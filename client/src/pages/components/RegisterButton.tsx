@@ -1,5 +1,5 @@
 import { Link, LinkProps, useParams } from 'react-router-dom';
-
+import { useAuth } from '../../hooks/useAuth';
 import { ClubMember } from '../../types/club';
 
 interface RegisterButtonProps {
@@ -21,7 +21,19 @@ const CustomLink: React.FC<CustomLinkProps> = ({ state, ...rest }) => (
 
 const RegisterButton: React.FC<RegisterButtonProps> = ({ clubLabel, member, userId, editing }) => {
     const { id } = useParams();
-
+    const { user } = useAuth();
+    
+    if (!user) {
+        return (
+            <Link
+                to={`/login`}
+                style={{ backgroundColor: "rgba(255, 255, 255, 0.25)", color: "#fff", fontWeight: "400" }}
+                className={`text-sm py-1 px-4 rounded-full ${editing === true ? 'invisible' : 'visible'}`}
+            >
+                เข้าสู่ระบบเพื่อสมัครเข้าชมรม
+            </Link>
+        );
+    }
     if (!member) {
         return (
             <Link

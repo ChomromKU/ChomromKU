@@ -6,7 +6,6 @@ import FollowFilter from "./_components/FollowFilter";
 import { Club } from "../../types/club";
 import { User } from "../../types/auth"
 import { useAuth } from "../../hooks/useAuth";
-import { useParams } from "react-router-dom";
 
 
 interface ClubWithSubscriber extends Club {
@@ -19,7 +18,6 @@ interface CalendarWithFilterProps extends CalendarWrapperProps {
 }
 
 const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }) => {
-	const { id } = useParams();
 	const { user } = useAuth();
 	const [userId, setUserId] = useState<number>(0);
 	const [campus, setCampus] = useState<string>("บางเขน");
@@ -38,24 +36,26 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
 	};
 
 	useEffect(() => {
-		const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedUserId = response.data.id;
-          setUserId(fetchedUserId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-    if (user?.stdId) {
-      fetchUserId();
-    }
-		let filtered = events;
-		if (user) {
+			if (!events.length) {
+				return; 
+			}
+			if (user) {
+				const fetchUserId = async () => {
+					try {
+						const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+						if (response.status === 200) {
+							const fetchedUserId = response.data.id;
+							setUserId(fetchedUserId);
+						} else {
+							console.error('Failed to fetch user id');
+						}
+					} catch (error) {
+						console.error('Error fetching user id:', error);
+					}
+				};
+				fetchUserId();
+			}
+			let filtered = events;
 			if (filterFollowings.event) {
 				filtered = filtered.filter(e => {
 					return e.followers && Array.isArray(e.followers) && e.followers.map(f => f.id).includes(userId);
@@ -65,21 +65,19 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
 				const subscribersId = clubs
 					.map((c) => c.subscribers)
 					.flat()
-					.filter((s) => s && s.id) // Filter out undefined/null values
 					.map((s) => s.id);
 				filtered = filtered.filter((_) => subscribersId.includes(userId));
 			}
-		}
-		filtered = filtered.filter((e) => {
-			const club = e.club;
-			if (club && club.branch) {
-				return getThaiBranch(club.branch) === campus;
-			}
-			return false;
-		});
-		setFilteredEvents(filtered);
+			filtered = filtered.filter((e) => {
+				const club = e.club;
+				if (club && club.branch) {
+					return getThaiBranch(club.branch) === campus;
+				}
+				return false;
+			});
+			setFilteredEvents(filtered);
 		return () => {};
-	}, [id, user?.stdId, userId, campus, filterFollowings]);
+	}, [campus, filterFollowings, events]);
 
 	return (
 		<>

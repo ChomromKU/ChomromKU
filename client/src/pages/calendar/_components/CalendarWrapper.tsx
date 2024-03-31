@@ -19,8 +19,6 @@ interface EventWithClub extends Events {
 }
 
 interface EventWithClubWithFollwer extends EventWithClub {
-  startDate: Date;
-  endDate: Date;
   followers: User[];
 }
 
@@ -59,9 +57,9 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
 		});
 
 		return event.length != 0 ? (
-			<Indicator size={6} color="gray" offset={-3}>
-				<div>{day}</div>
-			</Indicator>
+			<Indicator inline label={<span style={{ color: 'green' }}>✔︎</span>}>
+        <div>{day}</div>
+      </Indicator>
 		) : (
 			<div>{day}</div>
 		);
@@ -86,10 +84,21 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
 	};
 
 	const checkDateInRange = (startDate: Date, date: Date, endDate: Date) => {
-    if (!(startDate instanceof Date) || !(date instanceof Date) || !(endDate instanceof Date)) {
-      throw new Error('Invalid Date objects passed to checkDateInRange function');
+    if (typeof startDate === 'string') {
+      startDate = new Date(startDate);
     }
-  
+    if (!(startDate instanceof Date)) {
+      console.error('Invalid startDate format:', startDate);
+      return false;
+    }
+    if (typeof endDate === 'string') {
+      endDate = new Date(endDate);
+    }
+    if (!(endDate instanceof Date)) {
+      console.error('Invalid endDate format:', endDate);
+      return false;
+    }
+
     const day = {
       start: startDate.getDate(),
       actual: date.getDate(),
@@ -110,7 +119,6 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
   
     return [day, month, year].filter((v) => v.start <= v.actual && v.actual <= v.endDate).length === 3;
   };
-  
 
   return (
     <div className="w-full">

@@ -72,7 +72,15 @@ const EventDetail = ({ event }: EventDetailProps) => {
 						}) : 'ไม่ระบุเวลาที่โพส'}
 					</span>
 				</div>
+				<div className="flex flex-col gap-2">
 				<span className="text-2xl font-bold">{event.title}</span>
+				<span className="text-xl font-bold">วันเริ่มต้นและสิ้นสุด: {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
+					new Date(event.startDate),)} - {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
+					new Date(event.endDate),)}
+				</span>
+				<span className="text-xl font-bold">สถานที่จัดกิจกรรม: {event.location}</span>
+				<span className="text-xl font-bold">ณ เวลา {event.startTime} - {event.endTime}</span>
+				</div>
 			</header>
 			<section className="flex flex-col gap-4">
 				<Tag tagName={"อีเว้นท์"} color={"bg-[#F24B4B]"} />

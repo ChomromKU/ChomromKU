@@ -46,6 +46,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
     const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
 	const [isLike, setIsLike] = useState<boolean>(false);
 	const [postOwner, setPostOwner] = useState<User>();
+	const [userId, setUserId] = useState<number>(0);
 
 	const openSuccessModal = () => {
 		setSuccessModalOpened(true);
@@ -87,8 +88,24 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	};
 
 	useEffect(() => {
-		if (user && post && post.likes && Array.isArray(post.likes)) {
-			setIsLike(post.likes.some((like) => like.userId === user.id));
+		if (post.likes) {
+			const fetchUserId = async () => {
+				try {
+					const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+					if (response.status === 200) {
+						const fetchedId = response.data.id;
+						setUserId(fetchedId); 
+					} else {
+						console.error('Failed to fetch user id');
+					}
+				} catch (error) {
+					console.error('Error fetching user id:', error);
+				}
+			};
+			if (user?.stdId) {
+				fetchUserId();
+			}
+			setIsLike(post.likes.some((like) => like.userId === userId));
 		} else {
 			setIsLike(false);
 		}
@@ -164,7 +181,9 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 				<div>
 					<div className="flex gap-[10px] mb-[10px]">
 					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={0} type={"post"} />
-						<img src={commentIcon} height={16} width={16} alt={"comment"} />
+						<Link to={`/posts/${post.id}`} className="mt-[2px]">
+							<img src={commentIcon} height={16} width={16} alt={"comment"} />
+						</Link>
 						<img src={sendIcon} height={16} width={16} alt={"share"} />
 					</div>
 					<div className="flex justify-between gap-2">

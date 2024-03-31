@@ -12,7 +12,7 @@ import axios from "axios";
 const EventDetailPage: React.FC = () => {
 	const { user } =  useAuth();
 	const { id } = useParams< {id?: string}>();
-	const [authUserId, setAuthUserId] = useState<number>(0);
+	const [userId, setUserId] = useState<number>(0);
 	const [event, setEvent] = useState<Events | null>(null);
   const [club, setClub] = useState<any>(null);
 
@@ -22,7 +22,7 @@ const EventDetailPage: React.FC = () => {
         const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
         if (response.status === 200) {
           const fetchedUserId = response.data.id;
-          setAuthUserId(fetchedUserId); 
+          setUserId(fetchedUserId); 
         } else {
           console.error('Failed to fetch user id');
         }
@@ -58,14 +58,14 @@ const EventDetailPage: React.FC = () => {
 		};
     fetchEventAndClub();
 		
-  }, [id,  user?.stdId, authUserId]);
+  }, [userId]);
 
 	if (!event) {
 		return <div>Event not found</div>;
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col items-center bg-white">
+		<div className="flex min-h-screen flex-col items-center bg-white mt-2">
 			<div className="h-fit w-full relative">
 				<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 					<img

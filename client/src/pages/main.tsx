@@ -1,67 +1,56 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import AutocompleteWrapper from './components/AutocompleteWrapper';
 import CalendarWithFilter from './calendar/CalendarWithFilter';
 import News from './components/NewsPost';
-import { Post, PostType } from '../types/post';
+import { Events, Post } from '../types/post';
 import { useAuth } from '../hooks/useAuth';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { Events } from '../types/post';
-import { Club } from '../types/club'
-import { subscribe } from 'diagnostics_channel';
-// import { SocialMedia } from '../types/club';
+import { Club } from "../types/club";
 
 function Main() {
-  const[events, setEvents] = useState<Events[]>([]);
-  const[clubs, setClubs] = useState<Club[]>([]);
-  const[posts, setPosts] = useState<Post[]>([]);
+  const [events, setEvents] = useState<Events[]>([]);
+  const [clubs, setClubs] = useState<Club[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/events');
-        if (response.status === 200) {
-          const fetchedEvents: Events[] = response.data;
+        const [eventsResponse, clubsResponse, postsResponse] = await Promise.all([
+          axios.get('http://localhost:3001/events'),
+          axios.get('http://localhost:3001/clubs'),
+          axios.get('http://localhost:3001/posts?limit=10')
+        ]);
+        if (eventsResponse.status === 200) {
+          const fetchedEvents: Events[] = eventsResponse.data;
           setEvents(fetchedEvents);
         } else {
           console.error('Failed to fetch events');
         }
-      } catch (error) {
-        console.error('Error fetching events', error);
-      }
-    };
-    fetchEvents();
-    
-    const fetchClubs = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/clubs');
-        if (response.status === 200) {
-          const fetchedClubs: Club[] = response.data;
+        if (clubsResponse.status === 200) {
+          const fetchedClubs: Club[] = clubsResponse.data;
           setClubs(fetchedClubs);
         } else {
           console.error('Failed to fetch clubs');
         }
-      } catch (error) {
-        console.error('Error fetching clubs', error);
-      }
-    };
-    fetchClubs();
-
-    const fetchPosts = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/posts?limit=10');
-        if (response.status === 200) {
-          const fetchedPosts: Post[] = response.data;
+        if (postsResponse.status === 200) {
+          const fetchedPosts: Post[] = postsResponse.data;
           setPosts(fetchedPosts);
+          console.log(fetchedPosts);
         } else {
           console.error('Failed to fetch posts');
         }
+        setLoading(false); 
       } catch (error) {
-        console.error('Error fetching posts', error);
+        console.error('Error fetching data:', error);
+        setLoading(false); 
       }
     };
-    fetchPosts();
+    fetchData();
+    console.log(posts);
   }, []);
   
+
   const { user } = useAuth();
 
   return (
@@ -70,9 +59,11 @@ function Main() {
       <h1 className="self-start text-2xl font-bold">ตารางอีเว้นท์และกิจกรรม</h1>
       <CalendarWithFilter events={events} user={user} clubs={clubs} />
       <h1 className="self-start text-2xl font-bold">โพสต์</h1>
-      {posts.map((p) => (
-				<News post={p} key={p.id} />
-			))}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        posts.map((p) => <News post={p} key={p.id} />)
+      )}
     </div>
   );
 }

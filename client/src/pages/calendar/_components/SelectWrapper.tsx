@@ -12,10 +12,11 @@ const SelectWrapper: React.FC<SelectWrapperProps> = ({ value, setValue }) => {
       <select
         value={value}
         onChange={(event) => setValue(event.currentTarget.value)}
-        className="bg-[#03A96B] text-white py-2 pr-6 rounded-full border-0"
+        className="bg-[#03A96B] text-white py-2 pr-6 rounded-full border-0 w-[92px]"
       >
         <option value="บางเขน">บางเขน</option>
         <option value="กำแพงแสน">กำแพงแสน</option>
+        <option value="วิทยาเขตเฉลิมพระเกียรติ จังหวัดสกลนคร">วิทยาเขตเฉลิมพระเกียรติ จังหวัดสกลนคร</option>
         <option value="ศรีราชา">ศรีราชา</option>
       </select>
       <img

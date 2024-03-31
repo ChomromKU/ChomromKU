@@ -1,8 +1,7 @@
 import axios from "axios";
 import { VscSend } from "react-icons/vsc";
 import { useAuth } from "../../hooks/useAuth";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type CommentInputProps = {
 	postId: number;
@@ -10,43 +9,31 @@ type CommentInputProps = {
 };
 
 export default function CommentInput({ postId, type }: CommentInputProps) {
-	const { id } = useParams();
 	const { user } = useAuth();
 	const [comment, setComment] = useState<string>("");
-	const [commenterId, setCommenterId] = useState<number | null>(null);
 
-	useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedCommenterId = response.data.id;
-          setCommenterId(fetchedCommenterId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-
-    if (user?.stdId) {
-      fetchUserId();
-    }
-  }, [id, user?.stdId, commenterId]);
 
 	async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
+		if (!user) {
+			alert("กรุณาเข้าสู่ระบบ");
+			return;
+		}
 		try {
-			await axios.post(`http://localhost:3001/posts/${postId}/comment`, {
-				userId: commenterId,
+			const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+      if (response.status === 200) {
+				await axios.post(`http://localhost:3001/posts/${postId}/comment`, {
+				userId: response.data.id,
 				type: type,
 				message: comment,
 				postId,
 			});
 			setComment("");
 			window.location.reload();
+			} else {
+				console.error('Failed to fetch user id');
+			}
 		} catch (error) {
 			console.error(error);
 		}

@@ -2,9 +2,6 @@ import axios from "axios";
 import { FiHeart } from "react-icons/fi";
 import { FaHeart } from "react-icons/fa6";
 import { useAuth } from "../../hooks/useAuth";
-import { useState, useEffect } from "react";
-import { User } from "../../types/auth";
-import { useParams } from "react-router-dom";
 
 type LikeButtonProps = {
 	isLike: boolean;
@@ -15,30 +12,7 @@ type LikeButtonProps = {
 };
 
 export default function LikeButton({ isLike, like, unlike, postId, type }: LikeButtonProps) {
-  const { id } = useParams();
   const { user } = useAuth();
-  const [userId, setUserId] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedLikerId = response.data.id;
-          setUserId(fetchedLikerId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-
-    if (user?.stdId) {
-      fetchUserId();
-    }
-  }, [id, user?.stdId, userId]);
-
 
 	async function handleClickLike() {
 		if (!user) {
@@ -46,14 +20,19 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 			return;
 		}
 		try {
-			await axios.post(`http://localhost:3001/posts/${postId}/like`, {
+			const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+			if (response.status === 200) {
+				const userId = response.data.id;
+				await axios.post(`http://localhost:3001/posts/${postId}/like`, {
 				type,
 				userId: userId,
 				postId,
 			});
 			like();
+			} else {
+				console.error('Failed to fetch user id');
+			}
 		} catch (error) {
-			console.log(user);
 			console.error("Post like failed: ", error);
 		}
 	}
@@ -65,10 +44,16 @@ export default function LikeButton({ isLike, like, unlike, postId, type }: LikeB
 		}
 
 		try {
-			await axios.delete(`http://localhost:3001/posts/${postId}/like?type=${type}`, {
-				data: { userId: userId },
-			});
-			unlike();
+			const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+			if (response.status === 200) {
+				const userId = response.data.id;
+				await axios.delete(`http://localhost:3001/posts/${postId}/like?type=${type}`, {
+					data: { userId: userId },
+				});
+				unlike();
+			} else {
+				console.error('Failed to fetch user id');
+			}
 		} catch (error) {
 			console.error("Unlike failed: ", error);
 		}

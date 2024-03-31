@@ -115,10 +115,16 @@ app.get('/posts', async (req, res) => {
             posts = await prisma.post.findMany({
                 take: parsedLimit,
                 orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
             });
         } else {
             posts = await prisma.post.findMany({
                 orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
             });
         }
 
@@ -368,7 +374,11 @@ app.get('/posts/:id/comment', async (req, res) => {
 app.get('/events', async (req, res) => {
     try {
         const events = await prisma.event.findMany({
+            where: {
+                approved: true,
+            },
             include: {
+                club: true,
                 followers:true,
             }
         });
