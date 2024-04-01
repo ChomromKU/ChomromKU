@@ -51,7 +51,7 @@ export default function FollowClubButton({ member, club, clubId, isFollowing, ed
 			  socialMedia: {
 				facebook: club.socialMedia?.facebook || '',
 				instagram: club.socialMedia?.instagram || '',
-				twitter: club.socialMedia?.twitter || '',
+				line: club.socialMedia?.line || '',
 			  }
 			});
 		}

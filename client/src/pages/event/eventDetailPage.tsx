@@ -2,6 +2,7 @@ import EventDetail from "./_components/EventDetail";
 import CommentBox from "../components/CommentBox";
 import { Events } from "../../types/post";
 import { Post } from "../../types/post";
+import NewsEvent from "../components/NewsEvent";
 import News from "../components/NewsPost";
 import { useAuth } from "../../hooks/useAuth";
 import { useParams } from "react-router-dom";
@@ -100,6 +101,11 @@ const EventDetailPage: React.FC = () => {
 					<News post={p} key={p.id} />
 				))}
 			</div>
+			{/* <div className="w-full px-8 flex flex-col gap-4">
+				{club?.events.filter((e: Events) => e.id !== event.id).map((e: Events) => (
+					<NewsEvent event={e} key={e.id} clubLabel={club.label} />
+				))}
+			</div> */}
 		</div>
 	);
 };

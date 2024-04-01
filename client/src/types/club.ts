@@ -30,7 +30,7 @@ export type ClubMember = {
 export type SocialMedia = {
     facebook?: string,
     instagram?: string,
-    twitter?: string
+    line?: string
 }
 
 export type MemberRequestForm = {

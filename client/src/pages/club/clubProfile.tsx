@@ -253,12 +253,12 @@ export default function ClubProfile() {
 							</p>
 							<input
 							type="text"
-							value={editedFields.socialMedia?.twitter}
+							value={editedFields.socialMedia?.line}
 							className='bg-transparent border-b opacity-70 w-full mb-[7px] focus-visible:outline-none'
 							onChange={(e) =>
 								handleFieldChange('socialMedia', {
 								  ...editedFields.socialMedia,
-								  twitter: e.target.value,
+								  line: e.target.value,
 								})
 							  }
 							/>
@@ -296,7 +296,7 @@ export default function ClubProfile() {
 							<Link to={socialMedia?.instagram ? socialMedia?.instagram : '/'} className="flex items-center">
 								<img alt="instagram" src={instagramIcon} width="20" height="20" />
 							</Link>
-							<Link to={socialMedia?.twitter ? socialMedia?.twitter : '/'} className="flex items-center">
+							<Link to={socialMedia?.line ? socialMedia?.line : '/'} className="flex items-center">
 								<img alt="line" src={lineIcon} width="24" height="24" />
 							</Link>
 						</div>

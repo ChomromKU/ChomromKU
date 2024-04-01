@@ -75,7 +75,7 @@ app.put('/clubs/:id', async (req, res) => {
                     clubId: parseInt(id),
                     facebook: updatedFields.socialMedia?.facebook,
                     instagram: updatedFields.socialMedia?.instagram,
-                    twitter: updatedFields.socialMedia?.twitter,
+                    line: updatedFields.socialMedia?.line,
                 }
             });
         }
@@ -91,7 +91,7 @@ app.put('/clubs/:id', async (req, res) => {
                     update: {
                         facebook: updatedFields.socialMedia?.facebook,
                         instagram: updatedFields.socialMedia?.instagram,
-                        twitter: updatedFields.socialMedia?.twitter,
+                        line: updatedFields.socialMedia?.line,
                     },
                 },
             },
@@ -177,7 +177,7 @@ app.get('/posts/:id', async (req, res) => {
                         user:true,
                     },
                 },
-                club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, twitter: true}}}},
+                club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, line: true}}}},
                 owner:true,
             },
         });
