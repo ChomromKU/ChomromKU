@@ -30,6 +30,8 @@ const CalendarWithFilter: React.FC<CalendarWithFilterProps> = ({ events, clubs }
 				return "บางเขน";
 			case "KamphaengSaen":
 				return "กำแพงแสน";
+			case "SakonNakorn":
+				return "วิทยาเขตเฉลิมพระเกียรติ จังหวัดสกลนคร";
 			case "Sriracha":
 				return "ศรีราชา";
 		}

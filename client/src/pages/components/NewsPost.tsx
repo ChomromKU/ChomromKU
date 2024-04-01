@@ -88,28 +88,22 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	};
 
 	useEffect(() => {
-		if (post.likes) {
-			const fetchUserId = async () => {
-				try {
-					const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-					if (response.status === 200) {
-						const fetchedId = response.data.id;
-						setUserId(fetchedId); 
-					} else {
-						console.error('Failed to fetch user id');
-					}
-				} catch (error) {
-					console.error('Error fetching user id:', error);
-				}
-			};
-			if (user?.stdId) {
-				fetchUserId();
-			}
-			setIsLike(post.likes.some((like) => like.userId === userId));
-		} else {
-			setIsLike(false);
-		}
-	}, [user, post]);
+    const fetchIsLike = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+          if (response.status === 200) {
+            setIsLike(post.likes.some((like) => like.userId === response.data.id));
+          } else {
+            setIsLike(false);
+          }
+        } catch (error) {
+          setIsLike(false);
+        }
+      }
+    };
+    fetchIsLike();
+  }, [user, post]);
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -180,7 +174,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 			{!canApprove(role) ? (
 				<div>
 					<div className="flex gap-[10px] mb-[10px]">
-					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={0} type={"post"} />
+					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={post.id} type={"post"} />
 						<Link to={`/posts/${post.id}`} className="mt-[2px]">
 							<img src={commentIcon} height={16} width={16} alt={"comment"} />
 						</Link>
