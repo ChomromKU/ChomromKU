@@ -12,11 +12,27 @@ import { Comment } from '../../types/post';
 const PostDetailPage: React.FC = () => {
   const { user } = useAuth();
   const { id } = useParams<{ id?: string }>();
+  const [userId, setUserId] = useState<number>(0);
   const [post, setPost] = useState<Post | null>(null);
-  const [comments, setComments] = useState<Comment[]>([]);
   const [club, setClub] = useState<any>(null);
 
   useEffect(() => {
+    if (user) {
+			const fetchUserId = async () => {
+				try {
+					const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+					if (response.status === 200) {
+						const fetchedUserId = response.data.id;
+						setUserId(fetchedUserId); 
+					} else {
+						console.error('Failed to fetch user id');
+					}
+				} catch (error) {
+					console.error('Error fetching user id:', error);
+				}
+			};
+			fetchUserId();
+		}
     const fetchPostAndClub = async () => {
 			if (id) {
 				try {
@@ -61,7 +77,7 @@ const PostDetailPage: React.FC = () => {
             name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
             message={c.message}
             createdAt={c.createdAt}
-            isYou={user ? user.id === c.userId : false}
+            isYou={user ? userId === c.userId : false}
             firstChar={c.user.firstNameEn.substring(0, 1)}
             key={c.id}
           />

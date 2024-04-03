@@ -40,16 +40,13 @@ dayjs.locale("th");
 
 const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPost }) => {
 	const { user } = useAuth();
-    const navigate = useNavigate();
-
 	const [openedAccept, { open: openAccept, close: closeAccept }] = useDisclosure(false);
     const [openedDecline, { open: openDecline, close: closeDecline }] = useDisclosure(false);
 	const [sending, setSending] = useState<boolean>(false)
 	const [successModalOpened, setSuccessModalOpened] = useState(false);
-
 	const [postOwner, setPostOwner] = useState<User>();
-
-	const [likeCount, setLikeCount] = useState<number>(event.likes ? event.likes.length : 0);
+	const initialLikeCount = event.likes ? event.likes.length : 0;
+    const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
 	const [isLike, setIsLike] = useState<boolean>(false);
 
 	const openSuccessModal = () => {
@@ -58,14 +55,6 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 	const closeSuccessModal = () => {
 		setSuccessModalOpened(false);
 	};
-
-	// useEffect(() => {
-	// 	if (user) {
-	// 		setIsLike(event.likes.some((like) => like.userId === user.id));
-	// 	} else {
-	// 		setIsLike(false);
-	// 	}
-	// }, [user, event]);
 
 	const onDeletes = async (eventId: number) => {
 		try {
@@ -101,6 +90,24 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 	};
 	
 	useEffect(() => {
+		const fetchIsLike = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+          if (response.status === 200) {
+            setIsLike(event.likes.some((like) => like.userId === response.data.id));
+          } else {
+            setIsLike(false);
+          }
+        } catch (error) {
+          setIsLike(false);
+        }
+      }
+    };
+    fetchIsLike();
+  }, [user, event]);
+
+	useEffect(() => {
 		const fetchUser = async () => {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/users`);
@@ -110,6 +117,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 			}
 		}
 		fetchUser()
+		console.log(likeCount);
 	},[event.ownerId])
 
 	const like = async () => {
@@ -147,18 +155,16 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 					<span style={{ color: "#006664", textDecoration: "underline" }}>อ่านเพิ่มเติม</span>
 				</Link>
 			</div>
-			<div className="w-full relative mb-2">
-				{event.imageUrl ?(
+			<div className="w-full relative mb-2" style={{ display: "flex", justifyContent: "center" }}>
+				{event.imageUrl ? (
 					<img
-					// src={eventImage}
-					src={event.imageUrl}
-					// src={event.imageUrl? event.imageUrl : eventImage }
-					width={0}
-					height={0}
-					sizes="100vw"
-					style={{ width: "100%", height: "auto" , borderRadius: '10px'}}
-					alt={"event"}
-				/>
+						src={event.imageUrl}
+						width={0}
+						height={0}
+						sizes="100vw"
+						style={{ width: "auto", height: "400px", borderRadius: '10px' }}
+						alt={"event"}
+					/>
 				) : (
 					null
 				)}
@@ -167,7 +173,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 			{!canApprove(role) ? (
 				<div>
 					<div className="flex gap-1 mb-2">
-						<LikeButton isLike={isLike} like={like} unlike={unlike} postId={0} type={"post"} />
+						<LikeButton isLike={isLike} like={like} unlike={unlike} postId={event.id} type={"event"} />
 						<FaRegComment className="h-5 w-5" />
 						<FiSend className="h-5 w-5" />
 					</div>

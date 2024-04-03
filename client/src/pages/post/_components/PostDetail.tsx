@@ -25,28 +25,22 @@ const PostDetail = ({ post }: PostDetailProps) => {
 	);
 
 	useEffect(() => {
-		const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedUserId = response.data.id;
-          setUserId(fetchedUserId); 
-        } else {
-          console.error('Failed to fetch user id');
+		const fetchIsLike = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+          if (response.status === 200) {
+            setIsLike(post.likes.some((like) => like.userId === response.data.id));
+          } else {
+            setIsLike(false);
+          }
+        } catch (error) {
+          setIsLike(false);
         }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
       }
     };
-		if (user?.stdId) {
-      fetchUserId();
-    }
-		if (user && post && post.likes) {
-			setIsLike(post.likes.some((like) => like.userId === userId));
-		} else {
-			setIsLike(false);
-		}
-	}, [id, user, post]);
+    fetchIsLike();
+  }, [user, post]);
 
 	const like = () => {
 		setIsLike((prev) => !prev);

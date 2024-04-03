@@ -12,7 +12,7 @@ import { useDisclosure } from "@mantine/hooks";
 import eventImage from '../../images/event.png'
 import commentIcon from '../../images/chat.svg'
 import sendIcon from '../../images/send.svg'
-import { Like, Post } from "../../types/post";
+import { Post } from "../../types/post";
 import { SocialMedia } from "../../types/club";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
@@ -42,11 +42,10 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
     const [openedDecline, { open: openDecline, close: closeDecline }] = useDisclosure(false);
 	const [sending, setSending] = useState<boolean>(false)
 	const [successModalOpened, setSuccessModalOpened] = useState(false);
+	const [postOwner, setPostOwner] = useState<User>();
 	const initialLikeCount = post.likes ? post.likes.length : 0;
     const [likeCount, setLikeCount] = useState<number>(initialLikeCount);
 	const [isLike, setIsLike] = useState<boolean>(false);
-	const [postOwner, setPostOwner] = useState<User>();
-	const [userId, setUserId] = useState<number>(0);
 
 	const openSuccessModal = () => {
 		setSuccessModalOpened(true);
@@ -163,7 +162,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 					width={0}
 					height={0}
 					sizes="100vw"
-					style={{ width: "100%", height: "auto", borderRadius: '10px' }}
+					style={{ width: "auto", height: "400px", borderRadius: '10px' }}
 					alt={"event"}
 				/>
 				) : (

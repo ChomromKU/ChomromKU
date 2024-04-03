@@ -36,7 +36,6 @@ function Main() {
         if (postsResponse.status === 200) {
           const fetchedPosts: Post[] = postsResponse.data;
           setPosts(fetchedPosts);
-          console.log(fetchedPosts);
         } else {
           console.error('Failed to fetch posts');
         }
@@ -47,7 +46,6 @@ function Main() {
       }
     };
     fetchData();
-    console.log(posts);
   }, []);
   
 

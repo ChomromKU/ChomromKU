@@ -1,12 +1,10 @@
+import { useState, useEffect } from "react";
 import EventDetail from "./_components/EventDetail";
 import CommentBox from "../components/CommentBox";
 import { Events } from "../../types/post";
-import { Post } from "../../types/post";
 import NewsEvent from "../components/NewsEvent";
-import News from "../components/NewsPost";
 import { useAuth } from "../../hooks/useAuth";
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
 import axios from "axios";
 
 
@@ -18,22 +16,22 @@ const EventDetailPage: React.FC = () => {
   const [club, setClub] = useState<any>(null);
 
 	useEffect(() => {
-		const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedUserId = response.data.id;
-          setUserId(fetchedUserId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-    if (user?.stdId) {
-      fetchUserId();
-    }
+		if (user) {
+			const fetchUserId = async () => {
+				try {
+					const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+					if (response.status === 200) {
+						const fetchedUserId = response.data.id;
+						setUserId(fetchedUserId); 
+					} else {
+						console.error('Failed to fetch user id');
+					}
+				} catch (error) {
+					console.error('Error fetching user id:', error);
+				}
+			};
+			fetchUserId();
+		}
 
     const fetchEventAndClub = async () => {
 			if (id) {
@@ -59,7 +57,7 @@ const EventDetailPage: React.FC = () => {
 		};
     fetchEventAndClub();
 		
-  }, [userId]);
+  }, [id]);
 
 	if (!event) {
 		return <div>Event not found</div>;
@@ -89,7 +87,7 @@ const EventDetailPage: React.FC = () => {
 						name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
 						message={c.message}
 						createdAt={c.createdAt}
-						isYou={user ? user.id === c.userId : false}
+						isYou={user ? userId === c.userId : false}
 						firstChar={c.user.firstNameEn.substring(0, 1)}
 						key={c.id}
 					/>
@@ -97,15 +95,10 @@ const EventDetailPage: React.FC = () => {
 			</div>
 			<p className="font-bold text-[24px] w-full px-8 mb-2">อีเว้นท์ต่างๆจากชมรม</p>
 			<div className="w-full px-8 flex flex-col gap-4">
-				{club?.events.map((p: Post) => (
-					<News post={p} key={p.id} />
-				))}
-			</div>
-			{/* <div className="w-full px-8 flex flex-col gap-4">
 				{club?.events.filter((e: Events) => e.id !== event.id).map((e: Events) => (
 					<NewsEvent event={e} key={e.id} clubLabel={club.label} />
 				))}
-			</div> */}
+			</div>
 		</div>
 	);
 };

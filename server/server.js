@@ -44,7 +44,7 @@ app.get('/clubs/:id', async (req, res) => {
             where: { id: parseInt(id) },
             include: {
                 subscribers: true,
-                events: true,
+                events: { include: { owner: true, likes: true, club: true } },
                 members: { select: { id: true, role: true, user: true } },
                 posts: { include: { owner: true, likes: true, club: true } },
                 socialMedia: true,
@@ -378,6 +378,7 @@ app.get('/events', async (req, res) => {
                 approved: true,
             },
             include: {
+                likes: true,
                 club: true,
                 followers:true,
             }
