@@ -56,6 +56,7 @@ const PostDetailPage: React.FC = () => {
     	};
 		};
     fetchPostAndClub();
+    window.scrollTo({ top: 0 });
   }, [id]);
 
   if (!post) {

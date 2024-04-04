@@ -56,6 +56,7 @@ const EventDetailPage: React.FC = () => {
     	};
 		};
     fetchEventAndClub();
+		window.scrollTo({ top: 0 });
 		
   }, [id]);
 
