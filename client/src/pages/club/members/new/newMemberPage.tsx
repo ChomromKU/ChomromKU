@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import { Club } from "../../../../types/club";
-// import { cache } from "react";
+// import {cache} from 'react';
 // import prisma from "@/lib/prisma";
 
 export default function NewMemberPage() {

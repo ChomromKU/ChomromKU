@@ -6,13 +6,14 @@ interface CommentProps {
   createdAt: Date | string;
   isYou: boolean;
   firstChar: string;
+  isLast: boolean;
 }
 
-const CommentBox: React.FC<CommentProps> = ({ name, message, createdAt, isYou, firstChar }) => {
+const CommentBox: React.FC<CommentProps> = ({ name, message, createdAt, isYou, firstChar, isLast }) => {
   // Function to format date and time
   const formatDateTime = (dateTime: Date): string => {
-    return `${dateTime.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}
-    เวลา ${dateTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
+    return `${dateTime.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" })}`;
+    // เวลา ${dateTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
   };
 
   let formattedDate: string;
@@ -31,9 +32,9 @@ const CommentBox: React.FC<CommentProps> = ({ name, message, createdAt, isYou, f
   }
 
   return (
-    <div className="w-full flex flex-col gap-[15px] border-b pb-[15px]">
+    <div className={`w-full flex flex-col gap-[15px] ${!isLast && 'border-b pb-[15px]'} `}>
       <div className="flex-1 flex items-center justify-between">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-[10px] items-center">
           <div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-[#006664] text-white">
             {firstChar}
           </div>

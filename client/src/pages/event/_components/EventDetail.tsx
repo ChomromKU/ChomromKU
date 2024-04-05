@@ -8,6 +8,7 @@ import LikeButton from "../../components/LikeButton";
 import { useAuth } from "../../../hooks/useAuth";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { postTypeToColorMap, postTypeToLabelPost, getPostTypeEnumValue } from "../../../lib/post"
 
 type EventDetailProps = {
 	event: Events;
@@ -52,7 +53,7 @@ const EventDetail = ({ event }: EventDetailProps) => {
 	};
 
 	return (
-		<div className="w-full p-8 flex flex-col gap-3">
+		<div className="w-full p-[24px] flex flex-col gap-3">
 			<header>
 				<div className="flex justify-between font-light text-sm mb-2">
 					<span>

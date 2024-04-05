@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Client
@@ -18,23 +18,30 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
-    # depends_on:
-    #   - database
     environment:
-      DATABASE_URL: mysql://root:mickyoyo12345@database:3306/chomrom_ku
+      DATABASE_URL: mysql://root:mickyoyo12345@database/chomrom_ku
     volumes:
       - ./server:/app/server
-      - /server/node_modules
-
+      - /app/server/node_modules
+      # - /Users/kollawatrupanya/Documents/ChomromKU/server/prisma:/app/server/prisma
+      # - ./server/prisma/migrations:/app/server/prisma/migrations
+    depends_on:
+      database:
+        condition: service_completed_successfully
 
   # MySQL Database
   database:
     image: mysql:latest
     environment:
-      MYSQL_DATABASE: 'chomrom_ku'
-      MYSQL_ROOT_PASSWORD: 'mickyoyo12345'
+      MYSQL_DATABASE: "chomrom_ku"
+      MYSQL_ROOT_PASSWORD: "mickyoyo12345"
     ports:
       - "3307:3306"
     volumes:
       - ./database:/var/lib/mysql
-
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 --password=$$MYSQL_ROOT_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 55

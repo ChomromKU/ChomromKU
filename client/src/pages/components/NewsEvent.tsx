@@ -132,6 +132,9 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 	const truncateText = (text: string) => (text.length >= 100 ? text.substring(0, 99) + "..." : text);
 	const getPreviousTime = (date: Date) => dayjs(date).fromNow();
 
+	console.log();
+	
+
 	return (
 		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)"}}>
 			<Link to={`/events/${event.id}`}>

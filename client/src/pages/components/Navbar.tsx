@@ -43,7 +43,7 @@ const Navbar = () => {
 			{isUserTabOpen && (
 				<div
 					onClick={handleLogout} // Use handleLogout function to perform logout
-					className="cursor-pointer bg-slate-100 rounded absolute -bottom-5 shadow right-4 z-10"
+					className="cursor-pointer bg-slate-100 rounded absolute -bottom-5 shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] right-4 z-10"
 				>
 					<span className="p-4 rounded">ออกจากระบบ</span>
 				</div>

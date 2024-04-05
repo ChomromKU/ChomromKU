@@ -205,21 +205,42 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
           />
           {postType === 'event' && (
             <div className="text-sm absolute bottom-[58px]">
-              <Fragment>
-                <Group className="pb-1">
+              {/* <Fragment> */}
+                {/* <Group className="pb-1"> */}
                   วันเริ่มต้นและสิ้นสุด: 
                   <DatePickerInput 
                   control={control} 
                   name={'startDate'} 
                   placeholder="เลือกวันเริ่มต้น" 
-                  variant="unstyled" />
+                  variant="unstyled"
+                  styles={{
+                    monthThead: {
+                      backgroundColor: "#28C3D7",
+                      height: '36px',
+                      width: '36px',
+                      border: "1px solid #F2F2F2",
+                      paddingBottom: '10px !important',
+                      color: "white",
+                    },
+                  }}
+                  />
                   <DatePickerInput
                     control={control}
                     name={'endDate'}
                     placeholder="เลือกวันสิ้นสุด"
                     variant="unstyled"
+                    styles={{
+                      monthThead: {
+                        backgroundColor: "#28C3D7",
+                        height: '36px',
+                        width: '36px',
+                        border: "1px solid #F2F2F2",
+                        paddingBottom: '10px !important',
+                        color: "white",
+                      },
+                    }}
                   />
-                </Group>
+                {/* </Group> */}
                 <Group className="pb-1">
                   ช่วงเวลา:
                   <TimeInput control={control} name={'startTime'} variant="unstyled" /> ถึง
@@ -234,7 +255,7 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
                     className="focus:outline-none"
                   />
                 </Group>
-              </Fragment>
+              {/* </Fragment> */}
             </div>
           )}
         </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Tag from "../../components/Tag";
 import { Post } from "../../../types/post"
 import { FiSend } from "react-icons/fi";
-import { postTypeToColorMap, postTypeToLabelPost } from "../../../lib/post"
+import { postTypeToColorMap, postTypeToLabelPost, getPostTypeEnumValue } from "../../../lib/post"
 import CommentInput from "../../components/CommentInput";
 import LikeButton from "../../components/LikeButton";
 import { useAuth } from "../../../hooks/useAuth";
@@ -52,26 +52,28 @@ const PostDetail = ({ post }: PostDetailProps) => {
 	};
 
 	return (
-		<div className="w-full p-[24px] flex flex-col gap-[10px]">
+		<div className="w-full flex flex-col gap-[15px]">
 			<header>
-				<div className="flex justify-between font-light text-sm my-[10px]">
-					<span>
+				<div className="flex justify-between font-light text-[12px] mb-[15px]">
+					<p>
 						โดย {post.owner.firstNameTh} {post.owner.lastNameTh}
-					</span>
-					{post.createdAt && typeof post.createdAt === 'object' ? (
-						<span>{post.createdAt.toLocaleDateString("th-TH", {
+					</p>
+					{post.createdAt ? (
+						<p>{(new Date(post.createdAt)).toLocaleDateString("th-TH", {
 							year: "numeric",
 							month: "long",
 							day: "numeric",
-						})}</span>
+						})}</p>
 					) : (
-						<span>ไม่ระบุเวลาที่โพส</span>
+						<p>ไม่ระบุเวลาที่โพส</p>
 					)}
 				</div>
-				<span className="text-2xl font-bold">{post.title}</span>
+				<p className="text-2xl font-bold">{post.title}</p>
 			</header>
 			<section className="flex flex-col gap-[15px]">
-				<Tag tagName={postTypeToLabelPost(post.type)} color={postTypeToColorMap(post.type)} />
+				<Tag tagName={postTypeToLabelPost(getPostTypeEnumValue(post.type as unknown as string))}
+                    color={postTypeToColorMap(getPostTypeEnumValue(post.type as unknown as string))} 
+                />
 				<p className="break-all font-light">{post.content}</p>
 				<div className="flex gap-2">
 					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={post.id} type="post" />

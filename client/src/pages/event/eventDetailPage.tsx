@@ -11,9 +11,9 @@ import axios from "axios";
 const EventDetailPage: React.FC = () => {
 	const { user } =  useAuth();
 	const { id } = useParams< {id?: string}>();
-	const [userId, setUserId] = useState<number>(0);
+    const [userId, setUserId] = useState<number>(0);
 	const [event, setEvent] = useState<Events | null>(null);
-  const [club, setClub] = useState<any>(null);
+  	const [club, setClub] = useState<any>(null);
 
 	useEffect(() => {
 		if (user) {
@@ -33,7 +33,9 @@ const EventDetailPage: React.FC = () => {
 			fetchUserId();
 		}
 
-    const fetchEventAndClub = async () => {
+		const fetchEventAndClub = async () => {
+			setEvent(null)
+			setClub(null)
 			if (id) {
 				try {
 					const response = await axios.get(`http://localhost:3001/events/${id}`);
@@ -53,53 +55,62 @@ const EventDetailPage: React.FC = () => {
 				} catch (error) {
 					console.error('Error fetching data:', error);
 				}
-    	};
+			};
 		};
     fetchEventAndClub();
 		window.scrollTo({ top: 0 });
 		
   }, [id]);
 
+
 	if (!event) {
 		return <div>Event not found</div>;
 	}
 
 	return (
-		<div className="flex min-h-screen flex-col items-center bg-white mt-2">
-			<div className="h-fit w-full relative">
-				<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-					<img
-						src={event.imageUrl || "/event.png"}
-						width={0}
-						height={0}
-						sizes="100vw"
-						style={{ width: "auto", maxHeight: "100%", maxWidth: "100%" }}
-						alt={"event"}
-					/>
+		<div className="flex min-h-screen w-full flex-col items-center bg-white relative">
+			{event.imageUrl && 
+				<div className="h-fit w-full">
+					<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+						<img
+							src={event.imageUrl}
+							width={0}
+							height={0}
+							sizes="100vw"
+							style={{ width: "100%", height: "320px", maxWidth: "100%" }}
+							alt={"event"}
+						/>
+					</div>
 				</div>
-				<div className="absolute w-full bottom-0 p-3 font-bold bg-[#006664] text-white rounded-t-xl">
+			}
+			 <div className={`${event.imageUrl && 'translate-y-[-24px]'} w-full`}>
+			 	<div className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${event.imageUrl && 'rounded-t-[20px]'}`}>
 					{event.club.label}
 				</div>
-			</div>
-			<EventDetail event={event} />
-			<div className="w-full px-8 flex flex-col gap-3 mb-4">
-				{event.comments.map((c) => (
-					<CommentBox
-						name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
-						message={c.message}
-						createdAt={c.createdAt}
-						isYou={user ? userId === c.userId : false}
-						firstChar={c.user.firstNameEn.substring(0, 1)}
-						key={c.id}
-					/>
-				))}
-			</div>
-			<p className="font-bold text-[24px] w-full px-8 mb-2">อีเว้นท์ต่างๆจากชมรม</p>
-			<div className="w-full px-8 flex flex-col gap-4">
-				{club?.events.filter((e: Events) => e.id !== event.id).map((e: Events) => (
-					<NewsEvent event={e} key={e.id} clubLabel={club.label} />
-				))}
-			</div>
+				<div className={`${event.imageUrl ? 'px-[24px] pt-[24px]' : 'p-[24px]'}`}>
+					<EventDetail event={event} />
+					<div className="w-full pb-[24px] flex flex-col gap-[15px] mt-[15px]">
+						{event.comments.map((c, index) => (
+							<CommentBox
+								name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
+								message={c.message}
+								createdAt={c.createdAt}
+								isYou={user ? userId === c.userId : false}
+								firstChar={c.user.firstNameEn.substring(0, 1)}
+								isLast={index === event.comments.length - 1}
+								key={c.id}
+							/>
+						))}
+					</div>
+					<p className="font-bold text-[24px] w-full mb-[20px]">อีเว้นท์ต่างๆจากชมรม</p>
+					<div className="w-full flex flex-col gap-[20px]">
+						{club?.events.filter((e:Events ) => e.id !== event.id).map((event: Events) => (
+							<NewsEvent event={event} clubLabel={club?.label} key={event.id} />
+						))}
+					</div>
+				</div>
+				
+			 </div>
 		</div>
 	);
 };

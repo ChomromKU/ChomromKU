@@ -18,7 +18,7 @@ body {
     monospace;
 } */
 
-.m-18a3eca {
+.mantine-DatePicker-weekday {
   padding-bottom: 0 !important;
 }
 
@@ -36,10 +36,19 @@ body {
   width: -webkit-fill-available;
 }
 
+
 .m-730a79ed {
 display: flex;
 justify-content: space-between;
 margin-bottom: 15px;
+}
+
+.m-8f457cd5 {
+  background-color: white;
+}
+
+.m-f6645d97, .m-2351eeb0 {
+  flex: 1;
 }
 
 .mantine-DatePicker-weekday, .mantine-DatePicker-monthCell {
@@ -110,4 +119,24 @@ select {
   box-sizing: border-box;
   -webkit-appearance: none;
   -moz-appearance: none;
+}
+
+.mantine-DatePickerInput-levelsGroup, .mantine-Popover-dropdown{
+  position: absolute;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.mantine-DatePickerInput-month {
+  width: 100%;
+}
+
+.mantine-DatePickerInput-weekday , .mantine-DatePickerInput-monthCell{
+  /* padding: 10px; */
+  height: 33px;
+  width: 50px;
 }

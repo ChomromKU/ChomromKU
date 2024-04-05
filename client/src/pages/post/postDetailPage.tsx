@@ -64,31 +64,50 @@ const PostDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-white mt-2">
-      <div className="h-fit w-full relative">
-        <CarouselWrapper post={post} />
-        <div className="absolute w-full -bottom-5 p-3 font-bold bg-[#006664] text-white rounded-t-xl">
+    <div className="flex min-h-screen w-full flex-col items-center bg-white relative">
+      {post.imageUrl && 
+        <div className="h-fit w-full">
+          {/* <CarouselWrapper post={post} /> */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <img
+                src={post.imageUrl}
+                // src={post.imageUrl || "/event.png"}
+                width={0}
+                height={0}
+                sizes="100vw"
+                style={{ width: "100%", maxHeight: "320px", maxWidth: "100%" }}
+                alt={"event"}
+              />
+            </div>
+        </div>
+      }
+      {/* <div className="absolute w-full -bottom-5 px-[24px] py-[15px] font-bold bg-[#006664] text-white rounded-t-xl"> */}
+      <div className={`${post.imageUrl && 'translate-y-[-24px]'} w-full`}>
+        <div className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${post.imageUrl && 'rounded-t-[20px]'}`}>
           {post.club.label}
         </div>
-      </div>
-      <PostDetail post={post} />
-      <div className="w-full px-[24px] pb-[24px] flex flex-col gap-[15px]">
-        {post.comments.map((c) => (
-          <CommentBox
-            name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
-            message={c.message}
-            createdAt={c.createdAt}
-            isYou={user ? userId === c.userId : false}
-            firstChar={c.user.firstNameEn.substring(0, 1)}
-            key={c.id}
-          />
-        ))}
-      </div>
-      <p className="font-bold text-[24px] w-full px-8 mb-2">โพสต์ต่างๆจากชมรม</p>
-      <div className="w-full px-8 flex flex-col gap-4">
-        {club?.posts.filter((p: Post) => p.id !== post.id).map((p: Post) => (
-        <News post={p} key={p.id} />
-        ))}
+        <div className={`${post.imageUrl ? 'px-[24px] pt-[24px]' : 'p-[24px]'}`}>
+          <PostDetail post={post} />
+          <div className="w-full pb-[24px] flex flex-col gap-[15px] mt-[15px]">
+            {post.comments.map((c, index) => (
+              <CommentBox
+                name={`${c.user.firstNameTh} ${c.user.lastNameTh}`}
+                message={c.message}
+                createdAt={c.createdAt}
+                isYou={user ? user.id === c.userId : false}
+                firstChar={c.user.firstNameEn.substring(0, 1)}
+                isLast={index === post.comments.length - 1}
+                key={c.id}
+              />
+            ))}
+          </div>
+          <p className="font-bold text-[24px] w-full mb-[20px]">โพสต์ต่างๆจากชมรม</p>
+          <div className="w-full flex flex-col gap-[20px]">
+            {club?.posts.filter((p: Post) => p.id !== post.id).map((p: Post) => (
+            <News post={p} key={p.id} />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

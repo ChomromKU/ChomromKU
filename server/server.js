@@ -5,6 +5,8 @@ const cors = require('cors');
 const crypto = require('crypto');
 const axios = require('axios');
 const z = require('zod');
+const bodyParser = require('body-parser');
+const redis = require('redis');
 
 // process
 const PORT = process.env.PORT || 3001;
@@ -21,6 +23,43 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Redis
+const redisClient = redis.createClient();
+
+(async () => {
+    await redisClient.connect();
+})();
+
+redisClient.on('connect', () => console.log('Redis Client Connected'));
+redisClient.on('error', (err) => console.log('Redis Client Connection Error', err));
+
+
+
+// Redis initialization function
+const initRedis = async () => {
+    const redisClient = redis.createClient({ host: '127.0.0.1', port: 6379 });
+
+    redisClient.on('error', err => console.error('Redis error:', err));
+
+    await new Promise((resolve, reject) => {
+        redisClient.on('connect', () => {
+            console.log('Connected to Redis');
+            resolve();
+        });
+        redisClient.on('error', (error) => {
+            console.error('Error connecting to Redis:', error);
+            reject(error);
+        });
+    });
+};
+
+initRedis().catch(console.error);
+
+
 // Clubs
 
 app.get('/clubs', async (req, res) => {
@@ -36,6 +75,63 @@ app.get('/clubs', async (req, res) => {
         res.status(500).json({ error: 'Error fetching book stores' });
     }
 });
+
+// app.get('/clubs', async (req, res) => {
+//     try {
+//         const redisClient = redis.createClient();
+//         const clubsCached = await new Promise((resolve, reject) => {
+//             redisClient.get('clubs', (err, reply) => {
+//                 if (err) reject(err);
+//                 else resolve(reply);
+//             });
+//         });
+
+//         if (clubsCached) {
+//             console.log('Clubs data found in cache');
+//             res.json(JSON.parse(clubsCached));
+//         } else {
+//             const clubs = await prisma.club.findMany({
+//                 include: {
+//                     subscribers: true,
+//                 }
+//             });
+//             redisClient.set('clubs', JSON.stringify(clubs), 'EX', 3600); // Cache for 1 hour
+//             console.log('Clubs data not found in cache, fetched from database');
+//             res.json(clubs);
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Error fetching clubs data' });
+//     }
+// });
+
+// app.get('/clubs', async (req, res) => {
+//     try {
+//         const clubsCached = await new Promise((resolve, reject) => {
+//             redisClient.get('clubs', (err, reply) => {
+//                 if (err) reject(err);
+//                 else resolve(reply);
+//             });
+//         });
+
+//         if (clubsCached) {
+//             console.log('Clubs data found in cache');
+//             res.json(JSON.parse(clubsCached));
+//         } else {
+//             const clubs = await prisma.club.findMany({
+//                 include: {
+//                     subscribers: true,
+//                 }
+//             });
+//             redisClient.set('clubs', JSON.stringify(clubs), 'EX', 3600); // Cache for 1 hour
+//             console.log('Clubs data not found in cache, fetched from database');
+//             res.json(clubs);
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: 'Error fetching clubs data' });
+//     }
+// });
 
 app.get('/clubs/:id', async (req, res) => {
     const { id } = req.params;

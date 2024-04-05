@@ -8,8 +8,7 @@ import { useParams } from "react-router-dom";
 
 
 
-// TODO: cache this
-// const fetchClub = cache((clubId: number) => prisma.club.findUnique({ where: { id: clubId } }));
+
 
 export default function NewEventPage(){
 	const { user } = useAuth();
@@ -17,6 +16,7 @@ export default function NewEventPage(){
     const { id } = useParams();
 
     // const club = await fetchClub(parseInt(params.id));
+    // TODO: cache this
     useEffect(() => {
         const fetchClubs = async () => {
             try {

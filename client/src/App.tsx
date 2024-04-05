@@ -3,6 +3,7 @@ import {
   Route,
   Routes,
 } from 'react-router-dom';
+import ScrollToTop from './ScrollToTop';
 import Navbar from './pages/components/Navbar';
 import Footer from './pages/components/Footer';
 import Main from './pages/main';
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <Navbar />
         <div style={{ minHeight: 'calc(100vh - 160px)', position: 'relative' }}>
           <Routes>
