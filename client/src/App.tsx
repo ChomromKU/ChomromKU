@@ -26,7 +26,7 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <Navbar />
-        <div style={{ minHeight: 'calc(100vh - 160px)', position: 'relative' }}>
+        <div style={{ minHeight: 'calc(100vh - 160px)', position: 'relative'}}>
           <Routes>
               <Route path='/' element={<Main />} />
               <Route path='/login' element={<LoginPage />} />

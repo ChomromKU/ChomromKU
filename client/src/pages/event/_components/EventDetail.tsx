@@ -53,28 +53,28 @@ const EventDetail = ({ event }: EventDetailProps) => {
 	};
 
 	return (
-		<div className="w-full p-[24px] flex flex-col gap-3">
+		<div className="w-full flex flex-col gap-[15px]">
 			<header>
-				<div className="flex justify-between font-light text-sm mb-2">
-					<span>
+				<div className="flex justify-between font-light text-[12px] mb-[15px]">
+					<p>
 						โดย {event.owner?.firstNameTh} {event.owner?.lastNameTh}
-					</span>
-					<span>
-						{event.createdAt instanceof Date ? event.createdAt.toLocaleDateString("th-TH", {
+					</p>
+					<p>
+						{event.createdAt ? (new Date(event.createdAt)).toLocaleDateString("th-TH", {
 							year: "numeric",
 							month: "long",
 							day: "numeric",
 						}) : 'ไม่ระบุเวลาที่โพส'}
-					</span>
+					</p>
 				</div>
-				<div className="flex flex-col gap-2">
-				<span className="text-2xl font-bold">{event.title}</span>
-				<span className="text-xl font-bold">วันเริ่มต้นและสิ้นสุด: {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
-					new Date(event.startDate),)} - {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
-					new Date(event.endDate),)}
-				</span>
-				<span className="text-xl font-bold">สถานที่จัดกิจกรรม: {event.location}</span>
-				<span className="text-xl font-bold">ณ เวลา {event.startTime} - {event.endTime}</span>
+				<div className="flex flex-col gap-[15px]">
+					<p className="text-2xl font-bold">{event.title}</p>
+					<p className="font-normal">วันเริ่มต้นและสิ้นสุด: {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
+						new Date(event.startDate),)} - {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
+						new Date(event.endDate),)}
+					</p>
+					<p className="font-normal">สถานที่จัดกิจกรรม: {event.location}</p>
+					<p className="font-normal">ณ เวลา {event.startTime} - {event.endTime}</p>
 				</div>
 			</header>
 			<section className="flex flex-col gap-4">

@@ -162,7 +162,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 					width={0}
 					height={0}
 					sizes="100vw"
-					style={{ width: "auto", height: "400px", borderRadius: '10px' }}
+					style={{ width: "100%", height: "400px", borderRadius: '10px' }}
 					alt={"event"}
 				/>
 				) : (

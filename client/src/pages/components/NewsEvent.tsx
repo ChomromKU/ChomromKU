@@ -159,17 +159,15 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 				</Link>
 			</div>
 			<div className="w-full relative mb-2" style={{ display: "flex", justifyContent: "center" }}>
-				{event.imageUrl ? (
+				{event.imageUrl && (
 					<img
 						src={event.imageUrl}
 						width={0}
 						height={0}
 						sizes="100vw"
-						style={{ width: "auto", height: "400px", borderRadius: '10px' }}
+						style={{ width: "100%", height: "400px", borderRadius: '10px' }}
 						alt={"event"}
 					/>
-				) : (
-					null
 				)}
 			</div>
 			</Link>
