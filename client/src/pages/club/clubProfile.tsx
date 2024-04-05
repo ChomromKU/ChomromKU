@@ -48,6 +48,20 @@ export default function ClubProfile() {
     const [error, setError] = useState<boolean>(false)
 
     useEffect(() => {
+		const fetchPosts = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/posts`);
+				
+				if(data) {
+					setPosts(data);
+				} else {
+                    console.error('Post data not found in response:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching clubs:', error);
+                setError(true)
+            }
+		};
 		const fetchClubs = async () => {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
@@ -90,17 +104,12 @@ export default function ClubProfile() {
                     console.error('Social Media data not found in response:', data);
                 }
 
-				if(data.posts) {
-					setPosts(data.posts);
-				} else {
-                    console.error('Post data not found in response:', data);
-                }
-
             } catch (error) {
                 console.error('Error fetching clubs:', error);
                 setError(true)
             }
 		};
+		
 		const fetchCurrentMember = async () => {
 			try {
 				const { data } = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
@@ -110,23 +119,29 @@ export default function ClubProfile() {
 			}
 		};
 		const fetchUserId = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
-        if (response.status === 200) {
-          const fetchedUserId = response.data.id;
-          setUserId(fetchedUserId); 
-        } else {
-          console.error('Failed to fetch user id');
-        }
-      } catch (error) {
-        console.error('Error fetching user id:', error);
-      }
-    };
-    if (user?.stdId) {
-      fetchUserId();
-    }
-		fetchClubs();
-		fetchCurrentMember()
+			try {
+				const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
+				if (response.status === 200) {
+				const fetchedUserId = response.data.id;
+				setUserId(fetchedUserId); 
+				} else {
+				console.error('Failed to fetch user id');
+				}
+			} catch (error) {
+				console.error('Error fetching user id:', error);
+			}
+			};
+		if (user?.stdId) {
+			fetchUserId();
+		}
+		const fetchData = async () => {
+			// console.log('fetch posts');
+			await fetchPosts(); // Wait for fetchPosts to complete
+			// console.log('fetch club');
+			fetchClubs(); // Now fetchClubs can be called
+			fetchCurrentMember();
+		};
+		fetchData();
 	}, [id, user?.stdId, userId]);
 
 	const handleFieldChange = (fieldName: string, value: string | SocialMedia) => {

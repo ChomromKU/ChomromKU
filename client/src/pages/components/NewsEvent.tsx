@@ -138,7 +138,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 	return (
 		<div className="w-full p-[15px] rounded-[20px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)"}}>
 			<Link to={`/events/${event.id}`}>
-			<header className="flex items-center gap-2 mb-4">	
+			<header className="flex items-center gap-2 mb-[10px]">	
 				<div className="rounded-full p-4 h-6 w-6 flex items-center justify-center bg-orange-400 color-white">{postOwner?.firstNameEn[0]}</div>
 				<div className="w-full flex-1 flex flex-col">
 					<Link to={`/clubs/${event.clubId}`}>
@@ -152,7 +152,8 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 					<Tag tagName="อีเว้นท์" color="bg-[#F24B4B]" />
 				</div>
 			</header>
-			<div className="mb-2">
+			<p className="text-[24px] font-bold break-all mb-[10px]">{event.title}</p>
+			<div className="mb-[10px] font-light">
 				<span className="mr-2 break-all">{truncateText(event.content)}</span>
 				<Link to={`/events/${event.id}`}>
 					<span style={{ color: "#006664", textDecoration: "underline" }}>อ่านเพิ่มเติม</span>
@@ -201,7 +202,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 			)}
 			<Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
 				<p className="font-light mb-[15px] leading-[25px]">
-					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold">{event.title}</span>
+					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold break-all">{event.title}</span>
 					<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
 				</p>
 				<div className="flex gap-2 items-center justify-center">
@@ -224,7 +225,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 				{ sending ? <p>กำลังลบข้อมูล</p>:
 					<>
 						<p className="font-light mb-[15px] leading-[25px]">
-						คุณปฏิเสธโพสต์หัวข้อ <br/><span className="font-bold">{event.title}</span>
+						คุณปฏิเสธโพสต์หัวข้อ <br/><span className="font-bold break-all">{event.title}</span>
 						<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
 						</p>
 						<div className="flex gap-2 items-center justify-center">

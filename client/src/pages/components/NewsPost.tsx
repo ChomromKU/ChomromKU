@@ -147,7 +147,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
                     />
 				</div>
 			</header>
-			<h1 className="text-[24px] font-bold">{post.title}</h1>
+			<p className="text-[24px] font-bold break-all mb-[10px]">{post.title}</p>
  			<div className="mb-[10px] font-light">
 			 <span className="mr-2 break-all">{truncateText(post.content)}</span>
 				<Link to={`/posts/${post.id}`}>
@@ -202,7 +202,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 			)}
 			<Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
 				<p className="font-light mb-[15px] leading-[25px]">
-					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold">{post.title}</span>
+					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold break-all">{post.title}</span>
 					<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
 				</p>
 				<div className="flex gap-2 items-center justify-center">
@@ -225,7 +225,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 				{ sending ? <p>กำลังลบข้อมูล</p>:
 					<>
 						<p className="font-light mb-[15px] leading-[25px]">
-						คุณปฏิเสธโพสต์หัวข้อ <br/><span className="font-bold">{post.title}</span>
+						คุณปฏิเสธโพสต์หัวข้อ <br/><span className="font-bold break-all">{post.title}</span>
 						<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
 						</p>
 						<div className="flex gap-2 items-center justify-center">

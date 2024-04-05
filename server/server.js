@@ -44,7 +44,7 @@ app.get('/clubs', async (req, res) => {
         const cachedData = await redisConn.get('clubs');
         if (cachedData) {
             // cache hit
-            console.log("Cache hit for clubs");
+            console.log("Cache hit for all clubs");
             const result = JSON.parse(cachedData);
             res.json(result);
             return 
@@ -97,7 +97,7 @@ app.get('/clubs/:id', async (req, res) => {
         const cachedData = await redisConn.get(cacheKey);
         if (cachedData) {
             // Cache hit
-            console.log("Cache hit for club:", id);
+            // console.log("Cache hit for club:", id);
             const club = JSON.parse(cachedData);
             res.json(club);
         } else {
@@ -227,32 +227,91 @@ app.put('/clubs/:id', async (req, res) => {
 });
 
 
+// Post for invidivual club
+
+app.get('/clubs/:id/posts', async (req, res) => {
+    const { id } = req.params;
+    try {
+        posts = await prisma.post.findMany({
+            where: { clubId: parseInt(id) },
+            include: {
+                likes: true,
+            },
+        });
+        res.json(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching posts' });
+    }
+});
+
+
+
 
 // Posts
 
+app.get('/posts', async (req, res) => {
+    const { limit } = req.query;
+    try {
+        let posts;
+        if (limit) {
+            const parsedLimit = parseInt(limit);
+            posts = await prisma.post.findMany({
+                take: parsedLimit,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
+            });
+        } else {
+            posts = await prisma.post.findMany({
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
+            });
+        }
+        res.json(posts);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching posts' });
+    }
+});
+
 // app.get('/posts', async (req, res) => {
 //     const { limit } = req.query;
-//     try {
-//         let posts;
-//         if (limit) {
-//             const parsedLimit = parseInt(limit);
-//             posts = await prisma.post.findMany({
-//                 take: parsedLimit,
-//                 orderBy: { createdAt: 'desc' },
-//                 include: {
-//                     likes: true,
-//                 },
-//             });
-//         } else {
-//             posts = await prisma.post.findMany({
-//                 orderBy: { createdAt: 'desc' },
-//                 include: {
-//                     likes: true,
-//                 },
-//             });
-//         }
+//     const cacheKey = `posts:${limit || 'all'}`;
 
-//         res.json(posts);
+//     try {
+//         const cachedData = await redisConn.get(cacheKey);
+//         if (cachedData) {
+//             // Cache hit
+//             console.log("Cache hit for posts with limit:", limit || 'all');
+//             const posts = JSON.parse(cachedData);
+//             res.json(posts);
+//             return;
+//             } 
+//             // Cache miss
+//             console.log("Cache miss for posts with limit:", limit || 'all');
+//             let posts;
+//             if (limit) {
+//                 const parsedLimit = parseInt(limit);
+//                 posts = await prisma.post.findMany({
+//                     take: parsedLimit,
+//                     orderBy: { createdAt: 'desc' },
+//                     include: {
+//                         likes: true,
+//                     },
+//                 });
+//             } else {
+//                 posts = await prisma.post.findMany({
+//                     orderBy: { createdAt: 'desc' },
+//                     include: {
+//                         likes: true,
+//                     },
+//                 });
+//             }
+//             res.json(posts);
 //     } catch (error) {
 //         console.error(error);
 //         res.status(500).json({ error: 'Error fetching posts' });
@@ -261,7 +320,13 @@ app.put('/clubs/:id', async (req, res) => {
 
 app.get('/posts', async (req, res) => {
     const { limit } = req.query;
-    const cacheKey = `posts:${limit || 'all'}`;
+    let cacheKey = 'posts';
+    
+    if (limit) {
+        cacheKey += `:limit:${limit}`;
+    } else {
+        cacheKey += ':no-limit';
+    }
 
     try {
         const cachedData = await redisConn.get(cacheKey);
@@ -270,34 +335,70 @@ app.get('/posts', async (req, res) => {
             console.log("Cache hit for posts with limit:", limit || 'all');
             const posts = JSON.parse(cachedData);
             res.json(posts);
-        } else {
-            // Cache miss
-            console.log("Cache miss for posts with limit:", limit || 'all');
-            let posts;
-            if (limit) {
-                const parsedLimit = parseInt(limit);
-                posts = await prisma.post.findMany({
-                    take: parsedLimit,
-                    orderBy: { createdAt: 'desc' },
-                    include: {
-                        likes: true,
-                    },
-                });
-            } else {
-                posts = await prisma.post.findMany({
-                    orderBy: { createdAt: 'desc' },
-                    include: {
-                        likes: true,
-                    },
-                });
-            }
-            res.json(posts);
+            return;
         }
+
+        // Cache miss
+        console.log("Cache miss for posts with limit:", limit || 'all');
+        let posts;
+        if (limit) {
+            const parsedLimit = parseInt(limit);
+            posts = await prisma.post.findMany({
+                take: parsedLimit,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
+            });
+        } else {
+            posts = await prisma.post.findMany({
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
+            });
+        }
+        
+        // Update Redis cache with the retrieved posts data
+        await redisConn.set(cacheKey, JSON.stringify(posts), 'EX', 1800); // Cache for 30 minutes
+
+        res.json(posts);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error fetching posts' });
     }
 });
+
+
+
+// app.post('/posts', async (req, res) => {
+//     const postData = req.body;
+//     console.log('Post data:', postData);
+//     try {
+//         const newPost = await prisma.post.create({
+//             data: {
+//                 title: postData.title,
+//                 type: postData.type,
+//                 content: postData.content,
+//                 imageUrl: postData.imageUrl,
+//                 approved: postData.approved,
+//                 createdAt: new Date(),
+//                 updatedAt: new Date(),
+//                 club: {
+//                   connect: { id: parseInt(postData.clubId) } 
+//                 },
+//                 owner: {
+//                   connect: { id: parseInt(postData.ownerId) } 
+//                 },
+//               },
+//         });
+//         res.json(newPost);
+//         console.log('New post created:', newPost);
+//     } catch (error) {
+//         console.error('Error creating post:', error);
+//         res.status(500).json({ error: 'Error creating post' });
+//     }
+// });
 
 
 app.post('/posts', async (req, res) => {
@@ -314,13 +415,44 @@ app.post('/posts', async (req, res) => {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 club: {
-                  connect: { id: parseInt(postData.clubId) } 
+                    connect: { id: parseInt(postData.clubId) } 
                 },
                 owner: {
-                  connect: { id: parseInt(postData.ownerId) } 
+                    connect: { id: parseInt(postData.ownerId) } 
                 },
-              },
+            },
+            include: {
+                likes: true,
+            },
         });
+
+        // Update Redis cache with the new post data
+        const cacheKey = `posts:${postData.limit || 'all'}`; // Cache key for posts with limit or all posts
+        const cachedData = await redisConn.get(cacheKey);
+        let updatedPosts = [];
+
+        if (cachedData) {
+            updatedPosts = JSON.parse(cachedData);
+            updatedPosts.unshift(newPost); // Add the new post to the beginning of the array
+        } else {
+            const existingPosts = await prisma.post.findMany({
+                take: postData.limit ? parseInt(postData.limit) : undefined,
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    likes: true,
+                },
+            });
+            updatedPosts = existingPosts || [];
+            if (postData.limit && updatedPosts.length >= parseInt(postData.limit)) {
+                // Remove the last element if the array length exceeds the limit
+                updatedPosts.pop();
+            }
+            updatedPosts.unshift(newPost); // Add the new post to the beginning of the array
+        }
+
+        // Update the Redis cache with the updated posts data
+        await redisConn.set(cacheKey, JSON.stringify(updatedPosts), 'EX', 1800); // Cache for 30 minutes
+
         res.json(newPost);
         console.log('New post created:', newPost);
     } catch (error) {
@@ -329,73 +461,74 @@ app.post('/posts', async (req, res) => {
     }
 });
 
-app.get('/posts/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const post = await prisma.post.findUnique({
-            where: { id: parseInt(id) },
-            include: {
-                likes: true,
-                comments: {
-                    include: {
-                        user:true,
-                    },
-                },
-                club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, line: true}}}},
-                owner:true,
-            },
-        });
-        if (!post) {
-            return res.status(404).json({ error: 'Post not found' });
-        }
-        res.json(post);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error fetching post' });
-    }
-});
 
 // app.get('/posts/:id', async (req, res) => {
 //     const { id } = req.params;
-//     const cacheKey = `post:${id}`;
-
 //     try {
-//         const cachedData = await redisConn.get(cacheKey);
-//         if (cachedData) {
-//             // Cache hit
-//             console.log("Cache hit for post:", id);
-//             const post = JSON.parse(cachedData);
-//             res.json(post);
-//         } else {
-//             // Cache miss
-//             console.log("Cache miss for post:", id);
-//             const post = await prisma.post.findUnique({
-//                 where: { id: parseInt(id) },
-//                 include: {
-//                     likes: true,
-//                     comments: {
-//                         include: {
-//                             user:true,
-//                         },
+//         const post = await prisma.post.findUnique({
+//             where: { id: parseInt(id) },
+//             include: {
+//                 likes: true,
+//                 comments: {
+//                     include: {
+//                         user:true,
 //                     },
-//                     club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, line: true}}}},
-//                     owner:true,
 //                 },
-//             });
-//             if (!post) {
-//                 return res.status(404).json({ error: 'Post not found' });
-//             }
-
-//             // Set data in cache
-//             await redisConn.set(cacheKey, JSON.stringify(post), 'EX', 1800); // Cache for 30 minutes
-
-//             res.json(post);
+//                 club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, line: true}}}},
+//                 owner:true,
+//             },
+//         });
+//         if (!post) {
+//             return res.status(404).json({ error: 'Post not found' });
 //         }
+//         res.json(post);
 //     } catch (error) {
 //         console.error(error);
 //         res.status(500).json({ error: 'Error fetching post' });
 //     }
 // });
+
+
+// correct ver
+app.get('/posts/:id', async (req, res) => {
+    const { id } = req.params;
+    const cacheKey = `post:${id}`;
+
+    try {
+        const cachedData = await redisConn.get(cacheKey);
+        if (cachedData) {
+            // Cache hit
+            console.log("Cache hit for post:", id);
+            const post = JSON.parse(cachedData);
+            res.json(post);
+        } else {
+            // Cache miss
+            console.log("Cache miss for post:", id);
+            const post = await prisma.post.findUnique({
+                where: { id: parseInt(id) },
+                include: {
+                    likes: true,
+                    comments: {
+                        include: {
+                            user:true,
+                        },
+                    },
+                    club: { select: { id: true, label: true, branch: true, category:true, location: true, phoneNumber: true, socialMedia: { select: { facebook: true, instagram: true, line: true}}}},
+                    owner:true,
+                },
+            });
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+            // Store post data in cache
+            await redisConn.set(cacheKey, JSON.stringify(post), 'EX', 1800); // Cache for 30 minutes
+            res.json(post);
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching post' });
+    }
+});
 
 
 app.put('/posts/:id/approve', async (req, res) => {
@@ -458,123 +591,290 @@ const createLikeSchema = z.object({
     type: z.enum(["event", "post"]),
 });
 
+// app.post('/posts/:id/like', async (req, res) => {
+//     const { id } = req.params;
+//     const body = req.body;
+//     const validator = createLikeSchema.safeParse(body);
+//     if (!validator.success) {
+//         return res.status(400).json("กรุณากรอกข้อมูลให้ถูกต้อง");
+//     }
+//     const { type } = validator.data;
+
+//     try {
+//         const existingLike = await prisma.like.findFirst({
+//             where: {
+//                 userId: body.userId,
+//                 postId: type === "post" ? parseInt(id) : undefined,
+//                 eventId: type === "event" ? parseInt(id) : undefined,
+//             },
+//         });
+//         if (existingLike) {
+//             return res.status(400).json({ error: "User has already liked this post" });
+//         }
+
+//         const newLike = await prisma.like.create({
+//             data: {
+//                 userId: body.userId,
+//                 createdAt: new Date(),
+//                 postId: type === "post" ? parseInt(id) : undefined,
+//                 eventId: type === "event" ? parseInt(id) : undefined,
+//             },
+//         });
+//         res.status(201).json(newLike);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ error: "Error creating like" });
+//     }
+// });
+
 app.post('/posts/:id/like', async (req, res) => {
     const { id } = req.params;
-    const body = req.body;
-    const validator = createLikeSchema.safeParse(body);
-    if (!validator.success) {
-        return res.status(400).json("กรุณากรอกข้อมูลให้ถูกต้อง");
-    }
-    const { type } = validator.data;
+    const { userId } = req.body;
+    const cacheKey = `post:${id}`;
 
     try {
+        // Check if the user has already liked the post
         const existingLike = await prisma.like.findFirst({
             where: {
-                userId: body.userId,
-                postId: type === "post" ? parseInt(id) : undefined,
-                eventId: type === "event" ? parseInt(id) : undefined,
+                userId: parseInt(userId),
+                postId: parseInt(id),
             },
         });
+
         if (existingLike) {
             return res.status(400).json({ error: "User has already liked this post" });
         }
 
+        // Create a new like
         const newLike = await prisma.like.create({
             data: {
-                userId: body.userId,
+                userId: parseInt(userId),
+                postId: parseInt(id),
                 createdAt: new Date(),
-                postId: type === "post" ? parseInt(id) : undefined,
-                eventId: type === "event" ? parseInt(id) : undefined,
             },
         });
+
+        // Fetch the updated post data
+        const updatedPost = await prisma.post.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                likes: true,
+                comments: true,
+                club: true,
+                owner: true,
+            },
+        });
+
+        // Update the cache with the updated post data
+        await redisConn.set(cacheKey, JSON.stringify(updatedPost), 'EX', 1800); // Cache for 30 minutes
+
         res.status(201).json(newLike);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: "Error creating like" });
+        res.status(500).json({ error: 'Error liking post' });
     }
 });
+
+// app.delete('/posts/:id/like', async (req, res) => {
+//     const { id } = req.params;
+//     const { userId } = req.body;
+//     const { type } = req.query; 
+  
+//     try {
+//         const like = await prisma.like.findFirst({
+//             where: {
+//               postId: type === "post" ? parseInt(id) : undefined,
+//               eventId: type === "event" ? parseInt(id) : undefined,
+//               userId: userId,
+//             },
+//           });
+
+//         if (!like) {
+//             return res.status(404).json({ error: "Like not found" });
+//         }
+
+//         const deletedLike = await prisma.like.delete({ where: { id: like.id } });
+//         res.status(200).json(deletedLike);
+//     } catch (error) {
+//         console.error("Error deleting like:", error);
+//         res.status(500).json({ error: "Internal server error" });
+//     }
+// });
 
 app.delete('/posts/:id/like', async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body;
-    const { type } = req.query; 
-  
+    const cacheKey = `post:${id}`;
+
     try {
+        // Find the like
         const like = await prisma.like.findFirst({
             where: {
-              postId: type === "post" ? parseInt(id) : undefined,
-              eventId: type === "event" ? parseInt(id) : undefined,
-              userId: userId,
+                userId: parseInt(userId),
+                postId: parseInt(id),
             },
-          });
+        });
 
         if (!like) {
-            return res.status(404).json({ error: "Like not found" });
+            return res.status(404).json({ error: 'Like not found' });
         }
 
-        const deletedLike = await prisma.like.delete({ where: { id: like.id } });
-        res.status(200).json(deletedLike);
+        // Delete the like
+        await prisma.like.delete({
+            where: { id: like.id },
+        });
+
+        // Fetch the updated post data
+        const updatedPost = await prisma.post.findUnique({
+            where: { id: parseInt(id) },
+            include: {
+                likes: true,
+                comments: true,
+                club: true,
+                owner: true,
+            },
+        });
+
+        // Update the cache with the updated post data
+        await redisConn.set(cacheKey, JSON.stringify(updatedPost), 'EX', 1800); // Cache for 30 minutes
+
+        res.status(200).json({ message: 'Unlike post successfully' });
     } catch (error) {
-        console.error("Error deleting like:", error);
-        res.status(500).json({ error: "Internal server error" });
+        console.error(error);
+        res.status(500).json({ error: 'Error unliking post' });
     }
 });
+
+// const createCommentSchema = z.object({
+// 	message: z.string().min(1).max(1000),
+// 	type: z.enum(["event", "post"]),
+// });
+
+// app.post('/posts/:id/comment', async (req, res) => {
+//     const { id } = req.params;
+// 	const body = req.body;
+
+// 	const validator = createCommentSchema.safeParse(body);
+// 	if (!validator.success) {
+// 		res.json("กรุณากรอกข้อมูลให้ถูกต้อง", { status: 400 });
+// 	}
+// 	const { type, message } = validator.data;
+
+// 	try {
+// 		const newComment = await prisma.comment.create({
+// 			data: {
+// 				message: message,
+// 				userId: body.userId,
+// 				postId: type === "post" ? parseInt(id) : undefined,
+// 				eventId: type === "event" ? parseInt(id) : undefined,
+// 			},
+// 		});
+//         console.log(newComment);
+// 		res.status(201).json(newComment);
+// 	} catch (error) {
+// 		res.json({ error: error }, { status: 500 });
+// 	}
+// });
+
+
+
+// app.get('/posts/:id/comment', async (req, res) => {
+//     const { id } = req.params;
+//     try {
+//         const comments = await prisma.comment.findMany({
+//         where: {
+//           OR: [
+//             { postId: parseInt(id) },
+//             { eventId: parseInt(id) },
+//           ],
+//         },
+//         include: {
+//           user: true,
+//         },
+//         orderBy: {
+//           createdAt: 'desc',
+//         },
+//       });
   
+//       res.status(200).json(comments);
+//     } catch (error) {
+//       console.error('Error fetching comments:', error);
+//       res.status(500).json({ error: 'Error fetching comments' });
+//     }
+//   });
+
 const createCommentSchema = z.object({
-	message: z.string().min(1).max(1000),
-	type: z.enum(["event", "post"]),
+    message: z.string().min(1).max(1000),
+    userId: z.number(),
+    type: z.enum(["event", "post"]),
 });
 
 app.post('/posts/:id/comment', async (req, res) => {
     const { id } = req.params;
-	const body = req.body;
+    const body = req.body;
 
-	const validator = createCommentSchema.safeParse(body);
-	if (!validator.success) {
-		res.json("กรุณากรอกข้อมูลให้ถูกต้อง", { status: 400 });
-	}
-	const { type, message } = validator.data;
+    const validator = createCommentSchema.safeParse(body);
+    if (!validator.success) {
+        return res.status(400).json({ error: "Invalid request data" });
+    }
+    const { message, userId, type } = validator.data;
 
-	try {
-		const newComment = await prisma.comment.create({
-			data: {
-				message: message,
-				userId: body.userId,
-				postId: type === "post" ? parseInt(id) : undefined,
-				eventId: type === "event" ? parseInt(id) : undefined,
-			},
-		});
-        console.log(newComment);
-		res.status(201).json(newComment);
-	} catch (error) {
-		res.json({ error: error }, { status: 500 });
-	}
+    try {
+        const newComment = await prisma.comment.create({
+            data: {
+                message: message,
+                userId: userId,
+                postId: type === "post" ? parseInt(id) : undefined,
+                eventId: type === "event" ? parseInt(id) : undefined,
+                createdAt: new Date(),
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        // Update the cache with the new comment
+        const cacheKey = `post:${id}`;
+        const cachedData = await redisConn.get(cacheKey);
+        if (cachedData) {
+            console.log("Cache hit for pos com:", id);
+            const updatedPost = JSON.parse(cachedData);
+            updatedPost.comments.push(newComment); // Add the new comment to the post's comments array
+            await redisConn.set(cacheKey, JSON.stringify(updatedPost), 'EX', 1800); // Update the cache
+        }
+
+        res.status(201).json(newComment);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating comment' });
+    }
 });
 
 app.get('/posts/:id/comment', async (req, res) => {
     const { id } = req.params;
     try {
         const comments = await prisma.comment.findMany({
-        where: {
-          OR: [
-            { postId: parseInt(id) },
-            { eventId: parseInt(id) },
-          ],
-        },
-        include: {
-          user: true,
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
-  
-      res.status(200).json(comments);
+            where: {
+                OR: [
+                    { postId: parseInt(id) },
+                    { eventId: parseInt(id) },
+                ],
+            },
+            include: {
+                user: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+
+        res.status(200).json(comments);
     } catch (error) {
-      console.error('Error fetching comments:', error);
-      res.status(500).json({ error: 'Error fetching comments' });
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Error fetching comments' });
     }
-  });
+});
+
 
 // Events
 
