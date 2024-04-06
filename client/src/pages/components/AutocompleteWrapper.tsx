@@ -8,12 +8,11 @@ interface AutocompleteWrapperProps {
 }
 
 const AutocompleteWrapper: React.FC<AutocompleteWrapperProps> = ({ data }) => {
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
-//   const handleOptionSubmit = (value: string) => {
-//     navigate(`/clubs/${value}`);
-//   };
-
+  const handleOptionSubmit = (value: string) => {
+    navigate(`/clubs/${value}`);
+  };
   return (
     <div className="w-full rounded-full flex items-center border-2 py-[8px] px-[13px]">
       <img src={searchIcon} alt="" width={16} height={16} className="mr-2" />
@@ -21,7 +20,7 @@ const AutocompleteWrapper: React.FC<AutocompleteWrapperProps> = ({ data }) => {
         <Autocomplete
           placeholder="ค้นหาชมรมและคอมมิวนิตี้ของคุณ"
           data={data}
-          // // onOptionSubmit={handleOptionSubmit}
+          onOptionSubmit={handleOptionSubmit}
           styles={{
             input: {
               width: '100%',

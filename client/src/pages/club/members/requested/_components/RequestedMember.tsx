@@ -1,10 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-import { User } from "../../../../../types/auth";
 import { useDisclosure } from "@mantine/hooks";
 import { Modal } from "@mantine/core";
+import { User } from "../../../../../types/auth";
+
+
 
 interface RequestedMember {
     id: number;

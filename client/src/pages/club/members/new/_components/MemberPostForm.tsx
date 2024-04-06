@@ -1,13 +1,14 @@
-import { Link, useNavigate } from "react-router-dom";
-import { z } from "zod";
-import { useForm ,SubmitHandler, FieldValues } from "react-hook-form";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm ,SubmitHandler, FieldValues } from "react-hook-form";
+import { z } from "zod";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { DynamicSelect } from "../../../../components/DynamicSelect";
-import { useAuth } from "../../../../../hooks/useAuth";
-import { useEffect, useState } from "react";
+
 import closeIcon from '../../../../../images/close.svg'
+// import { useAuth } from "../../../../../hooks/useAuth";
 
 const postFormSchema = z.object({
 	year: z.string().min(1),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Tag from "../../components/Tag";
-import { FiSend } from "react-icons/fi";
+import ShareButton from "../../components/ShareButton";
 import CommentInput from "../../components/CommentInput";
 import { Events } from "../../../types/post";
 import FollowEventButton from "./FollowEventButton";
@@ -83,7 +83,7 @@ const EventDetail = ({ event }: EventDetailProps) => {
 				<div className="flex items-center justify-between">
 					<div className="flex gap-2">
 						<LikeButton isLike={isLike} like={like} unlike={unlike} postId={event.id} type="event" />
-						<FiSend className="h-5 w-5" />
+						<ShareButton />
 					</div>
 					<FollowEventButton
 						eventId={event.id}

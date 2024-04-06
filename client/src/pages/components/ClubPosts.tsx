@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import News from "./NewsPost";
 import NewsEvent from "./NewsEvent";
 import { useEffect, useState } from "react";
-import { Events, Like, PostType } from "../../types/post";
+import { Events, PostType } from "../../types/post";
 import { Post } from "../../types/post";
 import plusIcon from '../../images/plus-icon.svg'
 import {getPostTypeEnumValue} from "../../lib/post";

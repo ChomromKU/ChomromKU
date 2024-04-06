@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
 import axios from "axios";
-import SelectWrapper from "./_components/SelectWrapper";
-import CalendarWrapper, { CalendarWrapperProps } from "./_components/CalendarWrapper";
-import FollowFilter from "./_components/FollowFilter";
+import React, { useEffect, useState } from "react";
 import { Club } from "../../types/club";
 import { User } from "../../types/auth"
 import { useAuth } from "../../hooks/useAuth";
+import SelectWrapper from "./_components/SelectWrapper";
+import FollowFilter from "./_components/FollowFilter";
+import CalendarWrapper, { CalendarWrapperProps } from "./_components/CalendarWrapper";
 
 
 interface ClubWithSubscriber extends Club {
