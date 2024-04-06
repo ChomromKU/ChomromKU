@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import EventBox from '../../components/EventBox';
-import { useParams, Link } from 'react-router-dom'; // Import useParams hook
-
+import { useParams, Link } from 'react-router-dom';
 import { ClubEvent } from '../../../types/club';
+import EventBox from '../../components/EventBox';
 
 interface MembersComponentProps {
   clubId: string;
@@ -15,7 +14,6 @@ const EventComponent: React.FC<MembersComponentProps> = ({ clubId, status }) => 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        // Fetch events from your backend API
         const response = await fetch(`http://localhost:3001/events?clubId=${clubId}&status=${status}`);
         if (response.ok) {
           const data = await response.json();

@@ -1,5 +1,3 @@
-// import { PostType } from "@prisma/client";
-
 import { PostType } from "../types/post";
 
 export function getPostTypeEnumValue(type: string | PostType): PostType | undefined {

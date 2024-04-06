@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { DatePicker, DatePickerProps, DateValue } from "@mantine/dates";
-import "dayjs/locale/th";
-import dayjs from "dayjs";
-import localeData from "dayjs/plugin/localeData";
-import { Indicator } from "@mantine/core";
-import EventBox from "../../components/Event";
-import { animated, useSpring, useTransition } from "@react-spring/web";
 import { Link } from 'react-router-dom'
+import { animated, useSpring, useTransition } from "@react-spring/web";
+import { DatePicker, DatePickerProps, DateValue } from "@mantine/dates";
+import { Indicator } from "@mantine/core";
 import { Club } from "../../../types/club";
 import { User } from "../../../types/auth";
 import { Events } from "../../../types/post";
+import "dayjs/locale/th";
+import dayjs from "dayjs";
+import localeData from "dayjs/plugin/localeData";
+import EventBox from "../../components/Event";
 
 dayjs.extend(localeData);
 dayjs.locale("th");
@@ -43,7 +43,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
   });
 
   useEffect(() => {
-    checkEventsForToday(); // Check for events happening today on component mount
+    checkEventsForToday();
   }, []);
 
   const getNextMonth = (month: number) => (month >= 11 ? 0 : month + 1);
@@ -87,7 +87,7 @@ const CalendarWrapper: React.FC<CalendarWrapperProps> = ({ events }) => {
       const today = dayjs();
       return dayjs(e.startDate).isSame(today, 'day') || dayjs(e.endDate).isSame(today, 'day');
     });
-    setEventToday(todayEvents); // Set today's events to be displayed
+    setEventToday(todayEvents);
     setHasEventsForSelectedDate(todayEvents.length > 0);
   };
 

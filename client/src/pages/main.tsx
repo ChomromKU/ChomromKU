@@ -6,11 +6,15 @@ import News from './components/NewsPost';
 import { Events, Post } from '../types/post';
 import { useAuth } from '../hooks/useAuth';
 import { Club } from "../types/club";
+import Search from "./components/Search";
+import EventBox from "./components/Event";
+import SearchEvents from "./components/SearchEvents";
 
 function Main() {
   const [events, setEvents] = useState<Events[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [searchedEvents, setSearchedEvents] = useState<Events[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -24,6 +28,7 @@ function Main() {
         if (eventsResponse.status === 200) {
           const fetchedEvents: Events[] = eventsResponse.data;
           setEvents(fetchedEvents);
+          setSearchedEvents(fetchedEvents);
         } else {
           console.error('Failed to fetch events');
         }
@@ -53,9 +58,11 @@ function Main() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-[24px] bg-white gap-[20px]">
-      <AutocompleteWrapper data={[]} />
+      <div className="p-6 flex flex-col gap-6 w-full">
+        <SearchEvents events={events} placeholder="ค้นหาอีเว้นท์" />
+      </div>
       <h1 className="self-start text-2xl font-bold">ตารางอีเว้นท์และกิจกรรม</h1>
-      <CalendarWithFilter events={events} user={user} clubs={clubs} />
+      <CalendarWithFilter events={searchedEvents} user={user} clubs={clubs} />
       <h1 className="self-start text-2xl font-bold">โพสต์</h1>
       {loading ? (
         <p>Loading...</p>

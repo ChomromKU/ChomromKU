@@ -1,9 +1,8 @@
 import axios from 'axios';
-
-import Search from "../components/Search";
-import ClubBox from "../components/ClubBox";
 import { useEffect, useState } from "react";
 import { Club } from "../../types/club";
+import Search from "../components/Search";
+import ClubBox from "../components/ClubBox";
 
 
 export default function Clubs() {
@@ -31,7 +30,6 @@ export default function Clubs() {
 				type="clubs"
 				placeholder="ค้นหาชมรม"
 				onSearch={(query) => {
-					// console.log("Search query:", query);
 					const searchClubs = clubs.filter((club) =>
 						club.label.toLowerCase().includes((query || "").toLowerCase())
 					);
