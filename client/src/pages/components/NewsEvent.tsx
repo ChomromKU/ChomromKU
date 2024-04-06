@@ -15,7 +15,7 @@ import { postTypeToColorMap, postTypeToLabelPost } from "../../lib/post";
 import { useDisclosure } from "@mantine/hooks";
 import Modal from "./CustomModal";
 import { useNavigate } from "react-router-dom";
-import { FaRegComment } from "react-icons/fa6";
+import commentIcon from "../../images/chat.svg";
 import { FiSend } from "react-icons/fi";
 import { Club } from "../../types/club";
 import eventImage from '../../images/event.png'
@@ -89,6 +89,18 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 		}
 	};
 	
+	const handleCopyLink = () => {
+    const eventLink = `${window.location.origin}/events/${event.id}`;
+    navigator.clipboard.writeText(eventLink)
+      .then(() => {
+        alert('คัดลอกลิงค์สู่คลิปบอร์ดแล้ว');
+      })
+      .catch((error) => {
+        console.error('Error copying link:', error);
+        alert('คัดลอกลิงค์ล้มเหลว');
+      });
+	}
+	
 	useEffect(() => {
 		const fetchIsLike = async () => {
       if (user) {
@@ -129,10 +141,10 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 		setLikeCount((prev) => prev - 1);
 	};
 
+
 	const truncateText = (text: string) => (text.length >= 100 ? text.substring(0, 99) + "..." : text);
 	const getPreviousTime = (date: Date) => dayjs(date).fromNow();
 
-	console.log();
 	
 
 	return (
@@ -176,8 +188,10 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 				<div>
 					<div className="flex gap-1 mb-2">
 						<LikeButton isLike={isLike} like={like} unlike={unlike} postId={event.id} type={"event"} />
-						<FaRegComment className="h-5 w-5" />
-						<FiSend className="h-5 w-5" />
+						<Link to={`/events/${event.id}`} className="mt-[2px]">
+							<img src={commentIcon} height={16} width={16} alt={"comment"} />
+						</Link>
+						<FiSend className="h-5 w-5 cursor-pointer" onClick={handleCopyLink} />
 					</div>
 					<div className="flex justify-between gap-2">
 						<p className="h-1/2 font-light text-xs">{likeCount} likes</p>

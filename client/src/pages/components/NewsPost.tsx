@@ -11,13 +11,13 @@ import { postTypeToColorMap, postTypeToLabelPost, getPostTypeEnumValue } from ".
 import { useDisclosure } from "@mantine/hooks";
 import eventImage from '../../images/event.png'
 import commentIcon from '../../images/chat.svg'
-import sendIcon from '../../images/send.svg'
 import { Post } from "../../types/post";
 import { SocialMedia } from "../../types/club";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from "react-router-dom";
 import Modal from "./CustomModal";
 import { User } from "../../types/auth";
+import { FiSend } from "react-icons/fi";
 import { PostType } from "../../types/post";
 
 interface NewsProps {
@@ -85,6 +85,18 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 		console.error(error);
 		}
 	};
+
+	const handleCopyLink = () => {
+    const postLink = `${window.location.origin}/posys/${post.id}`;
+    navigator.clipboard.writeText(postLink)
+      .then(() => {
+        alert('คัดลอกลิงค์สู่คลิปบอร์ดแล้ว');
+      })
+      .catch((error) => {
+        console.error('Error copying link:', error);
+        alert('คัดลอกลิงค์ล้มเหลว');
+      });
+	}
 
 	useEffect(() => {
     const fetchIsLike = async () => {
@@ -174,10 +186,10 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 				<div>
 					<div className="flex gap-[10px] mb-[10px]">
 					<LikeButton isLike={isLike} like={like} unlike={unlike} postId={post.id} type={"post"} />
-						<Link to={`/posts/${post.id}`} className="mt-[2px]">
-							<img src={commentIcon} height={16} width={16} alt={"comment"} />
-						</Link>
-						<img src={sendIcon} height={16} width={16} alt={"share"} />
+					<Link to={`/posts/${post.id}`} className="mt-[2px]">
+						<img src={commentIcon} height={16} width={16} alt={"comment"} />
+					</Link>
+					<FiSend className="h-5 w-5 cursor-pointer" onClick={handleCopyLink} />
 					</div>
 					<div className="flex justify-between gap-2">
 						<p className="h-1/2 font-light text-xs">{likeCount} likes</p>

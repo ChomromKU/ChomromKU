@@ -58,7 +58,7 @@ function Main() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-[24px] bg-white gap-[20px]">
-      <div className="p-6 flex flex-col gap-6 w-full">
+      <div className="flex flex-col gap-6 w-full">
         <SearchEvents events={events} placeholder="ค้นหาอีเว้นท์" />
       </div>
       <h1 className="self-start text-2xl font-bold">ตารางอีเว้นท์และกิจกรรม</h1>
