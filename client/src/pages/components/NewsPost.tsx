@@ -87,7 +87,7 @@ const News: React.FC<NewsProps> = ({ post, role, reFetchPost }) => {
 	};
 
 	const handleCopyLink = () => {
-    const postLink = `${window.location.origin}/posys/${post.id}`;
+    const postLink = `${window.location.origin}/posts/${post.id}`;
     navigator.clipboard.writeText(postLink)
       .then(() => {
         alert('คัดลอกลิงค์สู่คลิปบอร์ดแล้ว');
