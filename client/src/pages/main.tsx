@@ -23,7 +23,7 @@ function Main() {
         const [eventsResponse, clubsResponse, postsResponse] = await Promise.all([
           axios.get('http://localhost:3001/events'),
           axios.get('http://localhost:3001/clubs'),
-          axios.get('http://localhost:3001/posts?limit=10')
+          axios.get('http://localhost:3001/posts?limit=20')
         ]);
         if (eventsResponse.status === 200) {
           const fetchedEvents: Events[] = eventsResponse.data;
