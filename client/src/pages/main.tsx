@@ -52,6 +52,8 @@ function Main() {
     };
     fetchData();
   }, []);
+
+  console.log(posts);
   
 
   const { user } = useAuth();

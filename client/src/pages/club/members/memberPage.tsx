@@ -58,7 +58,7 @@ const MembersComponent: React.FC<MembersComponentProps> = ({ clubId, name, role,
             {role === member.role && (
               <MemberBox
                 key={member.id}
-                name={`${member?.user?.titleTh} ${member?.user?.firstNameTh} ${member?.user?.lastNameTh}`}
+                name={`${member?.user?.titleTh}${member?.user?.firstNameTh} ${member?.user?.lastNameTh}`}
                 role={member.role} // Pass the role of the member
                 memberId={member.id}
                 userRole={userRole}

@@ -247,9 +247,6 @@ app.get('/clubs/:id/posts', async (req, res) => {
     }
 });
 
-
-
-
 // Posts
 
 // app.get('/posts', async (req, res) => {
@@ -322,26 +319,26 @@ app.get('/clubs/:id/posts', async (req, res) => {
 
 app.get('/posts', async (req, res) => {
     const { limit } = req.query;
-    let cacheKey = 'posts';
+    // let cacheKey = 'posts';
     
-    if (limit) {
-        cacheKey += `:limit:${limit}`;
-    } else {
-        cacheKey += ':no-limit';
-    }
+    // if (limit) {
+    //     cacheKey += `:limit:${limit}`;
+    // } else {
+    //     cacheKey += ':no-limit';
+    // }
 
     try {
-        const cachedData = await redisConn.get(cacheKey);
-        if (cachedData) {
-            // Cache hit
-            console.log("Cache hit for posts with limit:", limit || 'all');
-            const posts = JSON.parse(cachedData);
-            res.json(posts);
-            return;
-        }
+        // const cachedData = await redisConn.get(cacheKey);
+        // if (cachedData) {
+        //     // Cache hit
+        //     // console.log("Cache hit for posts with limit:", limit || 'all');
+        //     const posts = JSON.parse(cachedData);
+        //     res.json(posts);
+        //     return;
+        // }
 
-        // Cache miss
-        console.log("Cache miss for posts with limit:", limit || 'all');
+        // // Cache miss
+        // console.log("Cache miss for posts with limit:", limit || 'all');
         let posts;
         if (limit) {
             const parsedLimit = parseInt(limit);
@@ -349,6 +346,7 @@ app.get('/posts', async (req, res) => {
                 take: parsedLimit,
                 orderBy: { createdAt: 'desc' },
                 include: {
+                    club: true,
                     likes: true,
                 },
             });
@@ -356,13 +354,14 @@ app.get('/posts', async (req, res) => {
             posts = await prisma.post.findMany({
                 orderBy: { createdAt: 'desc' },
                 include: {
+                    club: true,
                     likes: true,
                 },
             });
         }
         
         // Update Redis cache with the retrieved posts data
-        await redisConn.set(cacheKey, JSON.stringify(posts), 'EX', 1800); // Cache for 30 minutes
+        // await redisConn.set(cacheKey, JSON.stringify(posts), 'EX', 1800); // Cache for 30 minutes
 
         res.json(posts);
     } catch (error) {
@@ -403,9 +402,70 @@ app.get('/posts', async (req, res) => {
 // });
 
 
+// app.post('/posts', async (req, res) => {
+//     const postData = req.body;
+//     console.log('Post data:', postData);
+//     try {
+//         const newPost = await prisma.post.create({
+//             data: {
+//                 title: postData.title,
+//                 type: postData.type,
+//                 content: postData.content,
+//                 imageUrl: postData.imageUrl,
+//                 approved: postData.approved,
+//                 createdAt: new Date(),
+//                 updatedAt: new Date(),
+//                 club: {
+//                     connect: { id: parseInt(postData.clubId) } 
+//                 },
+//                 owner: {
+//                     connect: { id: parseInt(postData.ownerId) } 
+//                 },
+//             },
+//             include: {
+//                 likes: true,
+//             },
+//         });
+
+//         // Update Redis cache with the new post data
+//         const cacheKey = `posts:${postData.limit || 'all'}`; // Cache key for posts with limit or all posts
+//         const cachedData = await redisConn.get(cacheKey);
+//         let updatedPosts = [];
+
+//         if (cachedData) {
+//             updatedPosts = JSON.parse(cachedData);
+//             updatedPosts.unshift(newPost); // Add the new post to the beginning of the array
+//         } else {
+//             const existingPosts = await prisma.post.findMany({
+//                 take: postData.limit ? parseInt(postData.limit) : undefined,
+//                 orderBy: { createdAt: 'desc' },
+//                 include: {
+//                     likes: true,
+//                 },
+//             });
+//             updatedPosts = existingPosts || [];
+//             if (postData.limit && updatedPosts.length >= parseInt(postData.limit)) {
+//                 // Remove the last element if the array length exceeds the limit
+//                 updatedPosts.pop();
+//             }
+//             updatedPosts.unshift(newPost); // Add the new post to the beginning of the array
+//         }
+
+//         // Update the Redis cache with the updated posts data
+//         await redisConn.set(cacheKey, JSON.stringify(updatedPosts), 'EX', 1800); // Cache for 30 minutes
+
+//         res.json(newPost);
+//         console.log('New post created:', newPost);
+//     } catch (error) {
+//         console.error('Error creating post:', error);
+//         res.status(500).json({ error: 'Error creating post' });
+//     }
+// });
+
 app.post('/posts', async (req, res) => {
     const postData = req.body;
     console.log('Post data:', postData);
+    
     try {
         const newPost = await prisma.post.create({
             data: {
@@ -462,6 +522,8 @@ app.post('/posts', async (req, res) => {
         res.status(500).json({ error: 'Error creating post' });
     }
 });
+
+
 
 
 // app.get('/posts/:id', async (req, res) => {

@@ -152,8 +152,8 @@ const RequestedMember: React.FC<RequestedMemberProb> = ({ clubLabel }) => {
                                     { sending ? <p>กำลังส่งข้อมูล</p>:
                                         <>
                                             <p className="font-light mb-2">
-                                                คุณตกลงรับ <span className="font-bold text-[#006664]">{user.firstNameTh} {user.lastNameTh}</span>
-                                                <span> เป็นสมาชิกชมรมใช่หรือไม่</span>
+                                                คุณตกลงรับ <br /><span className="font-bold text-[#006664]">{user.firstNameTh} {user.lastNameTh}</span>
+                                                <span> <br />เป็นสมาชิกชมรมใช่หรือไม่</span>
                                             </p>
                                             <div className="flex gap-2 items-center justify-center">
                                                 <button
@@ -176,8 +176,8 @@ const RequestedMember: React.FC<RequestedMemberProb> = ({ clubLabel }) => {
                                     { sending ? <p>กำลังลบข้อมูล</p>:
                                         <>
                                             <p className="font-light mb-2">
-                                                คุณปฎิเสธ <span className="font-bold text-[#006664]">{user.firstNameTh} {user.lastNameTh}</span>
-                                                <span> เป็นสมาชิกชมรมใช่หรือไม่</span>
+                                                คุณปฎิเสธ <br/><span className="font-bold text-[#006664]">{user.firstNameTh} {user.lastNameTh}</span>
+                                                <span> <br />เป็นสมาชิกชมรมใช่หรือไม่</span>
                                             </p>
                                             <div className="flex gap-2 items-center justify-center">
                                                 <button

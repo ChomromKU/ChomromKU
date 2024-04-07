@@ -61,25 +61,25 @@ const MemberBox: React.FC<MemberBoxProps> = ({ name, role, memberId, userRole })
 
   return (
     <div className="border rounded-[20px] p-[15px]" style={{ boxShadow: "0px 0px 20px 0px rgba(0, 0, 0, 0.10)" }}>
-	{userRole === "PRESIDENT" || userRole === "VICE_PRESIDENT" ? 
-      <p >
+    {userRole === "PRESIDENT" || userRole === "VICE_PRESIDENT" ? (
+        <div className="flex">
+          <p className="w-fit">{name}</p>
+          {role === "ADMIN" && (
+              <button className="ml-auto" onClick={openDecline}>
+                <img width={16} src={minus} alt="Minus" />
+              </button>
+            )}
+            {role === "NORMAL" && (
+              <button className="ml-auto" onClick={openAccept}>
+                <img width={16} src={plus} alt="Plus" />
+              </button>
+            )}
+        </div>)
+    :
+      <p>
         {name}
-        {role === "ADMIN" && (
-          <button onClick={openDecline}>
-            <img  src={minus} alt="Minus" />
-          </button>
-        )}
-        {role === "NORMAL" && (
-          <button onClick={openAccept}>
-            <img src={plus} alt="Plus" />
-          </button>
-        )}
       </p>
-	:
-		<p>
-			{name}
-		</p>
-}
+    }
 
 	  <Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
                                     { sending ? <p>กำลังส่งข้อมูล</p>:
