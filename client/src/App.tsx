@@ -3,7 +3,7 @@ import {
   Route,
   Routes,
 } from 'react-router-dom';
-import ScrollToTop from './ScrollToTop';
+import ScrollToTop from './pages/components/ScrollToTop';
 import Navbar from './pages/components/Navbar';
 import Footer from './pages/components/Footer';
 import Main from './pages/main';

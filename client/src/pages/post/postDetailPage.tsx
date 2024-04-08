@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import PostDetail from './_components/PostDetail';
 import { Post } from '../../types/post';
-import CarouselWrapper from './_components/CarouselWrapper';
 import CommentBox from '../components/CommentBox';
 import { useAuth } from '../../hooks/useAuth';
 import News from '../components/NewsPost';
