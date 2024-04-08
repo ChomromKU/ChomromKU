@@ -15,6 +15,7 @@ type EventDetailProps = {
 };
 
 const EventDetail = ({ event }: EventDetailProps) => {
+	console.log(event);
 	const { user } = useAuth();
 	const { id } = useParams< {id?: string}>();
 	const [userId, setUserId] = useState<number>(0);

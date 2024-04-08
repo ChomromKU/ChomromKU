@@ -62,34 +62,43 @@ export default function ClubProfile() {
                 setError(true)
             }
 		};
-		const fetchClubs = async () => {
+		const fetchEvents = async () => {
 			try {
-				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
-                setClub(data);
-				setError(false);
-				const currentDate = new Date().getTime();
-				const presentEvents = data.events.filter((event: ClubEvent) => {
-					const startDate = new Date(event.startDate).getTime();
-					const endDate = new Date(event.endDate).getTime();
-					return startDate <= currentDate && currentDate <= endDate;
-				});
-				const upcomingEvents = data.events.filter((event: ClubEvent) => {
-					const startDate = new Date(event.startDate).getTime();
-					return startDate > currentDate;
-				});
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}/events`);
+				
+				if(data) {
+					const currentDate = new Date().getTime();
+					const presentEvents = data.filter((event: ClubEvent) => {
+						const startDate = new Date(event.startDate).getTime();
+						const endDate = new Date(event.endDate).getTime();
+						return startDate <= currentDate && currentDate <= endDate;
+					});
+					const upcomingEvents = data.filter((event: ClubEvent) => {
+						const startDate = new Date(event.startDate).getTime();
+						return startDate > currentDate;
+					});
 
-				const combinedEvents = [...presentEvents, ...upcomingEvents];
+					const combinedEvents = [...presentEvents, ...upcomingEvents];
 
-				if (data.events) {
 					setUpcomingEvents(combinedEvents.sort((a, b) => {
 						const startDateA = new Date(a.startDate).getTime();
 						const startDateB = new Date(b.startDate).getTime();
 						return startDateA - startDateB;
 					}));
-					setEvents(data.events)
+					setEvents(data)
 				} else {
-					console.error('Events data not found in response:', data);
-				}
+                    console.error('Post data not found in response:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching clubs:', error);
+                setError(true)
+            }
+		};
+		const fetchClubs = async () => {
+			try {
+				const { data } = await axios.get(`http://localhost:3001/clubs/${id}`);
+                setClub(data);
+				setError(false);
 
 				if (data.members) {
 					setMembers(data.members);
@@ -137,6 +146,7 @@ export default function ClubProfile() {
 		const fetchData = async () => {
 			// console.log('fetch posts');
 			await fetchPosts(); // Wait for fetchPosts to complete
+			await fetchEvents(); // Wait for fetchPosts to complete
 			// console.log('fetch club');
 			fetchClubs(); // Now fetchClubs can be called
 			fetchCurrentMember();

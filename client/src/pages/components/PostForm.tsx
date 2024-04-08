@@ -15,15 +15,7 @@ import { useAuth } from './../../hooks/useAuth';
 import close from "../../images/close.svg";
 import { PostType } from '../../types/post';
 
-
-// // import { useS3Upload } from 'next-s3-upload';
-
-// const postFormSchema = z
-// 	.object({
-// 		...createEventSchema.partial().shape,
-// 		...createPostSchema.partial().shape,
-// 	})
-// 	.omit({ clubId: true });
+//TODO: Implement S3 Upload
 
 const postFormSchema = (postType: PostFormType): ZodType<any, any, any> => {
   if (postType === 'event') {
@@ -49,10 +41,11 @@ export default function PostForm() {
     handleSubmit,
     formState: { errors }
   } = useForm<PostForm>({ resolver: zodResolver(postFormSchema(postType)) });
-  const [image, setImage] = useState<{ name: string; url: string }>({
-    name: '',
-    url: ''
-  });
+  // const [image, setImage] = useState<{ name: string; url: string }>({
+  //   name: '',
+  //   url: ''
+  // });
+  const [file, setFile] = useState<File>();
   
   const fetchCurrentUser = async () => {
     try {
@@ -88,35 +81,7 @@ export default function PostForm() {
     fetchMembers();
   }, []);
 
-// const onSubmit: SubmitHandler<PostForm> = async (data) => {
-  // if (!image.url) {
-  //   alert("กรุณาอัพโหลดรูปภาพ");
-  //   return;
-  // }
-//   try {
-//     if (postType === 'event') {
-//       await axios.post(`http://localhost:3001/events`, {
-//         ...data,
-//         clubId: id,
-//         imageUrl: image.url || "",
-//         approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
-//         ownerId: member?.user.id,
-//       });
-//     } else {
-//       await axios.post(`http://localhost:3001/posts`, {
-//         ...data,
-//         clubId: id,
-//         imageUrl: image.url || "",
-//         type: postType.toUpperCase(),
-//         approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
-//         ownerId: member?.user.id,
-//       });
-//     }
-//     navigate(`/clubs/${id}`);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
+
 
 const onSubmit: SubmitHandler<PostForm> = async (data) => {
   try {
@@ -134,20 +99,44 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
     }
 
     // Create the event post
-    const postData = {
-      ...data,
-      clubId: id,
-      imageUrl: image.url || "",
-      approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
-      ownerId: memberId,
-    };
+    // const postData = {
+    //   ...data,
+    //   clubId: id,
+    //   imageUrl: file || "",
+    //   approved: member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN',
+    //   ownerId: memberId,
+    // };
+
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('content', data.content);
+    formData.append('imageUrl', file || ''); // Append file data here
+    formData.append('approved', member?.role === 'PRESIDENT' || member?.role === 'VICE_PRESIDENT' || member?.role === 'ADMIN' ? 'true' : 'false');
+    formData.append('ownerId', memberId !== undefined ? memberId.toString() : '');
+    formData.append('clubId', id !== undefined ? id.toString() : '');
+
+    if (postType !== 'event') {
+      formData.append('type', postType.toUpperCase())
+    }
+
+    console.log('formData', formData);
 
     if (postType === 'event') {
-      await axios.post(`http://localhost:3001/events`, postData);
+      formData.append('location', data.location);
+      formData.append('startDate', data.startDate);
+      formData.append('endDate', data.endDate);
+      formData.append('startTime', data.startTime);
+      formData.append('endTime', data.endTime);
+      await axios.post(`http://localhost:3001/events`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Set the Content-Type to multipart/form-data
+        }
+      });
     } else {
-      await axios.post(`http://localhost:3001/posts`, {
-        ...postData,
-        type: postType.toUpperCase(),
+      await axios.post(`http://localhost:3001/posts`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data' // Set the Content-Type to multipart/form-data
+        }
       });
     }
     navigate(`/clubs/${id}`);
@@ -161,18 +150,30 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
     setPostType(value);
   }
 
-//   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-//     const files = event.target.files;
-//     if (!files) return;
-//     if (files.length < 1) return;
-//     let file = files[0];
+  // async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    // const files = event.target.files;
+    // if (!files) return;
+    // if (files.length < 1) return;
+    // let file = files[0];
 
-//     const res = await uploadToS3(file);
-//     setImage({
-//       name: 'อัพโหลดภาพสำเร็จ',
-//       url: res.url
-//     });
-//   }
+  //   const res = await uploadToS3(file);
+  //   setImage({
+  //     name: 'อัพโหลดภาพสำเร็จ',
+  //     url: res.url
+  //   });
+  // }
+  const fileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files) return;
+    if (files.length < 1) return;
+    let file = files[0];
+
+    console.log('files', files);
+    console.log(files[0]);
+
+		setFile(file)
+	}
+
 
   return (
     <div className="px-6 py-4">
@@ -261,15 +262,16 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
         </div>
         <div className="flex items-center mt-2 absolute bottom-[16px] w-[calc(100%-48px)]">
           <label htmlFor="file-upload" className="custom-file-upload">
-            {image.name === '' ? 'เพิ่มรูปภาพ' : 'อัพโหลดภาพสำเร็จ'}
+            {file !== undefined ? 'อัพโหลดภาพสำเร็จ' : 'เพิ่มรูปภาพ'}
           </label>
           <input
             id="file-upload"
+            name="imageUrl"
             type="file"
             accept="image/jpeg, image/png"
-            // onChange={handleFileChange}
-            className="hidden"
+            onChange={fileSelected} // Ensure that this is properly bound
           />
+
           <button
             type="submit" 
             form="hook-form"  
