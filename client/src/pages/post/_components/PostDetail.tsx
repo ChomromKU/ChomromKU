@@ -68,13 +68,13 @@ const PostDetail = ({ post }: PostDetailProps) => {
             <p>ไม่ระบุเวลาที่โพส</p>
           )}
         </div>
-        <p className="text-2xl font-bold">{post.title}</p>
+        <p data-testid="post-title" className="text-2xl font-bold">{post.title}</p>
       </header>
       <section className="flex flex-col gap-[15px]">
         <Tag tagName={postTypeToLabelPost(getPostTypeEnumValue(post.type as unknown as string))}
             color={postTypeToColorMap(getPostTypeEnumValue(post.type as unknown as string))} 
         />
-        <p className="break-all font-light">{post.content}</p>
+        <p data-testid="post-content" className="break-all font-light">{post.content}</p>
         <div className="flex gap-2">
           <LikeButton isLike={isLike} like={like} unlike={unlike} postId={post.id} type="post" />
           <ShareButton />

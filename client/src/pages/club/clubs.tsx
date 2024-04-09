@@ -25,8 +25,9 @@ export default function Clubs() {
 	
 	return (
 		<div className="p-[24px] flex flex-col gap-[20px] w-full">
-			<h1 className="text-2xl font-bold">ชมรมทั้งหมด</h1>
+			<h1 data-testid="clubs" className="text-2xl font-bold">ชมรมทั้งหมด</h1>
 			<Search
+				data-testid="club-search-bar"
 				type="clubs"
 				placeholder="ค้นหาชมรม"
 				onSearch={(query) => {
@@ -36,25 +37,25 @@ export default function Clubs() {
 					setFilteredClubs(searchClubs)
 				}}
 			/>
-			<p className="font-bold">บางเขน</p>
+			<p data-testid="bangkhen-branch" className="font-bold">วิทยาเขตบางเขน</p>
 			{filteredClubs
 				.filter((club) => club.branch === "Bangkhen")
 				.map((club) => (
 					<ClubBox clubId={club.id} clubName={club.label} key={club.id} />
 				))}
-			<p className="font-bold">วิทยาเขตกำแพงแสน</p>
+			<p data-testid="kamphaengsaen-branch" className="font-bold">วิทยาเขตกำแพงแสน</p>
 			{filteredClubs
 				.filter((club) => club.branch === "KamphaengSaen")
 				.map((club) => (
 					<ClubBox clubId={club.id} clubName={club.label} key={club.id} />
 				))}
-			<p className="font-bold">วิทยาเขตเฉลิมพระเกียรติ จังหวัดสกลนคร</p>
+			<p data-testid="sakonnakorn-branch" className="font-bold">วิทยาเขตเฉลิมพระเกียรติ จังหวัดสกลนคร</p>
 			{filteredClubs
 				.filter((club) => club.branch === "SakonNakorn")
 				.map((club) => (
 					<ClubBox clubId={club.id} clubName={club.label} key={club.id} />
 				))}
-			<p className="font-bold">วิทยาเขตศรีราชา</p>
+			<p data-testid="sriracha-branch" className="font-bold">วิทยาเขตศรีราชา</p>
 			{filteredClubs
 				.filter((club) => club.branch === "Sriracha")
 				.map((club) => (

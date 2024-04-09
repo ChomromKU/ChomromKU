@@ -6,7 +6,6 @@ import { useAuth } from '../../hooks/useAuth';
 import News from '../components/NewsPost';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Comment } from '../../types/post';
 
 const PostDetailPage: React.FC = () => {
   const { user } = useAuth();
@@ -66,7 +65,6 @@ const PostDetailPage: React.FC = () => {
     <div className="flex min-h-screen w-full flex-col items-center bg-white relative">
       {post.imageUrl && 
         <div className="h-fit w-full">
-          {/* <CarouselWrapper post={post} /> */}
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
               <img
                 src={post.imageUrl}
@@ -80,9 +78,8 @@ const PostDetailPage: React.FC = () => {
             </div>
         </div>
       }
-      {/* <div className="absolute w-full -bottom-5 px-[24px] py-[15px] font-bold bg-[#006664] text-white rounded-t-xl"> */}
       <div className={`${post.imageUrl && 'translate-y-[-24px]'} w-full`}>
-        <div className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${post.imageUrl && 'rounded-t-[20px]'}`}>
+        <div data-testid="club-label" className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${post.imageUrl && 'rounded-t-[20px]'}`}>
           {post.club.label}
         </div>
         <div className={`${post.imageUrl ? 'px-[24px] pt-[24px]' : 'p-[24px]'}`}>
@@ -100,7 +97,7 @@ const PostDetailPage: React.FC = () => {
               />
             ))}
           </div>
-          <p className="font-bold text-[24px] w-full mb-[20px]">โพสต์ต่างๆจากชมรม</p>
+          <p data-testid="posts-from-club" className="font-bold text-[24px] w-full mb-[20px]">โพสต์ต่างๆจากชมรม</p>
           <div className="w-full flex flex-col gap-[20px]">
             {club?.posts.filter((p: Post) => p.id !== post.id).map((p: Post) => (
             <News post={p} key={p.id} />
