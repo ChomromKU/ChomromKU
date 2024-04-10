@@ -127,12 +127,12 @@ export default function ClubProfile() {
 				console.error('Error fetching clubs:', error);
 			}
 		};
+		if (user) {
 		const fetchUserId = async () => {
 			try {
 				const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
 				if (response.status === 200) {
-				const fetchedUserId = response.data.id;
-				setUserId(fetchedUserId); 
+				setUserId(response.data.id); 
 				} else {
 				console.error('Failed to fetch user id');
 				}
@@ -140,7 +140,6 @@ export default function ClubProfile() {
 				console.error('Error fetching user id:', error);
 			}
 			};
-		if (user?.stdId) {
 			fetchUserId();
 		}
 		const fetchData = async () => {

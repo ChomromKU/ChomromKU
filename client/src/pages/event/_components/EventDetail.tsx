@@ -32,6 +32,7 @@ const EventDetail = ({ event }: EventDetailProps) => {
         try {
           const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
           if (response.status === 200) {
+						setUserId(response.data.id);
             setIsLike(event.likes.some((like) => like.userId === response.data.id));
           } else {
             setIsLike(false);
