@@ -127,12 +127,12 @@ export default function ClubProfile() {
 				console.error('Error fetching clubs:', error);
 			}
 		};
+		if (user) {
 		const fetchUserId = async () => {
 			try {
 				const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
 				if (response.status === 200) {
-				const fetchedUserId = response.data.id;
-				setUserId(fetchedUserId); 
+				setUserId(response.data.id); 
 				} else {
 				console.error('Failed to fetch user id');
 				}
@@ -140,7 +140,6 @@ export default function ClubProfile() {
 				console.error('Error fetching user id:', error);
 			}
 			};
-		if (user?.stdId) {
 			fetchUserId();
 		}
 		const fetchData = async () => {
@@ -183,6 +182,7 @@ export default function ClubProfile() {
 
 			<div className="w-full h-[270px] relative -z-10 flex justify-center">
 				<img
+					data-testid="club-image"
 					src={eventImage}
 					width={0}
 					height={0}
@@ -195,8 +195,8 @@ export default function ClubProfile() {
 			{/* ------------------------------ club detail ------------------------------*/}
 
 			<div className="bg-[#006664] w-ful flex flex-col gap-[15px] p-[24px] text-white rounded-t-[20px] relative -mt-[20px]">
-				<h1 className="font-bold text-[24px]">{club?.label}</h1>
-				<div>
+				<h1 data-testid="club-label" className="font-bold text-[24px]">{club?.label}</h1>
+				<div data-testid="club-information">
 					<p>
 						หมวดหมู่: {editing ? (
 							<input
@@ -333,7 +333,7 @@ export default function ClubProfile() {
 
 			<div>
 				<div className="flex justify-between px-[24px] pt-[24px]">
-					<h1 className="font-bold text-[#006664]">Upcoming Event</h1>
+					<h1 data-testid="upcoming-events" className="font-bold text-[#006664]">Upcoming Event</h1>
 					<Link
 						to={`/clubs/${club?.id}/events`}
 						className="text-[12px] underline underline-offset-2 text-center h-min my-auto"
@@ -365,7 +365,7 @@ export default function ClubProfile() {
 
 			<div className="bg-[#FFFFDD]">
 				<div className="flex justify-between px-[24px] pt-[24px]">
-				<h1 className="font-bold">จำนวนสมาชิก {members.length ?? 0} คน</h1>
+				<h1 data-testid="club-members"className="font-bold">จำนวนสมาชิก {members.length ?? 0} คน</h1>
 					<CustomLink
 						to={`/clubs/${club?.id}/members`}
 						state={{ role: (members.find(member => member.user.stdId === user?.stdId)?.role), clubLabel: club.label }}
@@ -390,7 +390,7 @@ export default function ClubProfile() {
 
 			<div className="p-[24px] flex flex-col gap-[20px]">
 				<div className="flex">
-					<p className="font-bold text-[24px] w-full ">โพสต์</p>
+					<p data-testid="club-posts" className="font-bold text-[24px] w-full ">โพสต์</p>
 					{(roleUser === "PRESIDENT" || roleUser === "VICE_PRESIDENT" || roleUser === "ADMIN") && (
 						<Link to={"/clubs/" + club.id + "/posts/requested"} className="w-min whitespace-nowrap underline h-min my-auto text-[12px]">
 							โพสต์ที่รออนุมัติ

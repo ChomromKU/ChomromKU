@@ -103,7 +103,7 @@ export default function ClubPosts({ posts, events,clubId, clubLabel }: ClubPosts
             </div>
           ))}
       {filteredData.length === 0 && selectedTypes.length !== 0 && <p>ไม่พบข้อมูล</p>}
-      <Link to={`/clubs/${clubId}/posts/new`} className="fixed bottom-[24px] right-[24px] z-50">
+      <Link data-testid="create-post-button"to={`/clubs/${clubId}/posts/new`} className="fixed bottom-[24px] right-[24px] z-50">
         <img alt="line" src={plusIcon} width="64" height="64" />
       </Link>
     </>

@@ -63,9 +63,9 @@ function Main() {
       <div className="flex flex-col gap-6 w-full">
         <SearchEvents events={events} placeholder="ค้นหาอีเว้นท์" />
       </div>
-      <h1 className="self-start text-2xl font-bold">ตารางอีเว้นท์และกิจกรรม</h1>
+      <h1 data-testid="calendar" className="self-start text-2xl font-bold">ตารางอีเว้นท์และกิจกรรม</h1>
       <CalendarWithFilter events={searchedEvents} user={user} clubs={clubs} />
-      <h1 className="self-start text-2xl font-bold">โพสต์</h1>
+      <h1 data-testid="posts" className="self-start text-2xl font-bold">โพสต์</h1>
       {loading ? (
         <p>Loading...</p>
       ) : (

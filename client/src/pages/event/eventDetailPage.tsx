@@ -84,7 +84,7 @@ const EventDetailPage: React.FC = () => {
 				</div>
 			}
 			 <div className={`${event.imageUrl && 'translate-y-[-24px]'} w-full`}>
-			 	<div className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${event.imageUrl && 'rounded-t-[20px]'}`}>
+			 	<div data-testid="club-label" className={`w-full px-[24px] py-[15px] font-bold bg-[#006664] text-white ${event.imageUrl && 'rounded-t-[20px]'}`}>
 					{event.club.label}
 				</div>
 				<div className={`${event.imageUrl ? 'px-[24px] pt-[24px]' : 'p-[24px]'}`}>
@@ -102,7 +102,7 @@ const EventDetailPage: React.FC = () => {
 							/>
 						))}
 					</div>
-					<p className="font-bold text-[24px] w-full mb-[20px]">อีเว้นท์ต่างๆจากชมรม</p>
+					<p data-testid="events-from-club" className="font-bold text-[24px] w-full mb-[20px]">อีเว้นท์ต่างๆจากชมรม</p>
 					<div className="w-full flex flex-col gap-[20px]">
 						{club?.events.filter((e:Events ) => e.id !== event.id).map((event: Events) => (
 							<NewsEvent event={event} clubLabel={club?.label} key={event.id} />

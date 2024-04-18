@@ -61,6 +61,7 @@ export default function LoginPage() {
       <div>
         <a href={"/"}>
           <img
+              data-testid="logo"
               className="absolute top-0 right-0 mr-6 mt-[80px]"
               src={close}
               alt={"close"}
@@ -73,15 +74,17 @@ export default function LoginPage() {
         </div>
       </div>
       <div className="w-full flex flex-col items-start justify-start gap-2">
-        <label className="font-bold">บัญชีผู้ใช้เครือข่ายนนทรี</label>
+        <label data-testid="username-text" className="font-bold">บัญชีผู้ใช้เครือข่ายนนทรี</label>
         <input
+          data-testid="username-input"
           className="w-full mb-1 rounded-full py-1.5 px-3 border border-gray-100 text-sm placeholder:text-sm"
           placeholder="เช่น b63xxxxxxxx หรือ regxxx"
           value={formData.username}
           onChange={handleUsernameChange}
         />
-        <label className="font-bold">รหัสผ่าน</label>
+        <label data-testid="password-text" className="font-bold">รหัสผ่าน</label>
         <input
+          data-testid="password-input"
           className="w-full rounded-full py-1.5 px-3 border border-gray-100 placeholder:text-sm"
           placeholder="รหัสผ่านบัญชีผู้ใช้เครือข่ายนนทรี"
           type="password"
@@ -95,6 +98,7 @@ export default function LoginPage() {
         null
       )}
       <button
+        data-testid="login-button"
         onClick={onSubmit}
         className="rounded-full py-1.5 px-6 bg-[#006664] text-white text-sm"
       >

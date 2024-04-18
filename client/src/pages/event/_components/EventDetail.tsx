@@ -71,18 +71,18 @@ const EventDetail = ({ event }: EventDetailProps) => {
 					</p>
 				</div>
 				<div className="flex flex-col gap-[15px]">
-					<p className="text-2xl font-bold">{event.title}</p>
-					<p className="font-normal">วันเริ่มต้นและสิ้นสุด: {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
+					<p data-testid="event-title" className="text-2xl font-bold">{event.title}</p>
+					<p data-testid="event-date" className="font-normal">วันเริ่มต้นและสิ้นสุด: {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
 						new Date(event.startDate),)} - {Intl.DateTimeFormat("th-TH", { year: "2-digit", month: "short", day: "numeric" }).format(
 						new Date(event.endDate),)}
 					</p>
-					<p className="font-normal">สถานที่จัดกิจกรรม: {event.location}</p>
-					<p className="font-normal">ณ เวลา {event.startTime} - {event.endTime}</p>
+					<p data-testid="event-location" className="font-normal">สถานที่จัดกิจกรรม: {event.location}</p>
+					<p data-testid="event-time" className="font-normal">ณ เวลา {event.startTime} - {event.endTime}</p>
 				</div>
 			</header>
 			<section className="flex flex-col gap-4">
 				<Tag tagName={"อีเว้นท์"} color={"bg-[#F24B4B]"} />
-				<p className="font-light break-all">{event.content}</p>
+				<p data-testid="event-content" className="font-light break-all">{event.content}</p>
 				<div className="flex items-center justify-between">
 					<div className="flex gap-2">
 						<LikeButton isLike={isLike} like={like} unlike={unlike} postId={event.id} type="event" />
