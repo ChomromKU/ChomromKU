@@ -30,6 +30,7 @@ const PostDetail = ({ post }: PostDetailProps) => {
         try {
           const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
           if (response.status === 200) {
+            setUserId(response.data.id);
             setIsLike(post.likes.some((like) => like.userId === response.data.id));
           } else {
             setIsLike(false);

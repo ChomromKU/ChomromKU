@@ -214,7 +214,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 					</button>
 				</div>
 			)}
-			<Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+			<Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
 				<p className="font-light mb-[15px] leading-[25px]">
 					คุณตกลงอนุมัติโพสต์หัวข้อ <br/><span className="font-bold break-all">{event.title}</span>
 					<p>โดย {postOwner?.titleTh} {postOwner?.firstNameTh} {postOwner?.lastNameTh} ใช่หรือไม่</p>
@@ -235,7 +235,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 					</button>
 				</div>
 			</Modal>
-			<Modal centered opened={openedDecline} onClose={closeDecline} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedDecline && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+			<Modal centered opened={openedDecline} onClose={closeDecline} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedDecline && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
 				{ sending ? <p>กำลังลบข้อมูล</p>:
 					<>
 						<p className="font-light mb-[15px] leading-[25px]">
@@ -264,7 +264,7 @@ const NewsEvent: React.FC<NewsEventProps> = ({ event, role, clubLabel, reFetchPo
 				opened={successModalOpened}
 				onClose={closeSuccessModal}
 				withCloseButton={false}
-				className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
+				className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
 			>
 				<p>สำเร็จ</p>
 			</Modal>

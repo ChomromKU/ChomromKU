@@ -147,7 +147,7 @@ const postFormSchema = z.object({
 								  <textarea rows={4} className="border-b w-full" {...register("reason")} />
 							  </div>
 						  
-							  <Modal centered opened={opened} onClose={close} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${opened && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+							  <Modal centered opened={opened} onClose={close} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${opened && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
 								  { sending ? <p>กำลังส่งข้อมูล</p>:
 									  <>
 										  <p className="font-light mb-[5px]">คุณตกลงส่งใบสมัครเข้าเป็นสมาชิกชมรม ใช่หรือไม่</p>
@@ -175,7 +175,7 @@ const postFormSchema = z.object({
 							  opened={successModalOpened}
 							  onClose={closeSuccessModal}
 							  withCloseButton={false}
-							  className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
+							  className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
 						  >
 							  <p>ส่งข้อมูลสำเร็จ</p>
 						  </Modal>

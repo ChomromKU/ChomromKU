@@ -9,6 +9,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { postTypeToColorMap, postTypeToLabelPost, getPostTypeEnumValue } from "../../../lib/post"
+import { set } from "zod";
 
 type EventDetailProps = {
 	event: Events;
@@ -32,6 +33,7 @@ const EventDetail = ({ event }: EventDetailProps) => {
         try {
           const response = await axios.get(`http://localhost:3001/users/${user?.stdId}`);
           if (response.status === 200) {
+			setUserId(response.data.id);
             setIsLike(event.likes.some((like) => like.userId === response.data.id));
           } else {
             setIsLike(false);

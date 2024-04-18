@@ -81,7 +81,7 @@ const MemberBox: React.FC<MemberBoxProps> = ({ name, role, memberId, userRole })
       </p>
     }
 
-	  <Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+	  <Modal centered opened={openedAccept} onClose={closeAccept} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedAccept && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
                                     { sending ? <p>กำลังส่งข้อมูล</p>:
                                         <>
                                             <p className="font-light mb-2">
@@ -106,7 +106,7 @@ const MemberBox: React.FC<MemberBoxProps> = ({ name, role, memberId, userRole })
                                         </>
                                     }
                                 </Modal>
-								<Modal centered opened={openedDecline} onClose={closeDecline} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedDecline && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
+								<Modal centered opened={openedDecline} onClose={closeDecline} withCloseButton={false} className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${openedDecline && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}>
                                     { sending ? <p>กำลังลบข้อมูล</p>:
                                         <>
                                             <p className="font-light mb-2">
@@ -137,7 +137,7 @@ const MemberBox: React.FC<MemberBoxProps> = ({ name, role, memberId, userRole })
                                     opened={successModalOpened}
                                     onClose={closeSuccessModal}
                                     withCloseButton={false}
-                                    className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
+                                    className={`shadow-[0_0_20px_-0_rgba(0,0,0,0.1)] w-[312px] ${successModalOpened && 'p-[15px]'} rounded-[20px] bg-white fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center`}
                                 >
                                     <p>สำเร็จ</p>
                                 </Modal>

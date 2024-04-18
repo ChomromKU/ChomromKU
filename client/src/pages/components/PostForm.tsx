@@ -270,6 +270,7 @@ const onSubmit: SubmitHandler<PostForm> = async (data) => {
             type="file"
             accept="image/jpeg, image/png"
             onChange={fileSelected} // Ensure that this is properly bound
+            className="hidden"
           />
 
           <button
